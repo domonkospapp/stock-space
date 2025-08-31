@@ -35,7 +35,7 @@ export default function Portfolio() {
 
   const getTransactionsForStock = (isin: string): Transaction[] => {
     return processedTransactions.filter(
-      (transaction) => transaction.isin === isin
+      (transaction) => transaction.isin === isin,
     );
   };
 
@@ -51,7 +51,7 @@ export default function Portfolio() {
 
     return positions
       .filter(
-        (position) => position.totalShares > 0 && position.averagePrice > 0
+        (position) => position.totalShares > 0 && position.averagePrice > 0,
       )
       .map((position, index) => {
         const positionValue = position.totalShares * position.averagePrice;
@@ -89,7 +89,7 @@ export default function Portfolio() {
               transform: "rotate(-90deg)",
             }}
             title={`${position.stockName}: ${percentage.toFixed(
-              1
+              1,
             )}% (€${positionValue.toFixed(2)})`}
           />
         );
@@ -125,7 +125,7 @@ export default function Portfolio() {
 
   const totalValue = calculateTotalValue(portfolioSummary);
   const activePositions = portfolioSummary.filter(
-    (position) => position.totalShares > 0
+    (position) => position.totalShares > 0,
   );
 
   return (
@@ -164,7 +164,7 @@ export default function Portfolio() {
                   const change = (Math.random() - 0.5) * 20;
                   currentPrice = Math.max(
                     50,
-                    Math.min(150, currentPrice + change)
+                    Math.min(150, currentPrice + change),
                   );
 
                   const x = (i / 29) * width;
@@ -262,7 +262,7 @@ export default function Portfolio() {
                           ((points[points.length - 1]?.price -
                             points[0]?.price) /
                             points[0]?.price) *
-                            100
+                            100,
                         ).toFixed(1)}
                         %
                       </span>
@@ -396,7 +396,10 @@ export default function Portfolio() {
 
                     return acc;
                   },
-                  {} as Record<string, { shares: number; transactions: number }>
+                  {} as Record<
+                    string,
+                    { shares: number; transactions: number }
+                  >,
                 );
 
                 // Convert to array and sort by date
@@ -405,7 +408,7 @@ export default function Portfolio() {
                   .sort(
                     (a, b) =>
                       new Date(a.monthYear).getTime() -
-                      new Date(b.monthYear).getTime()
+                      new Date(b.monthYear).getTime(),
                   );
 
                 // Calculate running total
@@ -417,7 +420,7 @@ export default function Portfolio() {
 
                 const maxShares = Math.max(
                   ...chartData.map((d) => d.cumulativeShares),
-                  1
+                  1,
                 );
 
                 return chartData.map((data, index) => (
@@ -469,7 +472,7 @@ export default function Portfolio() {
                 👆 Click on any position above to view its purchase history
               </div>
               <div className="text-gray-500 text-sm">
-                You'll see all transactions, current shares, and average price
+                You will see all transactions, current shares, and average price
                 for the selected stock
               </div>
             </div>
