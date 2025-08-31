@@ -20,7 +20,7 @@ export type Transaction = {
   type: TransactionType;
 };
 
-export type StockSummary = {
+export type Position = {
   stockName: string;
   isin: string;
   totalShares: number;
