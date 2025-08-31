@@ -21,10 +21,9 @@ export function createPortfolioSummary(
 
     if (transaction.amount > 0) {
       // Buy transaction - add to lots
-      const price = parseFloat(transaction.price.replace(",", "."));
       stock.lots.push({
         shares: transaction.amount,
-        price: price,
+        price: transaction.price,
       });
       stock.totalShares += transaction.amount;
     } else if (transaction.amount < 0) {

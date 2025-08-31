@@ -27,7 +27,7 @@ const getTransactionType = (transaction: CsvTransaction): TransactionType => {
 };
 
 export default function processedTransactions(
-  csvTransaction: CsvTransaction[]
+  csvTransaction: CsvTransaction[],
 ): Transaction[] {
   const transactions = structuredClone(csvTransaction);
   const splitProcessed = processSplits(transactions);
@@ -47,7 +47,7 @@ export default function processedTransactions(
 }
 
 export function processSplits(
-  transactions: CsvTransaction[]
+  transactions: CsvTransaction[],
 ): CsvTransaction[] {
   const splitTransactions: SplitTransaction[] = [];
 
@@ -83,11 +83,11 @@ export function processSplits(
         const positiveTransactions = group.filter((t) => t.amount > 0);
 
         const totalNegativeShares = Math.abs(
-          negativeTransactions.reduce((sum, t) => sum + t.amount, 0)
+          negativeTransactions.reduce((sum, t) => sum + t.amount, 0),
         );
         const totalPositiveShares = positiveTransactions.reduce(
           (sum, t) => sum + t.amount,
-          0
+          0,
         );
         const splitRatio = totalPositiveShares / totalNegativeShares;
 
@@ -95,7 +95,7 @@ export function processSplits(
         const hasSplitDescription = group.some(
           (t) =>
             t.transactionInfo.toLowerCase().includes("split") ||
-            t.transactionInfo.toLowerCase().includes("verhältnis")
+            t.transactionInfo.toLowerCase().includes("verhältnis"),
         );
 
         if (splitRatio > 0.1 && splitRatio < 10 && hasSplitDescription) {
@@ -103,7 +103,7 @@ export function processSplits(
           const splitDate = new Date(
             parseInt(year),
             parseInt(month) - 1,
-            parseInt(day)
+            parseInt(day),
           );
           splitTransactions.push({
             isin: group[0].isin,
@@ -126,7 +126,7 @@ export function processSplits(
         const groupDate = new Date(
           parseInt(year),
           parseInt(month) - 1,
-          parseInt(day)
+          parseInt(day),
         );
         return (
           groupDate.getTime() === split.date.getTime() && !split.isIsinChanging
@@ -140,16 +140,16 @@ export function processSplits(
       const dateSplitTransactions = group.filter(
         (t) =>
           t.transactionInfo.toLowerCase().includes("split") ||
-          t.transactionInfo.toLowerCase().includes("verhältnis")
+          t.transactionInfo.toLowerCase().includes("verhältnis"),
       );
 
       if (dateSplitTransactions.length >= 2) {
         // This is likely an ISIN-changing split
         const negativeTransactions = dateSplitTransactions.filter(
-          (t) => t.amount < 0
+          (t) => t.amount < 0,
         );
         const positiveTransactions = dateSplitTransactions.filter(
-          (t) => t.amount > 0
+          (t) => t.amount > 0,
         );
 
         if (
@@ -157,11 +157,11 @@ export function processSplits(
           positiveTransactions.length > 0
         ) {
           const totalNegativeShares = Math.abs(
-            negativeTransactions.reduce((sum, t) => sum + t.amount, 0)
+            negativeTransactions.reduce((sum, t) => sum + t.amount, 0),
           );
           const totalPositiveShares = positiveTransactions.reduce(
             (sum, t) => sum + t.amount,
-            0
+            0,
           );
           const splitRatio = totalPositiveShares / totalNegativeShares;
 
@@ -170,7 +170,7 @@ export function processSplits(
             const splitDate = new Date(
               parseInt(year),
               parseInt(month) - 1,
-              parseInt(day)
+              parseInt(day),
             );
 
             // For ISIN-changing splits, create a single special marker
@@ -202,7 +202,7 @@ export function processSplits(
         const txDate = new Date(
           parseInt(year),
           parseInt(month) - 1,
-          parseInt(day)
+          parseInt(day),
         );
         return (
           split.affectedIsins!.includes(tx.isin) &&
@@ -216,7 +216,7 @@ export function processSplits(
         const txDate = new Date(
           parseInt(year),
           parseInt(month) - 1,
-          parseInt(day)
+          parseInt(day),
         );
         return (
           tx.isin === split.isin && txDate.getTime() < split.date.getTime()
@@ -229,17 +229,11 @@ export function processSplits(
       if (split.ratio > 1) {
         // Forward split (e.g., 1:3) - historical transactions should show adjusted values
         tx.amount = Math.round(tx.amount * split.ratio);
-        const currentPrice = parseFloat(tx.price.replace(",", "."));
-        tx.price = (Math.round((currentPrice / split.ratio) * 100) / 100)
-          .toFixed(2)
-          .replace(".", ",");
+        tx.price = Math.round((tx.price / split.ratio) * 100) / 100;
       } else if (split.ratio < 1) {
         // Reverse split (e.g., 4:1) - historical transactions should show adjusted values
         tx.amount = Math.round(tx.amount * split.ratio);
-        const currentPrice = parseFloat(tx.price.replace(",", "."));
-        tx.price = (Math.round((currentPrice / split.ratio) * 100) / 100)
-          .toFixed(2)
-          .replace(".", ",");
+        tx.price = Math.round((tx.price / split.ratio) * 100) / 100;
       }
     });
   });
@@ -252,7 +246,7 @@ export function processSplits(
       const transactionDate = new Date(
         parseInt(year),
         parseInt(month) - 1,
-        parseInt(day)
+        parseInt(day),
       );
 
       // Check if this transaction is on a split date

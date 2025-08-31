@@ -3,7 +3,7 @@ export type CsvTransaction = {
   stockName: string;
   isin: string;
   amount: number;
-  price: string;
+  price: number;
   currency: string;
   transactionInfo: string;
 };
@@ -15,7 +15,7 @@ export type Transaction = {
   stockName: string;
   isin: string;
   amount: number;
-  price: string;
+  price: number;
   currency: string;
   type: TransactionType;
 };

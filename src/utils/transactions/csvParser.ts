@@ -13,7 +13,7 @@ export default function csvParser(text: string): CsvTransaction[] {
         stockName: row[4] || "",
         isin: row[3] || "",
         amount: row[5] ? Number(row[5].split(",")[0]) : 0,
-        price: row[9] || "",
+        price: row[9] ? parseFloat(row[9].replace(",", ".")) : 0,
         currency: row[10] || "",
         transactionInfo: row[7] || "",
       }));

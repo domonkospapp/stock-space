@@ -5,7 +5,9 @@ import { useState } from "react";
 import { CsvTransaction, Transaction, Position } from "utils/types";
 import processedTransactions from "utils/transactions/processTransactions";
 import { createPortfolioSummary } from "utils/transactions/createPortfolioSummary";
+import { savePortfolioToLocalStorage } from "utils/localStorage";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -13,6 +15,7 @@ export default function Home() {
   const [processedData, setProcessedData] = useState<Transaction[]>([]);
   const [portfolioSummary, setPortfolioSummary] = useState<Position[]>([]);
   const [activeTab, setActiveTab] = useState<string>("original");
+  const router = useRouter();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -213,15 +216,18 @@ export default function Home() {
             </div>
             <div className="flex justify-center flex-col mt-2">
               <h2>
-                The import was successfull, check the data and if exerything
-                looks good, open your Portfolio!
+                The import was successful, check the data and if everything
+                looks good, save your Portfolio!
               </h2>
-              <a
-                className="relative text-2xl bg-amber-200 text-black p-5"
-                href="/dashboard"
+              <button
+                className="relative text-2xl bg-amber-200 text-black p-5 hover:bg-amber-300 transition-colors cursor-pointer"
+                onClick={() => {
+                  savePortfolioToLocalStorage(portfolioSummary, processedData);
+                  router.push("/portfolio");
+                }}
               >
-                Open Portfolio
-              </a>
+                Save Portfolio to Local Storage
+              </button>
             </div>
           </>
         )}
