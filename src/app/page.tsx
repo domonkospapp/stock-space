@@ -1,5 +1,6 @@
-import getStockPrice from "components/actions/getStockPrice";
 import Image from "next/image";
+import Link from "next/link";
+import getStockPrice from "../actions/getStockPrice";
 
 export default async function Home() {
   const results = await getStockPrice("US88160R1014");
@@ -21,9 +22,9 @@ export default async function Home() {
           <li>✅ Clean, modern insights Flatex doesn’t give you</li>
         </ul>
         <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
+          <Link
             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href={"fileUpload"}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -35,7 +36,7 @@ export default async function Home() {
               height={20}
             />
             Upload Your Flatex CSV
-          </a>
+          </Link>
 
           <a
             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
