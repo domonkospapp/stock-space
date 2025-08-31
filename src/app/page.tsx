@@ -1,6 +1,13 @@
+import getStockPrice from "components/actions/getStockPrice";
 import Image from "next/image";
+import yahooFinance from "yahoo-finance2";
 
-export default function Home() {
+export default async function Home() {
+  // US88160R1014
+  //
+  const results = await getStockPrice("US88160R1014");
+  const { ticker, price, currency } = results;
+
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
@@ -21,7 +28,7 @@ export default function Home() {
             .
           </li>
           <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
+            {ticker} stock is {price} {currency} now.
           </li>
         </ol>
 
