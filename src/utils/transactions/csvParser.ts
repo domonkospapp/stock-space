@@ -1,11 +1,11 @@
 "use client";
 
-import { ProcessedTransaction } from "../types";
+import { CsvTransaction } from "../types";
 
-export default function csvParser(text: string): ProcessedTransaction[] {
+export default function csvParser(text: string): CsvTransaction[] {
   const rows = text.split("\n").map((row) => row.split(";"));
   if (rows.length > 0) {
-    const transactionData: ProcessedTransaction[] = rows
+    const transactionData: CsvTransaction[] = rows
       .slice(1)
       .filter((row) => row.length > 1 && row[1]?.trim() !== "") // Skip empty rows
       .map((row) => ({
