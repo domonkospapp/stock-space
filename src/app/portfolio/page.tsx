@@ -6,6 +6,7 @@ import {
   loadPortfolioFromLocalStorage,
   hasPortfolioData,
 } from "utils/localStorage";
+import getStockPrice from "../../actions/getStockPrice";
 
 export default function Portfolio() {
   const [portfolioSummary, setPortfolioSummary] = useState<Position[]>([]);
@@ -14,14 +15,35 @@ export default function Portfolio() {
   >([]);
   const [loading, setLoading] = useState(true);
   const [selectedStock, setSelectedStock] = useState<string | null>(null);
+  const [fullValue, setFullValue] = useState(0);
 
   useEffect(() => {
-    if (hasPortfolioData()) {
-      const data = loadPortfolioFromLocalStorage();
-      setPortfolioSummary(data.portfolioSummary);
-      setProcessedTransactions(data.processedTransactions);
-    }
-    setLoading(false);
+    const fetchStockPrices = async () => {
+      if (hasPortfolioData()) {
+        const data = loadPortfolioFromLocalStorage();
+
+        try {
+          const { extendedSummary, totalCurrentValue } =
+            await fetchCurrentStockPrices(data.portfolioSummary);
+
+          setPortfolioSummary(extendedSummary);
+          setProcessedTransactions(data.processedTransactions);
+          setFullValue(totalCurrentValue);
+        } catch (error) {
+          console.error("Error fetching stock prices:", error);
+          // Fallback to original data if API calls fail
+          setPortfolioSummary(data.portfolioSummary);
+          setProcessedTransactions(data.processedTransactions);
+          setFullValue(calculateTotalValue(data.portfolioSummary));
+        }
+      }
+      setLoading(false);
+    };
+
+    fetchStockPrices();
+
+    // Return cleanup function (even if empty)
+    return () => {};
   }, []);
 
   const calculateTotalValue = (positions: Position[]): number => {
@@ -35,12 +57,47 @@ export default function Portfolio() {
 
   const getTransactionsForStock = (isin: string): Transaction[] => {
     return processedTransactions.filter(
-      (transaction) => transaction.isin === isin,
+      (transaction) => transaction.isin === isin
     );
   };
 
   const handleStockSelect = (isin: string) => {
     setSelectedStock(selectedStock === isin ? null : isin);
+  };
+
+  const fetchCurrentStockPrices = async (
+    portfolioData: Position[]
+  ): Promise<{ extendedSummary: Position[]; totalCurrentValue: number }> => {
+    let totalCurrentValue = 0;
+
+    const extendedSummary = await Promise.all(
+      portfolioData.map(async (position: Position) => {
+        try {
+          const price = await getStockPrice(position.isin);
+          const currentValue = position.totalShares * price.price || 0;
+          totalCurrentValue += currentValue;
+
+          return {
+            ...position,
+            currentValue,
+          };
+        } catch (error) {
+          console.error(`Error fetching price for ${position.isin}:`, error);
+
+          // Fallback to average price if current price fetch fails
+          const fallbackValue =
+            position.totalShares * position.averagePrice || 0;
+          totalCurrentValue += fallbackValue;
+
+          return {
+            ...position,
+            currentValue: fallbackValue,
+          };
+        }
+      })
+    );
+
+    return { extendedSummary, totalCurrentValue };
   };
 
   const createPieChart = (positions: Position[]) => {
@@ -51,7 +108,7 @@ export default function Portfolio() {
 
     return positions
       .filter(
-        (position) => position.totalShares > 0 && position.averagePrice > 0,
+        (position) => position.totalShares > 0 && position.averagePrice > 0
       )
       .map((position, index) => {
         const positionValue = position.totalShares * position.averagePrice;
@@ -89,7 +146,7 @@ export default function Portfolio() {
               transform: "rotate(-90deg)",
             }}
             title={`${position.stockName}: ${percentage.toFixed(
-              1,
+              1
             )}% (€${positionValue.toFixed(2)})`}
           />
         );
@@ -125,14 +182,14 @@ export default function Portfolio() {
 
   const totalValue = calculateTotalValue(portfolioSummary);
   const activePositions = portfolioSummary.filter(
-    (position) => position.totalShares > 0,
+    (position) => position.totalShares > 0
   );
 
   return (
     <div className="min-h-screen bg-gray-900 p-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-8xl font-bold mb-8 text-white">
-          {totalValue.toLocaleString("en-US", {
+          {fullValue.toLocaleString("en-US", {
             style: "currency",
             currency: "USD",
           })}
@@ -164,7 +221,7 @@ export default function Portfolio() {
                   const change = (Math.random() - 0.5) * 20;
                   currentPrice = Math.max(
                     50,
-                    Math.min(150, currentPrice + change),
+                    Math.min(150, currentPrice + change)
                   );
 
                   const x = (i / 29) * width;
@@ -262,7 +319,7 @@ export default function Portfolio() {
                           ((points[points.length - 1]?.price -
                             points[0]?.price) /
                             points[0]?.price) *
-                            100,
+                            100
                         ).toFixed(1)}
                         %
                       </span>
@@ -347,7 +404,7 @@ export default function Portfolio() {
                     </div>
                     <div className="text-right">
                       <div className="font-semibold text-white">
-                        €{positionValue.toFixed(2)}
+                        €{position.currentValue?.toFixed(2)}
                       </div>
                       <div className="text-sm text-gray-400">
                         {percentage.toFixed(1)}%
@@ -396,10 +453,7 @@ export default function Portfolio() {
 
                     return acc;
                   },
-                  {} as Record<
-                    string,
-                    { shares: number; transactions: number }
-                  >,
+                  {} as Record<string, { shares: number; transactions: number }>
                 );
 
                 // Convert to array and sort by date
@@ -408,7 +462,7 @@ export default function Portfolio() {
                   .sort(
                     (a, b) =>
                       new Date(a.monthYear).getTime() -
-                      new Date(b.monthYear).getTime(),
+                      new Date(b.monthYear).getTime()
                   );
 
                 // Calculate running total
@@ -420,7 +474,7 @@ export default function Portfolio() {
 
                 const maxShares = Math.max(
                   ...chartData.map((d) => d.cumulativeShares),
-                  1,
+                  1
                 );
 
                 return chartData.map((data, index) => (
