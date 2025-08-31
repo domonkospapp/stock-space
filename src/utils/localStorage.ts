@@ -5,16 +5,16 @@ const PROCESSED_TRANSACTIONS_KEY = "processed_transactions";
 
 export const savePortfolioToLocalStorage = (
   portfolioSummary: Position[],
-  processedTransactions: Transaction[]
+  processedTransactions: Transaction[],
 ): void => {
   try {
     localStorage.setItem(
       PORTFOLIO_SUMMARY_KEY,
-      JSON.stringify(portfolioSummary)
+      JSON.stringify(portfolioSummary),
     );
     localStorage.setItem(
       PROCESSED_TRANSACTIONS_KEY,
-      JSON.stringify(processedTransactions)
+      JSON.stringify(processedTransactions),
     );
     console.log("Portfolio data saved to local storage successfully");
   } catch (error) {
@@ -29,7 +29,7 @@ export const loadPortfolioFromLocalStorage = (): {
   try {
     const portfolioSummary = localStorage.getItem(PORTFOLIO_SUMMARY_KEY);
     const processedTransactions = localStorage.getItem(
-      PROCESSED_TRANSACTIONS_KEY
+      PROCESSED_TRANSACTIONS_KEY,
     );
 
     return {
