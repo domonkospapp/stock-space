@@ -27,6 +27,7 @@ export type Position = {
   averagePrice: number;
   currency: string;
   currentPrice?: number;
+  currentPriceCurrency?: string;
   currentValue?: number;
   gainLoss?: number;
   gainLossPercent?: number;
