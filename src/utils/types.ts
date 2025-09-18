@@ -31,6 +31,7 @@ export type Position = {
   currentValue?: number;
   gainLoss?: number;
   gainLossPercent?: number;
+  ticker?: string;
   lots: Array<{
     shares: number;
     price: number;

@@ -135,6 +135,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
                 currentValue: currentValueUSD,
                 currentPrice: price.price,
                 currentPriceCurrency: price.currency,
+                ticker: price.ticker,
               },
             },
             calculatedIsins: { ...s.calculatedIsins, [position.isin]: true },
@@ -160,6 +161,61 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
           }
           const fallbackValueUSD =
             position.totalShares * position.averagePrice * rateToUSD;
+          // Try to extract a better ticker from the company name
+          let fallbackTicker = position.stockName;
+
+          // Check if this looks like an ISIN (starts with letters followed by numbers)
+          const isinPattern = /^[A-Z]{2}[0-9]+/;
+          if (isinPattern.test(position.stockName)) {
+            // This looks like an ISIN, try to find the company name from the original transaction data
+            const { processedTransactions } = get();
+            const matchingTransaction = processedTransactions.find(
+              (t) => t.isin === position.isin
+            );
+
+            if (
+              matchingTransaction &&
+              matchingTransaction.stockName !== position.stockName
+            ) {
+              // Use the actual company name from the transaction
+              const words = matchingTransaction.stockName.split(" ");
+              if (words.length > 0) {
+                let firstWord = words[0];
+                firstWord = firstWord
+                  .replace(/\.(COM|INC|CORP|LTD|LLC|ADR|AG|SA|NV|SE)$/i, "")
+                  .replace(/[^A-Z0-9]/g, "")
+                  .substring(0, 8);
+
+                if (firstWord.length >= 2) {
+                  fallbackTicker = firstWord;
+                }
+              }
+            } else {
+              // Fallback: take first 2-4 letters from ISIN
+              const letters = position.stockName.match(/[A-Z]+/g);
+              if (letters && letters.length > 0) {
+                fallbackTicker = letters[0].substring(0, 4);
+              }
+            }
+          } else {
+            // Extract first word from company name for cleaner display
+            const words = position.stockName.split(" ");
+            if (words.length > 0) {
+              // Take the first word and clean it up
+              let firstWord = words[0];
+
+              // Remove common suffixes and clean up
+              firstWord = firstWord
+                .replace(/\.(COM|INC|CORP|LTD|LLC|ADR|AG|SA|NV|SE)$/i, "") // Remove common company suffixes
+                .replace(/[^A-Z0-9]/g, "") // Keep only letters and numbers
+                .substring(0, 8); // Limit to 8 characters for readability
+
+              if (firstWord.length >= 2) {
+                fallbackTicker = firstWord;
+              }
+            }
+          }
+
           set((s) => ({
             holdingsMap: {
               ...s.holdingsMap,
@@ -168,6 +224,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
                 currentValue: fallbackValueUSD,
                 currentPrice: position.averagePrice,
                 currentPriceCurrency: position.currency,
+                ticker: fallbackTicker,
               },
             },
             calculatedIsins: { ...s.calculatedIsins, [position.isin]: true },
@@ -238,4 +295,3 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
     return processedTransactions.filter((t) => t.isin === isin);
   },
 }));
-

@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { hasPortfolioData } from "utils/localStorage";
 import { usePortfolioStore } from "../../store/portfolioStore";
 import PortfolioHeader from "./components/PortfolioHeader";
-import AllocationPie from "./components/AllocationPie";
-import PositionsList from "./components/PositionsList";
+import PositionsTreemap from "./components/PositionsTreemap";
 import TransactionsChart from "./components/TransactionsChart";
 
 type Currency = "EUR" | "USD";
@@ -94,23 +93,14 @@ export default function Portfolio() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <AllocationPie
-            positions={positions}
+        <div className="mb-8">
+          <PositionsTreemap
+            positions={displayPositions}
             selectedCurrency={selectedCurrency}
             convert={convertCurrency}
-            ratesToUSD={ratesToUSD}
+            onPositionClick={handleStockSelect}
           />
         </div>
-
-        <PositionsList
-          positions={displayPositions}
-          selectedStock={selectedStock}
-          onSelectStock={handleStockSelect}
-          selectedCurrency={selectedCurrency}
-          convert={convertCurrency}
-          ratesToUSD={ratesToUSD}
-        />
 
         <TransactionsChart
           transactions={
