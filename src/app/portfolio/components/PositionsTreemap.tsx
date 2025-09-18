@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Position } from "utils/types";
 
@@ -26,6 +26,7 @@ export default function PositionsTreemap({
   onPositionClick,
 }: PositionsTreemapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
 
   useEffect(() => {
     if (!svgRef.current || positions.length === 0) return;
@@ -98,9 +99,15 @@ export default function PositionsTreemap({
         .attr("y", (d) => (d as any).y0)
         .attr("width", (d) => (d as any).x1 - (d as any).x0)
         .attr("height", (d) => (d as any).y1 - (d as any).y0)
-        .style("fill", "#111827")
+        .style("fill", (d) => {
+          const isin = (d.data as any).isin;
+          return selectedPosition === isin ? "#374151" : "#111827";
+        })
         .style("stroke", "white")
-        .style("stroke-width", "2px")
+        .style("stroke-width", (d) => {
+          const isin = (d.data as any).isin;
+          return selectedPosition === isin ? "3px" : "2px";
+        })
         .style("rx", (d) => {
           const width = (d as any).x1 - (d as any).x0;
           const height = (d as any).y1 - (d as any).y0;
@@ -115,14 +122,18 @@ export default function PositionsTreemap({
         })
         .style("cursor", "pointer")
         .on("click", (event, d) => {
-          onPositionClick?.((d.data as any).isin);
+          const isin = (d.data as any).isin;
+          setSelectedPosition(isin);
+          onPositionClick?.(isin);
         })
         .on("mouseover", function (event, d) {
           d3.select(this).style("fill", "white");
           invertTextColors(svg, d as any, "#111827");
         })
         .on("mouseout", function (event, d) {
-          d3.select(this).style("fill", "#111827");
+          const isin = (d.data as any).isin;
+          const fillColor = selectedPosition === isin ? "#374151" : "#111827";
+          d3.select(this).style("fill", fillColor);
           invertTextColors(svg, d as any, "white");
         });
 
@@ -241,7 +252,10 @@ export default function PositionsTreemap({
                 const rY = parseFloat(d3.select(this).attr("y"));
                 return rX === rectX && rY === rectY;
               })
-              .style("fill", "#111827");
+              .style("fill", (d) => {
+                const isin = (d.data as any).isin;
+                return selectedPosition === isin ? "#374151" : "#111827";
+              });
 
             invertTextColors(svg, rectData, "white");
           });
