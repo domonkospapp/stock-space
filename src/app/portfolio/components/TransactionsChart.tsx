@@ -193,45 +193,45 @@ export default function TransactionsChart({ transactions }: Props) {
   const maxShares = Math.max(...chartData.map((d) => d.cumulativeShares), 1);
 
   return (
-    <div className="mt-8 bg-gray-900 p-6 rounded-lg border border-gray-700 shadow-xl">
+    <div className="mt-8">
       <h3 className="text-lg font-semibold text-white mb-4">
         Cumulative Stock Count Over Time
       </h3>
       <div className="space-y-4">
-        {chartData.map((data) => (
-          <div key={data.monthYear} className="relative">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-300">
-                {data.monthYear}
-              </span>
-              <span className="text-sm text-gray-400">
-                {data.transactions} transactions
-              </span>
-            </div>
-            <div className="relative h-8 bg-gray-700 rounded-full overflow-hidden">
-              <div className="absolute inset-0 flex">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 border-r border-gray-600 last:border-r-0"
-                  />
-                ))}
-              </div>
-              <div
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-lime-400 to-lime-500 rounded-full transition-all duration-500 ease-out"
-                style={{
-                  width: `${(data.cumulativeShares / maxShares) * 100}%`,
-                  minWidth: "20px",
-                }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-medium text-white px-2">
+        {chartData.map((data) => {
+          const progressPercentage = (data.cumulativeShares / maxShares) * 100;
+          const totalSegments = 40; // Total number of segments in the bar
+          const filledSegments = Math.round(
+            (progressPercentage / 100) * totalSegments
+          );
+
+          return (
+            <div key={data.monthYear} className="relative">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-white">
+                  {data.monthYear}
+                </span>
+                <span className="text-sm text-white">
                   {data.cumulativeShares.toLocaleString()} shares
                 </span>
               </div>
+              <div className="flex gap-1">
+                {[...Array(totalSegments)].map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-8 w-2 rounded-full ${
+                      i < filledSegments ? "" : "bg-gray-600"
+                    }`}
+                    style={{
+                      backgroundColor:
+                        i < filledSegments ? "#A3A2F9" : undefined,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
