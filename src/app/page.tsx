@@ -172,7 +172,7 @@ export default function Home() {
       <section className="px-8 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gray-300 p-6 rounded-lg relative">
+            <div className="bg-foreground p-6 rounded-lg relative">
               <div className="absolute top-4 right-4 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
                 <svg
                   className="w-4 h-4 text-white"
@@ -208,7 +208,7 @@ export default function Home() {
                 100% private, all calculations happen in your browser.
               </p>
             </div>
-            <div className="bg-purple-200 p-6 rounded-lg relative">
+            <div className="bg-ci-purple p-6 rounded-lg relative">
               <div className="absolute top-4 right-4 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
                 <svg
                   className="w-4 h-4 text-white"
@@ -228,98 +228,41 @@ export default function Home() {
 
       {/* Three Steps Section */}
       <section className="px-8 py-16">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold font-[hagrid] mb-12">
-            Three simple steps to get started :
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-7xl font-bold font-[hagrid] mb-12">
+            Three simple steps to get started{" "}
+            <span className="text-ci-purple">:</span>
           </h2>
           <div className="space-y-6">
-            <div className="flex items-center justify-between py-4 border-b border-gray-700">
-              <div className="flex items-center space-x-6">
-                <span className="text-2xl font-bold font-[hagrid]">01</span>
-                <div>
-                  <h3 className="text-xl font-[hagrid] mb-1">
-                    Export CSV from Flatex
-                  </h3>
-                  <p className="text-gray-400 font-[hagrid]">
-                    Download your portfolio file directly from Flatex.
-                  </p>
-                </div>
-              </div>
-              <button
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
-                onMouseEnter={() => handlePlayButtonHover(1)}
-                onMouseLeave={handlePlayButtonLeave}
-              >
-                <svg
-                  className="w-4 h-4 text-gray-900 ml-0.5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                </svg>
-              </button>
-            </div>
-            <div className="flex items-center justify-between py-4 border-b border-gray-700">
-              <div className="flex items-center space-x-6">
-                <span className="text-2xl font-bold font-[hagrid]">02</span>
-                <div>
-                  <h3 className="text-xl font-[hagrid] mb-1">
-                    Upload in Stock Space
-                  </h3>
-                  <p className="text-gray-400 font-[hagrid]">
-                    Drag & drop your CSV file into the upload box on this page.
-                  </p>
-                </div>
-              </div>
-              <button
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
-                onMouseEnter={() => handlePlayButtonHover(2)}
-                onMouseLeave={handlePlayButtonLeave}
-              >
-                <svg
-                  className="w-4 h-4 text-gray-900 ml-0.5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                </svg>
-              </button>
-            </div>
-            <div className="flex items-center justify-between py-4">
-              <div className="flex items-center space-x-6">
-                <span className="text-2xl font-bold font-[hagrid]">03</span>
-                <div>
-                  <h3 className="text-xl font-[hagrid] mb-1">
-                    Explore insights instantly
-                  </h3>
-                  <p className="text-gray-400 font-[hagrid]">
-                    View your portfolio with modern visualizations and
-                    analytics.
-                  </p>
-                </div>
-              </div>
-              <button
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
-                onMouseEnter={() => handlePlayButtonHover(3)}
-                onMouseLeave={handlePlayButtonLeave}
-              >
-                <svg
-                  className="w-4 h-4 text-gray-900 ml-0.5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                </svg>
-              </button>
-            </div>
+            <StepExplanation
+              rowIndex={1}
+              title="Export CSV from Flatex"
+              description="Export your data from Flatex in CSV format"
+              onMouseEnter={() => handlePlayButtonHover(1)}
+              onMouseLeave={handlePlayButtonLeave}
+            />
+            <StepExplanation
+              rowIndex={2}
+              title="Import CSV to StockSpace"
+              description="Import your data into StockSpace in CSV format"
+              onMouseEnter={() => handlePlayButtonHover(2)}
+              onMouseLeave={handlePlayButtonLeave}
+            />
+            <StepExplanation
+              rowIndex={3}
+              title="Analyze your data"
+              description="Analyze your data using StockSpace's powerful tools"
+              onMouseEnter={() => handlePlayButtonHover(3)}
+              onMouseLeave={handlePlayButtonLeave}
+            />
           </div>
         </div>
       </section>
 
       {/* Why Stock Space Section */}
       <section className="px-8 py-16">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold font-[hagrid] mb-12">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-7xl font-bold font-[hagrid] mb-12">
             Why Stock Space?
           </h2>
           <div className="h-64 flex items-center justify-center">
@@ -349,3 +292,42 @@ export default function Home() {
     </div>
   );
 }
+
+const StepExplanation = ({
+  onMouseEnter,
+  onMouseLeave,
+  rowIndex,
+  title,
+  description,
+}: {
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  rowIndex: number;
+  title: string;
+  description: string;
+}) => {
+  return (
+    <div className="flex items-center justify-between py-4 border-b border-foreground">
+      <div className="flex items-center space-x-6">
+        <span className="text-7xl font-bold font-[hagrid]">0{rowIndex}</span>
+        <div>
+          <h3 className="text-2xl font-urbanist mb-1">{title}</h3>
+          <p className="text-gray-400 font-urbanist">{description}</p>
+        </div>
+      </div>
+      <button
+        className="w-20 h-20 border-foreground border rounded-full flex items-center justify-center hover:bg-gray-200 group transition-colors"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
+        <svg
+          className="w-8 h-8 text-foreground ml-0.5 group-hover:text-background"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+        </svg>
+      </button>
+    </div>
+  );
+};
