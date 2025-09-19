@@ -101,7 +101,7 @@ export default function PositionsTreemap({
         .attr("height", (d) => (d as any).y1 - (d as any).y0)
         .style("fill", (d) => {
           const isin = (d.data as any).isin;
-          return selectedPosition === isin ? "#374151" : "#111827";
+          return selectedPosition === isin ? "white" : "#111827";
         })
         .style("stroke", "white")
         .style("stroke-width", "1px")
@@ -122,16 +122,6 @@ export default function PositionsTreemap({
           const isin = (d.data as any).isin;
           setSelectedPosition(isin);
           onPositionClick?.(isin);
-        })
-        .on("mouseover", function (event, d) {
-          d3.select(this).style("fill", "white");
-          invertTextColors(svg, d as any, "#111827");
-        })
-        .on("mouseout", function (event, d) {
-          const isin = (d.data as any).isin;
-          const fillColor = selectedPosition === isin ? "#374151" : "#111827";
-          d3.select(this).style("fill", fillColor);
-          invertTextColors(svg, d as any, "white");
         });
 
       // Add text labels
@@ -173,26 +163,6 @@ export default function PositionsTreemap({
     };
 
     // Helper functions
-    const invertTextColors = (svg: any, d: any, color: string) => {
-      const x = d.x0;
-      const y = d.y0;
-      const rectWidth = d.x1 - d.x0;
-      const rectHeight = d.y1 - d.y0;
-
-      svg
-        .selectAll("text")
-        .filter(function (this: any) {
-          const textX = parseFloat(d3.select(this).attr("x"));
-          const textY = parseFloat(d3.select(this).attr("y"));
-          return (
-            textX >= x &&
-            textX <= x + rectWidth &&
-            textY >= y &&
-            textY <= y + rectHeight
-          );
-        })
-        .style("fill", color);
-    };
 
     const addText = (
       svg: any,
@@ -208,55 +178,20 @@ export default function PositionsTreemap({
         .append("text")
         .attr("x", x)
         .attr("y", y)
-        .style("fill", "white")
+        .style(
+          "fill",
+          rectData
+            ? selectedPosition === (rectData.data as any).isin
+              ? "#111827"
+              : "white"
+            : "white"
+        )
         .style("font-size", `${fontSize}px`)
         .style("font-weight", fontWeight)
         .style("font-family", "hagrid-text, system-ui, sans-serif")
         .style("text-anchor", textAnchor)
-        .style("pointer-events", "none") // Prevent text from interfering with hover
+        .style("pointer-events", "none")
         .text(text);
-
-      // Add hover events to text to maintain rectangle hover state
-      if (rectData) {
-        textElement
-          .on("mouseover", function () {
-            // Find the corresponding rectangle and trigger its hover
-            const rectX = rectData.x0;
-            const rectY = rectData.y0;
-            const rectWidth = rectData.x1 - rectData.x0;
-            const rectHeight = rectData.y1 - rectData.y0;
-
-            svg
-              .selectAll("rect")
-              .filter(function (this: any) {
-                const rX = parseFloat(d3.select(this).attr("x"));
-                const rY = parseFloat(d3.select(this).attr("y"));
-                return rX === rectX && rY === rectY;
-              })
-              .style("fill", "white");
-
-            invertTextColors(svg, rectData, "#111827");
-          })
-          .on("mouseout", function () {
-            // Find the corresponding rectangle and trigger its mouseout
-            const rectX = rectData.x0;
-            const rectY = rectData.y0;
-
-            svg
-              .selectAll("rect")
-              .filter(function (this: any) {
-                const rX = parseFloat(d3.select(this).attr("x"));
-                const rY = parseFloat(d3.select(this).attr("y"));
-                return rX === rectX && rY === rectY;
-              })
-              .style("fill", (d) => {
-                const isin = (d.data as any).isin;
-                return selectedPosition === isin ? "#374151" : "#111827";
-              });
-
-            invertTextColors(svg, rectData, "white");
-          });
-      }
 
       return textElement;
     };
