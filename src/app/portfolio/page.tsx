@@ -44,7 +44,7 @@ export default function Portfolio() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl font-[hagrid-text]">Loading portfolio...</div>
+        <div className="text-xl font-[hagrid]">Loading portfolio...</div>
       </div>
     );
   }
@@ -53,15 +53,15 @@ export default function Portfolio() {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4 font-[hagrid-text]">
+          <h1 className="text-2xl font-bold mb-4 font-[hagrid]">
             No Portfolio Data Found
           </h1>
-          <p className="mb-4 font-[hagrid-text]">
+          <p className="mb-4 font-[hagrid]">
             Please upload a CSV file first to view your portfolio.
           </p>
           <a
             href="/fileUpload"
-            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-[hagrid-text]"
+            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-[hagrid]"
           >
             Go to File Upload
           </a>

@@ -190,7 +190,7 @@ export default function PositionsTreemap({
         )
         .style("font-size", `${fontSize}px`)
         .style("font-weight", fontWeight)
-        .style("font-family", "hagrid-text, system-ui, sans-serif")
+        .style("font-family", "hagrid, system-ui, sans-serif")
         .style("text-anchor", textAnchor)
         .style("pointer-events", "none")
         .text(text);
@@ -223,7 +223,7 @@ export default function PositionsTreemap({
         y + topPadding + fontSize,
         name,
         fontSize,
-        "700",
+        "500",
         "start",
         rectData
       );
@@ -242,7 +242,7 @@ export default function PositionsTreemap({
           y + topPadding + fontSize * 2.2,
           valueText,
           valueFontSize,
-          "bold",
+          "400",
           "start",
           rectData
         );
@@ -254,7 +254,7 @@ export default function PositionsTreemap({
           y + topPadding + fontSize,
           `${portfolioPercent.toFixed(1)}%`,
           fontSize,
-          "bold",
+          "400",
           "end",
           rectData
         );
@@ -266,7 +266,7 @@ export default function PositionsTreemap({
           y + topPadding + fontSize * 1.8,
           `${portfolioPercent.toFixed(1)}%`,
           fontSize,
-          "bold",
+          "400",
           "start",
           rectData
         );
@@ -300,7 +300,7 @@ export default function PositionsTreemap({
         y + topPadding + fontSize,
         truncatedName,
         fontSize,
-        "700",
+        "500",
         "start",
         rectData
       );
@@ -319,7 +319,7 @@ export default function PositionsTreemap({
           y + topPadding + fontSize * 2.2,
           valueText,
           valueFontSize,
-          "bold",
+          "400",
           "start",
           rectData
         );
@@ -331,7 +331,7 @@ export default function PositionsTreemap({
           y + topPadding + fontSize,
           `${portfolioPercent.toFixed(1)}%`,
           fontSize,
-          "bold",
+          "400",
           "end",
           rectData
         );
@@ -343,7 +343,7 @@ export default function PositionsTreemap({
           y + topPadding + fontSize * 1.8,
           `${portfolioPercent.toFixed(1)}%`,
           fontSize,
-          "bold",
+          "400",
           "start",
           rectData
         );
@@ -375,7 +375,7 @@ export default function PositionsTreemap({
         y + topPadding + fontSize,
         truncatedName,
         fontSize,
-        "700",
+        "500",
         "start",
         rectData
       );
@@ -389,7 +389,7 @@ export default function PositionsTreemap({
           y + topPadding + fontSize,
           `${portfolioPercent.toFixed(0)}%`,
           fontSize,
-          "bold",
+          "400",
           "end",
           rectData
         );
@@ -401,7 +401,7 @@ export default function PositionsTreemap({
           y + topPadding + fontSize * 2.2,
           `${portfolioPercent.toFixed(0)}%`,
           fontSize,
-          "bold",
+          "400",
           "start",
           rectData
         );
