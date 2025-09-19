@@ -44,7 +44,7 @@ export default function Portfolio() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl">Loading portfolio...</div>
+        <div className="text-xl font-[hagrid-text]">Loading portfolio...</div>
       </div>
     );
   }
@@ -53,13 +53,15 @@ export default function Portfolio() {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">No Portfolio Data Found</h1>
-          <p className="mb-4">
+          <h1 className="text-2xl font-bold mb-4 font-[hagrid-text]">
+            No Portfolio Data Found
+          </h1>
+          <p className="mb-4 font-[hagrid-text]">
             Please upload a CSV file first to view your portfolio.
           </p>
           <a
             href="/fileUpload"
-            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-[hagrid-text]"
           >
             Go to File Upload
           </a>
@@ -71,7 +73,7 @@ export default function Portfolio() {
   const displayPositions = Object.values(holdingsMap);
 
   return (
-    <div className="min-h-screen bg-gray-900 p-8">
+    <div className="min-h-screen p-8" style={{ backgroundColor: "#292929" }}>
       <div className="max-w-6xl mx-auto">
         <PortfolioHeader
           selectedCurrency={selectedCurrency}
@@ -83,15 +85,6 @@ export default function Portfolio() {
           eurToUsd={ratesToUSD["EUR"]}
           lastPriceUpdate={lastPriceUpdate}
         />
-
-        <div className="mb-8 bg-gray-800 border border-gray-700 p-6 rounded-lg shadow-xl">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Portfolio Performance
-          </h2>
-          <div className="h-24 text-gray-400 flex items-center">
-            Chart coming soon…
-          </div>
-        </div>
 
         <div className="mb-8">
           <PositionsTreemap

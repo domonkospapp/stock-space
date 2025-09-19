@@ -66,7 +66,7 @@ export default function PositionsTreemap({
       // Setup dimensions
       const containerWidth = svgRef.current?.parentElement?.clientWidth || 800;
       const width = Math.max(containerWidth - 40, 600);
-      const height = 600;
+      const height = 800;
 
       // Create SVG
       const svg = d3
@@ -101,7 +101,9 @@ export default function PositionsTreemap({
         .attr("height", (d) => (d as any).y1 - (d as any).y0)
         .style("fill", (d) => {
           const isin = (d.data as any).isin;
-          return selectedPosition === isin ? "white" : "#111827";
+          return selectedPosition === isin
+            ? "rgba(255, 255, 255, 0.9)"
+            : "transparent";
         })
         .style("stroke", "white")
         .style("stroke-width", "1px")
