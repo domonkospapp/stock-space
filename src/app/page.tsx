@@ -34,7 +34,7 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen bg-gray-900 text-white"
+      className="min-h-screen bg-ci-black text-white"
       onMouseMove={handleMouseMove}
     >
       {/* Header Navigation */}
@@ -108,16 +108,16 @@ export default function Home() {
       <section className="px-8 pb-16">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex-1 max-w-2xl">
-            <h1 className="text-8xl font-bold font-[hagrid] mb-6 leading-tight">
+            <h1 className="text-7xl font-bold font-[hagrid] mb-6 leading-tight">
               Launch your portfolio
             </h1>
-            <p className="text-xl font-[hagrid] mb-8 text-gray-300">
+            <p className="text-2xl font-[urbanist] mb-8 text-gray-300">
               Upload your Flatex CSV and see your portfolio like never before.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex flex-col space-y-4">
               <Link
                 href="/fileUpload"
-                className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-[hagrid] transition-colors flex items-center space-x-2"
+                className="bg-foreground hover:bg-ci-yellow text-background text-xl font-bold font-[urbanist] px-6 py-2 rounded-full transition-colors flex items-center space-x-2 w-fit h-16"
               >
                 <span>Upload Your Flatex CSV</span>
                 <svg
@@ -145,22 +145,8 @@ export default function Home() {
                     </clipPath>
                   </defs>
                 </svg>
-
-                {/* <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16l-4-4m0 0l4-4m-4 4h18"
-                  />
-                </svg> */}
               </Link>
-              <button className="border border-white text-white px-6 py-3 rounded-lg font-[hagrid] hover:bg-white hover:text-gray-900 transition-colors">
+              <button className="border border-foreground text-foreground px-6 py-2 cursor-pointer rounded-full font-[urbanist] hover:bg-foreground hover:text-background text-xl font-bold transition-colors w-fit h-16">
                 Try Demo Portfolio
               </button>
             </div>
