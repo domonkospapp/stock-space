@@ -104,10 +104,7 @@ export default function PositionsTreemap({
           return selectedPosition === isin ? "#374151" : "#111827";
         })
         .style("stroke", "white")
-        .style("stroke-width", (d) => {
-          const isin = (d.data as any).isin;
-          return selectedPosition === isin ? "3px" : "2px";
-        })
+        .style("stroke-width", "1px")
         .style("rx", (d) => {
           const width = (d as any).x1 - (d as any).x0;
           const height = (d as any).y1 - (d as any).y0;
