@@ -276,13 +276,13 @@ export default function Home() {
       {/* Footer Branding */}
       <footer className="px-8 py-16">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-ci-yellow rounded-lg p-8 relative">
-            <div className="absolute top-4 left-4 w-6 h-6 border-l-4 border-t-4 border-gray-800"></div>
-            <div className="absolute top-4 right-4 w-6 h-6 border-r-4 border-t-4 border-gray-800"></div>
-            <div className="absolute bottom-4 left-4 w-6 h-6 border-l-4 border-b-4 border-gray-800"></div>
-            <div className="absolute bottom-4 right-4 w-6 h-6 border-r-4 border-b-4 border-gray-800"></div>
+          <div className="bg-ci-yellow rounded-b-[4rem] p-48 relative">
+            <div className="absolute top-20 left-8 w-12 h-12 border-l-4 border-t-4 border-background"></div>
+            <div className="absolute top-20 right-8 w-12 h-12 border-r-4 border-t-4 border-background"></div>
+            <div className="absolute bottom-20 left-8 w-12 h-12 border-l-4 border-b-4 border-background"></div>
+            <div className="absolute bottom-20 right-8 w-12 h-12 border-r-4 border-b-4 border-background"></div>
             <div className="flex items-center justify-center">
-              <h1 className="text-6xl font-bold font-[hagrid] text-gray-900">
+              <h1 className="text-8xl font-bold font-[hagrid] text-background">
                 STCK.SPACE
               </h1>
             </div>
