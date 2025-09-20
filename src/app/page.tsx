@@ -172,56 +172,21 @@ export default function Home() {
       <section className="px-8 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-foreground p-6 rounded-lg relative">
-              <div className="absolute top-4 right-4 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <p className="font-[hagrid] text-gray-800 text-sm">
-                No account needed, you get instant access to your data.
-              </p>
-            </div>
-            <div className="bg-green-200 p-6 rounded-lg relative">
-              <div className="absolute top-4 right-4 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <p className="font-[hagrid] text-gray-800 text-sm">
-                100% private, all calculations happen in your browser.
-              </p>
-            </div>
-            <div className="bg-ci-purple p-6 rounded-lg relative">
-              <div className="absolute top-4 right-4 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                </svg>
-              </div>
-              <p className="font-[hagrid] text-gray-800 text-sm">
-                Clean, modern insights Flatex doesn't give you.
-              </p>
-            </div>
+            <Advantage
+              title="Instant Access"
+              text="No account needed, you get instant access to your data."
+              color="bg-foreground"
+            />
+            <Advantage
+              title="Full Privacy"
+              text="100% private, all calculations happen in your browser."
+              color="bg-ci-yellow"
+            />
+            <Advantage
+              title="Fresh Insights"
+              text="Clean, modern insights Flatex doesn’t give you."
+              color="bg-ci-purple"
+            />
           </div>
         </div>
       </section>
@@ -328,6 +293,39 @@ const StepExplanation = ({
           <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
         </svg>
       </button>
+    </div>
+  );
+};
+
+const Advantage = ({
+  title,
+  text,
+  color,
+}: {
+  title: string;
+  text: string;
+  color: string;
+}) => {
+  return (
+    <div className={`p-6 rounded-4xl relative ${color}`}>
+      <div className="absolute top-4 right-4 w-8 h-8 bg-background rounded-full flex items-center justify-center">
+        <svg
+          className="w-4 h-4 text-foreground"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path
+            fillRule="evenodd"
+            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
+      <h3 className="text-2xl font-bold font-urbanist mb-4 text-background">
+        {title}
+      </h3>
+
+      <p className="font-urbanist text-background text-sm mb-2">{text}</p>
     </div>
   );
 };
