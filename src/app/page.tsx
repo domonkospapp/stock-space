@@ -38,13 +38,13 @@ export default function Home() {
       onMouseMove={handleMouseMove}
     >
       {/* Header Navigation */}
-      <header className="flex justify-between items-center p-8">
-        <nav className="flex space-x-8">
+      <header className="flex justify-between items-center py-8 max-w-6xl mx-auto">
+        <nav className="flex space-x-2">
           <Link
             href="/"
-            className={`font-[hagrid] text-lg transition-all ${
+            className={`font-urbanist text-xl transition-all ${
               activeNav === "home"
-                ? "border border-white rounded-full px-4 py-2"
+                ? "border border-white rounded-full px-12 py-2"
                 : "hover:text-gray-300"
             }`}
             onClick={() => setActiveNav("home")}
@@ -53,25 +53,25 @@ export default function Home() {
           </Link>
           <Link
             href="/about"
-            className="font-[hagrid] text-lg hover:text-gray-300"
+            className="font-urbanist text-xl hover:text-gray-300 px-12 py-2"
             onClick={() => setActiveNav("about")}
           >
             about
           </Link>
           <Link
             href="/demo"
-            className="font-[hagrid] text-lg hover:text-gray-300"
+            className="font-urbanist text-xl hover:text-gray-300 px-12 py-2"
             onClick={() => setActiveNav("demo")}
           >
             demo
           </Link>
         </nav>
-        <Link
+        {/*<Link
           href="/login"
           className="font-[hagrid] text-lg hover:text-gray-300"
         >
           login
-        </Link>
+        </Link>*/}
       </header>
 
       {/* Floating Video Player */}
