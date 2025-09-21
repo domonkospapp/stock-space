@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { hasPortfolioData } from "utils/localStorage";
 import { usePortfolioStore } from "../../store/portfolioStore";
 import PortfolioHeader from "./components/PortfolioHeader";
+import PortfolioNavigation from "./components/PortfolioNavigation";
 import PositionsTreemap from "./components/PositionsTreemap";
 import TransactionsChart from "./components/TransactionsChart";
 
@@ -30,6 +31,15 @@ export default function Portfolio() {
 
   useEffect(() => {
     initFromLocalStorage();
+
+    // Load saved currency preference
+    const savedCurrency = localStorage.getItem(
+      "portfolio-currency"
+    ) as Currency;
+    if (savedCurrency && (savedCurrency === "EUR" || savedCurrency === "USD")) {
+      setSelectedCurrency(savedCurrency);
+    }
+
     setLoading(false);
   }, [initFromLocalStorage]);
 
@@ -75,16 +85,16 @@ export default function Portfolio() {
   return (
     <div className="min-h-screen p-8" style={{ backgroundColor: "#292929" }}>
       <div className="max-w-6xl mx-auto">
-        <PortfolioHeader
-          selectedCurrency={selectedCurrency}
-          onSelectCurrency={setSelectedCurrency}
-          isAllCalculated={isAllCalculated}
-          totalCurrentValueUSD={totalCurrentValueUSD}
-          investedUSD={investedUSD}
-          convert={convertCurrency}
-          eurToUsd={ratesToUSD["EUR"]}
-          lastPriceUpdate={lastPriceUpdate}
-        />
+        <div className="flex items-start justify-between mb-8">
+          <PortfolioNavigation />
+          <PortfolioHeader
+            selectedCurrency={selectedCurrency}
+            isAllCalculated={isAllCalculated}
+            totalCurrentValueUSD={totalCurrentValueUSD}
+            investedUSD={investedUSD}
+            convert={convertCurrency}
+          />
+        </div>
 
         <div className="mb-8">
           <PositionsTreemap
