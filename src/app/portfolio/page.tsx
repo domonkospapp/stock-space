@@ -17,10 +17,8 @@ export default function Portfolio() {
 
   const positions = usePortfolioStore((s) => s.positions);
   const holdingsMap = usePortfolioStore((s) => s.holdingsMap);
-  const investedUSD = usePortfolioStore((s) => s.investedUSD);
+  // const investedUSD = usePortfolioStore((s) => s.investedUSD);
   const totalCurrentValueUSD = usePortfolioStore((s) => s.totalCurrentValueUSD);
-  const lastPriceUpdate = usePortfolioStore((s) => s.lastPriceUpdate);
-  const ratesToUSD = usePortfolioStore((s) => s.ratesToUSD);
   const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
   const getTransactionsForStock = usePortfolioStore(
     (s) => s.getTransactionsForStock
@@ -91,7 +89,7 @@ export default function Portfolio() {
             selectedCurrency={selectedCurrency}
             isAllCalculated={isAllCalculated}
             totalCurrentValueUSD={totalCurrentValueUSD}
-            investedUSD={investedUSD}
+            // investedUSD={investedUSD}
             convert={convertCurrency}
           />
         </div>

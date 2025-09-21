@@ -6,7 +6,7 @@ import { CsvTransaction, Transaction, Position } from "utils/types";
 import processedTransactions from "utils/transactions/processTransactions";
 import { createPortfolioSummary } from "utils/transactions/createPortfolioSummary";
 import { savePortfolioToLocalStorage } from "utils/localStorage";
-import Image from "next/image";
+// import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function FileUpload() {
@@ -122,7 +122,7 @@ export default function FileUpload() {
                         </svg>
                         <p className="text-lg font-[urbanist] text-gray-300 mb-2">
                           {csvFile
-                            ? `Selected: ${csvFile.name}`
+                            ? `Selected: ${(csvFile as File).name}`
                             : "Drop your CSV file here or click to browse"}
                         </p>
                         <p className="text-sm text-gray-500">
@@ -178,7 +178,7 @@ export default function FileUpload() {
                   <source src="/videos/how-to.mov" type="video/quicktime" />
                   <source src="/videos/how-to.mov" type="video/mp4" />
                   <p className="text-center text-gray-400 mt-4">
-                    Your browser doesn't support this video format.
+                    Your browser doesn&apos;t support this video format.
                     <br />
                     Please try downloading the video or use a different browser.
                   </p>
@@ -435,7 +435,7 @@ export default function FileUpload() {
                               <td className="py-4 pr-6">
                                 <span
                                   className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    transaction.type === "buy"
+                                    transaction.type === "BUY"
                                       ? "bg-green-500/20 text-green-400"
                                       : "bg-red-500/20 text-red-400"
                                   }`}

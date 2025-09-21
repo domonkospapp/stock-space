@@ -49,7 +49,9 @@ export default function Home() {
         >
           <div className="bg-black rounded-lg p-4 shadow-2xl">
             <video
-              ref={(el) => (videoRefs.current[hoveredVideo - 1] = el)}
+              ref={(el) => {
+                videoRefs.current[hoveredVideo - 1] = el;
+              }}
               className="w-80 h-48 rounded"
               muted
               loop

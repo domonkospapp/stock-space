@@ -36,7 +36,7 @@ export function createPortfolioSummary(
   });
 
   // Create ISIN transition mapping (old ISIN -> new ISIN)
-  stockNameToIsinMap.forEach((isins, stockName) => {
+  stockNameToIsinMap.forEach((isins) => {
     if (isins.length > 1) {
       // Sort ISINs by their first appearance in transactions
       const isinOrder = isins.sort((a, b) => {

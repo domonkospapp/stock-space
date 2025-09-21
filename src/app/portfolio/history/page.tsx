@@ -9,7 +9,6 @@ type Currency = "EUR" | "USD";
 export default function PortfolioHistory() {
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
 
-  const positions = usePortfolioStore((s) => s.positions);
   const processedTransactions = usePortfolioStore(
     (s) => s.processedTransactions
   );
@@ -131,10 +130,14 @@ export default function PortfolioHistory() {
                             />
                             <div>
                               <h3 className="text-white font-[hagrid] text-lg">
-                                {transaction.type} {transaction.shares} shares
+                                {transaction.type}{" "}
+                                {Math.abs(
+                                  transaction.amount / transaction.price
+                                ).toFixed(0)}{" "}
+                                shares
                               </h3>
                               <p className="text-gray-300 font-[urbanist] text-sm">
-                                {transaction.isin} • {transaction.symbol}
+                                {transaction.isin} • {transaction.stockName}
                               </p>
                             </div>
                           </div>
@@ -156,8 +159,8 @@ export default function PortfolioHistory() {
                           </div>
                           <div className="text-gray-400 font-[urbanist] text-sm">
                             {formatCurrency(
-                              Math.abs(transaction.amount / transaction.shares),
-                              transaction.currency
+                              Math.abs(transaction.price),
+                              transaction.currency as Currency
                             )}{" "}
                             per share
                           </div>
