@@ -106,7 +106,7 @@ export default function PositionsTreemap({
             : "transparent";
         })
         .style("stroke", "white")
-        .style("stroke-width", "1px")
+        .style("strokeWidth", "1px")
         .style("rx", (d) => {
           const width = (d as any).x1 - (d as any).x0;
           const height = (d as any).y1 - (d as any).y0;

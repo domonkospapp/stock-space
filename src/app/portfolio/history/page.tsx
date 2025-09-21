@@ -117,7 +117,7 @@ export default function PortfolioHistory() {
                     return (
                       <div
                         key={`${transaction.date}-${index}`}
-                        className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:bg-gray-800/70 transition-colors"
+                        className="flex items-center justify-between p-4 rounded-lg border border-ci-purple"
                       >
                         <div className="flex-1">
                           <div className="flex items-center space-x-4">
@@ -176,7 +176,7 @@ export default function PortfolioHistory() {
 
         {/* Summary Stats */}
         {processedTransactions.length > 0 && (
-          <div className="mt-12 p-6 bg-gray-800/30 rounded-lg border border-gray-700/30">
+          <div className="mt-12 p-6 rounded-lg border border-ci-purple">
             <h3 className="text-xl font-bold text-white font-[hagrid] mb-4">
               Summary
             </h3>
