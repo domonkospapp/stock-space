@@ -32,6 +32,16 @@ export default function PortfolioNavigation() {
               allocation
             </Link>
             <Link
+              href="/portfolio/history"
+              className={`font-urbanist text-lg font-bold transition-colors ${
+                isActive("/portfolio/history")
+                  ? "text-ci-yellow underline decoration-2 underline-offset-4"
+                  : "text-gray-300 hover:text-white hover:underline decoration-2 underline-offset-4 hover:decoration-ci-yellow"
+              }`}
+            >
+              history
+            </Link>
+            <Link
               href="/portfolio/settings"
               className={`font-urbanist text-lg font-bold transition-colors ${
                 isActive("/portfolio/settings")
