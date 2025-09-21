@@ -332,10 +332,10 @@ export default function FileUpload() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-8 py-4 font-bold font-[urbanist] text-lg rounded-xl transition-all ${
+                    className={`px-8 py-4 font-bold font-[urbanist] text-lg rounded-full transition-all cursor-pointer border-2 ${
                       activeTab === tab.id
-                        ? "bg-ci-purple text-background"
-                        : "text-gray-300 hover:text-white hover:bg-ci-purple/30"
+                        ? "border-white text-white"
+                        : "border-transparent text-gray-300 hover:text-white"
                     }`}
                   >
                     {tab.label}
@@ -355,7 +355,7 @@ export default function FileUpload() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="border-b border-gray-700">
+                        <tr className="border-b border-white">
                           <th className="pb-4 pr-6 font-bold font-[urbanist] text-gray-300">
                             Date
                           </th>
@@ -383,7 +383,7 @@ export default function FileUpload() {
                         {csvTransactions.map((transaction, index) => (
                           <tr
                             key={`original-${index}`}
-                            className="border-b border-gray-800"
+                            className="border-b border-white"
                           >
                             <td className="py-4 pr-6 font-bold text-white">
                               {transaction.date}
@@ -424,7 +424,7 @@ export default function FileUpload() {
                     {processedData.length > 0 && (
                       <table className="w-full text-left">
                         <thead>
-                          <tr className="border-b border-gray-700">
+                          <tr className="border-b border-white">
                             <th className="pb-4 pr-6 font-bold font-[urbanist] text-gray-300">
                               Date
                             </th>
@@ -452,7 +452,7 @@ export default function FileUpload() {
                           {processedData.map((transaction, index) => (
                             <tr
                               key={`processed-${index}`}
-                              className="border-b border-gray-800"
+                              className="border-b border-white"
                             >
                               <td className="py-4 pr-6 font-bold text-white">
                                 {transaction.date}
@@ -502,7 +502,7 @@ export default function FileUpload() {
                     {portfolioSummary.length > 0 && (
                       <table className="w-full text-left">
                         <thead>
-                          <tr className="border-b border-gray-700">
+                          <tr className="border-b border-white">
                             <th className="pb-4 pr-6 font-bold font-[urbanist] text-gray-300">
                               Stock Name
                             </th>
@@ -524,7 +524,7 @@ export default function FileUpload() {
                           {portfolioSummary.map((position, index) => (
                             <tr
                               key={`summary-${index}`}
-                              className="border-b border-gray-800"
+                              className="border-b border-white"
                             >
                               <td className="py-4 pr-6 text-white font-medium">
                                 {position.stockName}
