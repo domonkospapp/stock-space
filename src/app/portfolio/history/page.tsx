@@ -14,6 +14,8 @@ export default function PortfolioHistory() {
   );
   const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
   const initFromLocalStorage = usePortfolioStore((s) => s.initFromLocalStorage);
+  const roundedTotalUSD = usePortfolioStore((s) => s.roundedTotalUSD);
+  const isAllCalculated = usePortfolioStore((s) => s.isAllCalculated());
 
   // Load saved currency preference
   useEffect(() => {
@@ -31,6 +33,8 @@ export default function PortfolioHistory() {
     return amount.toLocaleString("en-US", {
       style: "currency",
       currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     });
   };
 
@@ -79,13 +83,31 @@ export default function PortfolioHistory() {
   return (
     <div className="min-h-screen p-8" style={{ backgroundColor: "#292929" }}>
       <div className="max-w-6xl mx-auto">
-        <PortfolioNavigation />
+        <div className="flex items-start justify-between mb-8">
+          <PortfolioNavigation />
+          <div>
+            <h1 className="text-8xl font-bold text-white font-[hagrid]">
+              {isAllCalculated ? (
+                formatCurrency(
+                  convertCurrency(
+                    roundedTotalUSD || 0,
+                    "USD",
+                    selectedCurrency
+                  ),
+                  selectedCurrency
+                )
+              ) : (
+                <span className="text-gray-400">Calculating...</span>
+              )}
+            </h1>
+          </div>
+        </div>
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white font-[hagrid]">
+          <h2 className="text-4xl font-bold text-white font-[hagrid]">
             Transaction History
-          </h1>
+          </h2>
           <p className="text-gray-300 font-[urbanist] mt-2">
             Complete history of all your portfolio transactions
           </p>

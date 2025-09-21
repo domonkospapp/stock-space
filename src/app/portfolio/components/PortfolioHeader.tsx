@@ -8,6 +8,7 @@ type Props = {
   selectedCurrency: Currency;
   isAllCalculated: boolean;
   totalCurrentValueUSD: number;
+  roundedTotalUSD: number;
   // investedUSD: number;
   convert: (amount: number, from: string, to: string) => number;
 };
@@ -16,6 +17,8 @@ const formatCurrency = (amount: number, currency: Currency): string => {
   return amount.toLocaleString("en-US", {
     style: "currency",
     currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
 };
 
@@ -23,12 +26,12 @@ export default function PortfolioHeader(props: Props) {
   const {
     selectedCurrency,
     isAllCalculated,
-    totalCurrentValueUSD,
+    roundedTotalUSD,
     // investedUSD,
     convert,
   } = props;
 
-  const total = convert(totalCurrentValueUSD || 0, "USD", selectedCurrency);
+  const total = convert(roundedTotalUSD || 0, "USD", selectedCurrency);
   // const invested = convert(investedUSD || 0, "USD", selectedCurrency);
   // const gainLoss = total - invested;
   // const gainLossPercent = invested > 0 ? (total / invested - 1) * 100 : 0;

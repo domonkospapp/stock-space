@@ -19,6 +19,7 @@ export default function Portfolio() {
   const holdingsMap = usePortfolioStore((s) => s.holdingsMap);
   // const investedUSD = usePortfolioStore((s) => s.investedUSD);
   const totalCurrentValueUSD = usePortfolioStore((s) => s.totalCurrentValueUSD);
+  const roundedTotalUSD = usePortfolioStore((s) => s.roundedTotalUSD);
   const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
   const getTransactionsForStock = usePortfolioStore(
     (s) => s.getTransactionsForStock
@@ -89,6 +90,7 @@ export default function Portfolio() {
             selectedCurrency={selectedCurrency}
             isAllCalculated={isAllCalculated}
             totalCurrentValueUSD={totalCurrentValueUSD}
+            roundedTotalUSD={roundedTotalUSD}
             // investedUSD={investedUSD}
             convert={convertCurrency}
           />

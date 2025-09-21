@@ -16,14 +16,14 @@ type Props = {
 };
 
 const formatCurrency = (amount: number, currency: Currency): string => {
-  return amount.toLocaleString("en-US", {
+  return Math.round(amount).toLocaleString("en-US", {
     style: "currency",
     currency: currency,
   });
 };
 
 const formatAnyCurrency = (amount: number, currency: string): string => {
-  return amount.toLocaleString("en-US", {
+  return Math.round(amount).toLocaleString("en-US", {
     style: "currency",
     currency,
   });
@@ -205,4 +205,3 @@ export default function PositionCard(props: Props) {
     </div>
   );
 }
-

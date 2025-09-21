@@ -18,6 +18,7 @@ type PortfolioState = {
   ratesToUSD: Record<string, number>;
   investedUSD: number;
   totalCurrentValueUSD: number;
+  roundedTotalUSD: number;
   lastPriceUpdate: Date | null;
   isCalculating: boolean;
   initFromLocalStorage: () => void;
@@ -46,6 +47,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
   ratesToUSD: { USD: 1 },
   investedUSD: 0,
   totalCurrentValueUSD: 0,
+  roundedTotalUSD: 0,
   lastPriceUpdate: null,
   isCalculating: false,
 
@@ -255,6 +257,7 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
 
       set({
         totalCurrentValueUSD,
+        roundedTotalUSD: Math.round(totalCurrentValueUSD),
         investedUSD,
         lastPriceUpdate: new Date(),
         isCalculating: false,
