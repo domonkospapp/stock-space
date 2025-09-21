@@ -142,7 +142,7 @@ export default function FileUpload() {
                 <div className="mb-8">
                   <label htmlFor="csv-upload" className="cursor-pointer">
                     <div
-                      className={`border-2 border-dashed rounded-2xl p-8 transition-colors ${
+                      className={`border-2 border-dashed rounded-2xl p-8 transition-colors h-64 flex flex-col items-center justify-center ${
                         isDragOver
                           ? "border-ci-yellow bg-ci-yellow/10"
                           : "border-gray-600 hover:border-ci-yellow"
