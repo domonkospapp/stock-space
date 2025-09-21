@@ -16,10 +16,15 @@ export default function FileUpload() {
   const [portfolioSummary, setPortfolioSummary] = useState<Position[]>([]);
   const [activeTab, setActiveTab] = useState<string>("original");
   const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
   const router = useRouter();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    processFile(file);
+  };
+
+  const processFile = (file: File | null | undefined) => {
     if (file && file.type === "text/csv") {
       setCsvFile(file);
 
@@ -39,6 +44,26 @@ export default function FileUpload() {
       reader.readAsText(file);
     } else {
       alert("Please select a valid CSV file!");
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    setIsDragOver(false);
+
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+      processFile(files[0]);
     }
   };
 
@@ -105,7 +130,16 @@ export default function FileUpload() {
               <div className="text-center">
                 <div className="mb-8">
                   <label htmlFor="csv-upload" className="cursor-pointer">
-                    <div className="border-2 border-dashed border-gray-600 rounded-2xl p-8 hover:border-ci-yellow transition-colors">
+                    <div
+                      className={`border-2 border-dashed rounded-2xl p-8 transition-colors ${
+                        isDragOver
+                          ? "border-ci-yellow bg-ci-yellow/10"
+                          : "border-gray-600 hover:border-ci-yellow"
+                      }`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                    >
                       <div className="text-center">
                         <svg
                           className="w-12 h-12 mx-auto mb-4 text-gray-400"
