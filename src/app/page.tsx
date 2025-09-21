@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState, useRef } from "react";
 
 export default function Home() {
-  const [activeNav, setActiveNav] = useState("home");
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -38,41 +37,6 @@ export default function Home() {
       onMouseMove={handleMouseMove}
     >
       {/* Header Navigation */}
-      <header className="flex justify-between items-center py-8 max-w-6xl mx-auto">
-        <nav className="flex space-x-2">
-          <Link
-            href="/"
-            className={`font-urbanist text-xl transition-all ${
-              activeNav === "home"
-                ? "border border-white rounded-full px-12 py-2"
-                : "hover:text-gray-300"
-            }`}
-            onClick={() => setActiveNav("home")}
-          >
-            home
-          </Link>
-          <Link
-            href="/about"
-            className="font-urbanist text-xl hover:text-gray-300 px-12 py-2"
-            onClick={() => setActiveNav("about")}
-          >
-            about
-          </Link>
-          <Link
-            href="/demo"
-            className="font-urbanist text-xl hover:text-gray-300 px-12 py-2"
-            onClick={() => setActiveNav("demo")}
-          >
-            demo
-          </Link>
-        </nav>
-        {/*<Link
-          href="/login"
-          className="font-[hagrid] text-lg hover:text-gray-300"
-        >
-          login
-        </Link>*/}
-      </header>
 
       {/* Floating Video Player */}
       {hoveredVideo && (
@@ -105,13 +69,18 @@ export default function Home() {
       )}
 
       {/* Hero Section */}
-      <section className="px-8 pb-16">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex-1 max-w-2xl">
-            <h1 className="text-7xl font-bold font-[hagrid] mb-6 leading-tight">
+      <section
+        id="hero"
+        className="min-h-screen max-w-6xl mx-auto flex flex-col"
+      >
+        <Header />
+
+        <div className="max-w-6xl mx-auto grow flex items-start justify-between ">
+          <div className="w-[60%] h-full items-start">
+            <h1 className="text-8xl font-bold font-[hagrid] mb-8 leading-tight">
               Launch your portfolio
             </h1>
-            <p className="text-2xl font-[urbanist] mb-8 text-gray-300">
+            <p className="text-3xl font-[urbanist] my-16 text-gray-300 mr-24">
               Upload your Flatex CSV and see your portfolio like never before.
             </p>
             <div className="flex flex-col space-y-4">
@@ -151,8 +120,8 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <div className="flex-1 flex justify-center">
-            <div className="w-96 h-1/2 relative">
+          <div className="w-[40%] flex justify-center">
+            <div className="w-full h-full relative">
               <video
                 className="w-full h-full object-cover rounded-full shadow-2xl"
                 autoPlay
@@ -169,7 +138,7 @@ export default function Home() {
       </section>
 
       {/* Feature Highlights */}
-      <section className="px-8 py-16">
+      <section id="features" className="px-8 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Advantage
@@ -192,7 +161,7 @@ export default function Home() {
       </section>
 
       {/* Three Steps Section */}
-      <section className="px-8 py-16">
+      <section id="steps" className="px-8 py-16">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-7xl font-bold font-[hagrid] mb-12">
             Three simple steps to get started{" "}
@@ -225,16 +194,118 @@ export default function Home() {
       </section>
 
       {/* Why Stock Space Section */}
-      <section className="px-8 py-16">
+      <section id="about" className="px-8 py-16">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-7xl font-bold font-[hagrid] mb-12">
             Why Stock Space?
           </h2>
-          <div className="h-64 flex items-center justify-center">
-            <p className="text-gray-400 font-[hagrid] text-lg">
-              More content coming soon...
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-ci-purple p-8 rounded-2xl">
+              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                Beyond Basic Charts
+              </h3>
+              <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                Flatex gives you basic portfolio data, but Stock Space
+                transforms it into actionable insights. See your portfolio
+                allocation, performance trends, and risk metrics in beautiful,
+                interactive visualizations.
+              </p>
+            </div>
+
+            <div className="bg-ci-purple p-8 rounded-2xl">
+              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                Privacy First
+              </h3>
+              <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                Your financial data never leaves your browser. All calculations
+                happen locally, ensuring complete privacy while giving you
+                powerful analytics tools.
+              </p>
+            </div>
+
+            <div className="bg-ci-purple p-8 rounded-2xl">
+              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                No Account Required
+              </h3>
+              <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                Upload your CSV and start analyzing immediately. No sign-ups, no
+                subscriptions, no data collection. Just pure portfolio insights.
+              </p>
+            </div>
+
+            <div className="bg-ci-purple p-8 rounded-2xl">
+              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                Modern Interface
+              </h3>
+              <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                Built with modern web technologies for a smooth, responsive
+                experience. Clean design that makes complex financial data easy
+                to understand.
+              </p>
+            </div>
+
+            <div className="bg-ci-purple p-8 rounded-2xl">
+              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                Comprehensive Analysis
+              </h3>
+              <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                From pie charts showing asset allocation to treemaps visualizing
+                position sizes, get the insights you need to make informed
+                investment decisions.
+              </p>
+            </div>
+
+            <div className="bg-ci-purple p-8 rounded-2xl">
+              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                Always Up-to-Date
+              </h3>
+              <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                Import fresh data whenever you want. No waiting for platform
+                updates or delayed reporting. Your portfolio analysis is always
+                current.
+              </p>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Closing CTA Section */}
+      <section className="px-8 py-16">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-6xl font-bold font-[hagrid] mb-12">
+            Ready to see your portfolio the way it should be?
+          </h2>
+          <Link
+            href="/fileUpload"
+            className="bg-foreground hover:bg-ci-yellow text-background text-2xl font-bold font-[urbanist] px-12 py-6 rounded-full transition-colors inline-flex items-center space-x-4"
+          >
+            <span>Upload CSV Now</span>
+            <svg
+              width="53"
+              height="53"
+              viewBox="0 0 53 53"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g clipPath="url(#clip0_67_2009)">
+                <path
+                  d="M13.8913 14.9227C15.134 16.1654 18.2077 16.811 20.9968 17.1456C24.588 17.5759 28.2308 17.4464 31.7363 16.6234C34.3619 16.0064 37.2948 15.0014 38.8763 13.4199M37.4026 38.434C36.1599 37.1912 35.5142 34.1176 35.1797 31.3285C34.7494 27.7373 34.8789 24.0945 35.7019 20.5889C36.3189 17.9634 37.3239 15.0305 38.9054 13.449M38.8909 13.4344L-69.4685 121.794"
+                  stroke="#292929"
+                  strokeWidth="3"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_67_2009">
+                  <rect
+                    width="36"
+                    height="38"
+                    fill="white"
+                    transform="translate(0 25.4551) rotate(-45)"
+                  />
+                </clipPath>
+              </defs>
+            </svg>
+          </Link>
         </div>
       </section>
 
@@ -252,6 +323,14 @@ export default function Home() {
               </h1>
             </div>
           </div>
+        </div>
+
+        {/* Minimal Footer Text */}
+        <div className="max-w-6xl mx-auto px-8 py-8 text-center">
+          <p className="text-sm font-[urbanist] text-gray-400">
+            Stock Space is not affiliated with Flatex. Your data never leaves
+            your browser.
+          </p>
         </div>
       </footer>
     </div>
@@ -327,5 +406,51 @@ const Advantage = ({
 
       <p className="font-urbanist text-background text-sm mb-2">{text}</p>
     </div>
+  );
+};
+
+const Header = () => {
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  return (
+    <header className="flex justify-between items-center py-8 w-full">
+      <nav className="flex space-x-2">
+        <button
+          className="font-urbanist text-xl font-bold hover:text-gray-300 pr-12 py-2 underline decoration-2 underline-offset-4 hover:decoration-ci-yellow"
+          onClick={() => scrollToSection("hero")}
+        >
+          home
+        </button>
+        <button
+          className="font-urbanist text-xl font-bold hover:text-gray-300 px-12 py-2 underline decoration-2 underline-offset-4 hover:decoration-ci-yellow"
+          onClick={() => scrollToSection("features")}
+        >
+          features
+        </button>
+        <button
+          className="font-urbanist text-xl font-bold hover:text-gray-300 px-12 py-2 underline decoration-2 underline-offset-4 hover:decoration-ci-yellow"
+          onClick={() => scrollToSection("steps")}
+        >
+          steps
+        </button>
+        <button
+          className="font-urbanist text-xl font-bold hover:text-gray-300 px-12 py-2 underline decoration-2 underline-offset-4 hover:decoration-ci-yellow"
+          onClick={() => scrollToSection("about")}
+        >
+          about
+        </button>
+      </nav>
+      {/*<Link
+        href="/login"
+        className="font-[hagrid] text-lg hover:text-gray-300"
+      >
+        login
+      </Link>*/}
+    </header>
   );
 };
