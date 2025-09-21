@@ -402,11 +402,11 @@ const Advantage = ({
           />
         </svg>
       </div>
-      <h3 className="text-2xl font-bold font-urbanist mb-4 text-background">
+      <h3 className="text-3xl font-bold font-urbanist mb-4 text-background">
         {title}
       </h3>
 
-      <p className="font-urbanist text-background text-sm mb-2">{text}</p>
+      <p className="font-urbanist text-background text-lg mb-2">{text}</p>
     </div>
   );
 };
