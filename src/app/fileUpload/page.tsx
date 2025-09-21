@@ -8,6 +8,7 @@ import { createPortfolioSummary } from "utils/transactions/createPortfolioSummar
 import { savePortfolioToLocalStorage } from "utils/localStorage";
 // import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function FileUpload() {
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -107,7 +108,17 @@ export default function FileUpload() {
 
   return (
     <div className="min-h-screen bg-ci-black text-white">
-      <main className="max-w-7xl mx-auto px-8 py-16">
+      <main className="max-w-7xl mx-auto px-8 pt-8 pb-16">
+        {/* Brand Header */}
+        <div className="text-left mb-6">
+          <Link
+            href="/"
+            className="text-2xl font-bold text-white font-[hagrid] cursor-pointer hover:text-gray-300 transition-colors"
+          >
+            stck.space
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-6xl font-bold font-[hagrid] mb-6">
