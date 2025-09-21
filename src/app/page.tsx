@@ -43,30 +43,24 @@ export default function Home() {
         <div
           className="fixed pointer-events-none z-50"
           style={{
-            left: mousePosition.x - 340,
-            top: mousePosition.y - 100,
+            left: mousePosition.x - 580,
+            top: mousePosition.y - 450,
           }}
         >
-          <div className="bg-black rounded-lg p-4 shadow-2xl">
-            <video
-              ref={(el) => {
-                videoRefs.current[hoveredVideo - 1] = el;
-              }}
-              className="w-80 h-48 rounded"
-              muted
-              loop
-              onEnded={() => setHoveredVideo(null)}
-            >
-              <source
-                src={`/videos/step-${hoveredVideo}.mp4`}
-                type="video/mp4"
-              />
-              Your browser does not support the video tag.
-            </video>
-            <p className="text-white text-sm mt-2 font-[hagrid]">
-              Step {hoveredVideo} Tutorial
-            </p>
-          </div>
+          <video
+            ref={(el) => {
+              videoRefs.current[hoveredVideo - 1] = el;
+            }}
+            className="w-[640px] h-[384px] rounded-lg shadow-2xl"
+            autoPlay
+            muted
+            loop
+            onEnded={() => setHoveredVideo(null)}
+          >
+            <source src="/videos/how-to.mov" type="video/quicktime" />
+            <source src="/videos/how-to.mov" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
       )}
 
@@ -362,7 +356,7 @@ const StepExplanation = ({
         </div>
       </div>
       <button
-        className="w-20 h-20 border-foreground border rounded-full flex items-center justify-center hover:bg-gray-200 group transition-colors"
+        className="w-20 h-20 border-foreground border rounded-full flex items-center justify-center hover:bg-gray-200 group transition-colors cursor-pointer"
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
