@@ -417,25 +417,25 @@ const Header = () => {
     <header className="flex justify-between items-center py-8 w-full">
       <nav className="flex space-x-2">
         <button
-          className="font-urbanist text-xl font-bold hover:text-gray-300 pr-12 py-2 underline decoration-2 underline-offset-4 hover:decoration-ci-yellow"
+          className="font-urbanist text-xl text-white px-6 py-2 border border-white rounded-full hover:bg-white hover:text-background transition-all cursor-pointer"
           onClick={() => scrollToSection("hero")}
         >
           home
         </button>
         <button
-          className="font-urbanist text-xl font-bold hover:text-gray-300 px-12 py-2 underline decoration-2 underline-offset-4 hover:decoration-ci-yellow"
+          className="font-urbanist text-xl text-white px-6 py-2 border border-white rounded-full hover:bg-white hover:text-background transition-all cursor-pointer"
           onClick={() => scrollToSection("features")}
         >
           features
         </button>
         <button
-          className="font-urbanist text-xl font-bold hover:text-gray-300 px-12 py-2 underline decoration-2 underline-offset-4 hover:decoration-ci-yellow"
+          className="font-urbanist text-xl text-white px-6 py-2 border border-white rounded-full hover:bg-white hover:text-background transition-all cursor-pointer"
           onClick={() => scrollToSection("steps")}
         >
           steps
         </button>
         <button
-          className="font-urbanist text-xl font-bold hover:text-gray-300 px-12 py-2 underline decoration-2 underline-offset-4 hover:decoration-ci-yellow"
+          className="font-urbanist text-xl text-white px-6 py-2 border border-white rounded-full hover:bg-white hover:text-background transition-all cursor-pointer"
           onClick={() => scrollToSection("about")}
         >
           about
