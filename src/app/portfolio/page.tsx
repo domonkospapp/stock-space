@@ -96,7 +96,7 @@ export default function Portfolio() {
           />
         </div>
 
-        <div className="mb-8">
+        <div className="mb-8 h-[calc(100vh-200px)]">
           <PositionsTreemap
             positions={displayPositions}
             selectedCurrency={selectedCurrency}
