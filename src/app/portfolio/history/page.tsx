@@ -8,6 +8,9 @@ type Currency = "EUR" | "USD";
 
 export default function PortfolioHistory() {
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear()
+  );
 
   const processedTransactions = usePortfolioStore(
     (s) => s.processedTransactions
@@ -49,8 +52,24 @@ export default function PortfolioHistory() {
     });
   };
 
+  // Get available years from transactions
+  const availableYears = Array.from(
+    new Set(
+      processedTransactions.map((transaction) => {
+        const [day, month, year] = transaction.date.split(".");
+        return parseInt(year);
+      })
+    )
+  ).sort((a, b) => b - a);
+
+  // Filter transactions by selected year
+  const filteredTransactions = processedTransactions.filter((transaction) => {
+    const [day, month, year] = transaction.date.split(".");
+    return parseInt(year) === selectedYear;
+  });
+
   // Group transactions by date
-  const groupedTransactions = processedTransactions.reduce(
+  const groupedTransactions = filteredTransactions.reduce(
     (acc, transaction) => {
       const date = transaction.date;
       if (!acc[date]) {
@@ -80,6 +99,21 @@ export default function PortfolioHistory() {
     return dateB.getTime() - dateA.getTime();
   });
 
+  // Create monthly transaction counts for calendar
+  const monthlyCounts = Array.from({ length: 12 }, (_, monthIndex) => {
+    const monthName = new Date(selectedYear, monthIndex).toLocaleDateString(
+      "en-US",
+      {
+        month: "short",
+      }
+    );
+    const count = filteredTransactions.filter((transaction) => {
+      const [day, month, year] = transaction.date.split(".");
+      return parseInt(month) === monthIndex + 1;
+    }).length;
+    return { month: monthName, count, monthIndex };
+  });
+
   return (
     <div className="min-h-screen p-8" style={{ backgroundColor: "#292929" }}>
       <div className="max-w-6xl mx-auto">
@@ -105,95 +139,158 @@ export default function PortfolioHistory() {
 
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-4xl font-bold text-white font-[hagrid]">
-            Transaction History
-          </h2>
-          <p className="text-gray-300 font-[urbanist] mt-2">
-            Complete history of all your portfolio transactions
-          </p>
+          <div className="mb-6">
+            <h2 className="text-4xl font-bold text-white font-[hagrid]">
+              Transaction History
+            </h2>
+            <p className="text-gray-300 font-[urbanist] mt-2">
+              Complete history of all your portfolio transactions
+            </p>
+          </div>
         </div>
 
-        {/* Transaction History */}
-        <div className="space-y-8">
-          {sortedDates.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-400 font-[urbanist] text-lg">
-                No transaction history found
-              </p>
-            </div>
-          ) : (
-            sortedDates.map((date) => (
-              <div key={date}>
-                <h2 className="text-2xl font-bold text-white font-[hagrid] mb-4">
-                  {formatDate(date)}
-                </h2>
+        {/* Split View: Transaction List and Calendar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Transaction History */}
+          <div className="lg:col-span-2">
+            <div className="space-y-8">
+              {sortedDates.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-400 font-[urbanist] text-lg">
+                    No transaction history found
+                  </p>
+                </div>
+              ) : (
+                sortedDates.map((date) => (
+                  <div key={date}>
+                    <h2 className="text-2xl font-bold text-white font-[hagrid] mb-4">
+                      {formatDate(date)}
+                    </h2>
 
-                <div className="space-y-3">
-                  {groupedTransactions[date].map((transaction, index) => {
-                    const amountInSelectedCurrency = convertCurrency(
-                      Math.abs(transaction.amount),
-                      transaction.currency,
-                      selectedCurrency
-                    );
+                    <div className="space-y-3">
+                      {groupedTransactions[date].map((transaction, index) => {
+                        const amountInSelectedCurrency = convertCurrency(
+                          Math.abs(transaction.amount),
+                          transaction.currency,
+                          selectedCurrency
+                        );
 
-                    return (
-                      <div
-                        key={`${transaction.date}-${index}`}
-                        className="flex items-center justify-between p-4 rounded-lg border border-ci-purple"
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-4">
-                            <div
-                              className={`w-3 h-3 rounded-full ${
-                                transaction.type === "BUY"
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
-                              }`}
-                            />
-                            <div>
-                              <h3 className="text-white font-[hagrid] text-lg">
-                                {transaction.type}{" "}
-                                {Math.abs(
-                                  transaction.amount / transaction.price
-                                ).toFixed(0)}{" "}
-                                shares
-                              </h3>
-                              <p className="text-gray-300 font-[urbanist] text-sm">
-                                {transaction.isin} • {transaction.stockName}
-                              </p>
+                        return (
+                          <div
+                            key={`${transaction.date}-${index}`}
+                            className="flex items-center justify-between p-4 rounded-lg border border-ci-purple"
+                          >
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-4">
+                                <div
+                                  className={`w-3 h-3 rounded-full ${
+                                    transaction.type === "BUY"
+                                      ? "bg-green-500"
+                                      : "bg-red-500"
+                                  }`}
+                                />
+                                <div>
+                                  <h3 className="text-white font-[hagrid] text-lg">
+                                    {transaction.type}{" "}
+                                    {Math.abs(
+                                      transaction.amount / transaction.price
+                                    ).toFixed(0)}{" "}
+                                    shares
+                                  </h3>
+                                  <p className="text-gray-300 font-[urbanist] text-sm">
+                                    {transaction.isin} • {transaction.stockName}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="text-right">
+                              <div
+                                className={`font-[hagrid] text-lg ${
+                                  transaction.type === "BUY"
+                                    ? "text-red-400"
+                                    : "text-green-400"
+                                }`}
+                              >
+                                {transaction.type === "BUY" ? "-" : "+"}
+                                {formatCurrency(
+                                  amountInSelectedCurrency,
+                                  selectedCurrency
+                                )}
+                              </div>
+                              <div className="text-gray-400 font-[urbanist] text-sm">
+                                {formatCurrency(
+                                  Math.abs(transaction.price),
+                                  transaction.currency as Currency
+                                )}{" "}
+                                per share
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
 
-                        <div className="text-right">
-                          <div
-                            className={`font-[hagrid] text-lg ${
-                              transaction.type === "BUY"
-                                ? "text-red-400"
-                                : "text-green-400"
-                            }`}
-                          >
-                            {transaction.type === "BUY" ? "-" : "+"}
-                            {formatCurrency(
-                              amountInSelectedCurrency,
-                              selectedCurrency
-                            )}
-                          </div>
-                          <div className="text-gray-400 font-[urbanist] text-sm">
-                            {formatCurrency(
-                              Math.abs(transaction.price),
-                              transaction.currency as Currency
-                            )}{" "}
-                            per share
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+          {/* Calendar Layout */}
+          <div className="lg:col-span-1">
+            <div className="p-6 sticky top-8">
+              {/* Year Selector */}
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-white font-[hagrid]">
+                  Calendar
+                </h3>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                  className="bg-transparent border border-white text-white px-3 py-1 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
+                >
+                  {availableYears.map((year) => (
+                    <option
+                      key={year}
+                      value={year}
+                      className="bg-background text-white"
+                    >
+                      {year}
+                    </option>
+                  ))}
+                </select>
               </div>
-            ))
-          )}
+
+              <div className="grid grid-cols-3 gap-3">
+                {monthlyCounts.map(({ month, count, monthIndex }) => (
+                  <div
+                    key={monthIndex}
+                    className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                      count > 0
+                        ? "border-ci-yellow bg-ci-yellow/10 hover:bg-ci-yellow/20"
+                        : "border-gray-600 bg-gray-700 hover:bg-gray-600"
+                    }`}
+                  >
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-white font-[hagrid] mb-1">
+                        {month}
+                      </div>
+                      <div
+                        className={`text-2xl font-bold font-[hagrid] ${
+                          count > 0 ? "text-ci-yellow" : "text-gray-400"
+                        }`}
+                      >
+                        {count}
+                      </div>
+                      <div className="text-xs text-gray-400 font-[urbanist] mt-1">
+                        {count}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Summary Stats */}
