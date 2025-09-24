@@ -111,13 +111,13 @@ export default function PositionsTreemap({
           const width = (d as any).x1 - (d as any).x0;
           const height = (d as any).y1 - (d as any).y0;
           // Use height/2 as max radius to prevent weird distortions
-          return Math.min(height / 2, 36);
+          return Math.min(height / 2 - 18, 36);
         })
         .style("ry", (d) => {
           const width = (d as any).x1 - (d as any).x0;
           const height = (d as any).y1 - (d as any).y0;
           // Use height/2 as max radius to prevent weird distortions
-          return Math.min(height / 2, 36);
+          return Math.min(height / 2 - 18, 36);
         })
         .style("cursor", "pointer")
         .on("click", (event, d) => {
