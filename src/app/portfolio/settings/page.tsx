@@ -32,7 +32,7 @@ export default function PortfolioSettings() {
 
   return (
     <div className="min-h-screen p-8" style={{ backgroundColor: "#292929" }}>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <PortfolioNavigation />
 
         {/* Header */}
