@@ -214,13 +214,13 @@ export default function PositionsTreemap({
       const baseFontSize = Math.min(rectWidth, rectHeight) * 0.1;
       const fontSize = isMajorHolding ? baseFontSize * 1.2 : baseFontSize;
       const valueFontSize = fontSize * 0.8;
-      const topPadding = rectHeight * 0.18;
+      const topPadding = 36; // Fixed distance from top
 
       // Ticker
       addText(
         svg,
         x + 20,
-        y + topPadding + fontSize,
+        y + topPadding + fontSize * 0.8, // Add font size offset for proper baseline positioning
         name,
         fontSize,
         "500",
@@ -251,7 +251,7 @@ export default function PositionsTreemap({
         addText(
           svg,
           x + rectWidth - 20,
-          y + topPadding + fontSize,
+          y + topPadding + fontSize * 0.8, // Add font size offset for proper baseline positioning
           `${portfolioPercent.toFixed(1)}%`,
           fontSize,
           "400",
@@ -263,7 +263,7 @@ export default function PositionsTreemap({
         addText(
           svg,
           x + 20,
-          y + topPadding + fontSize * 1.8,
+          y + topPadding + fontSize * 2.2,
           `${portfolioPercent.toFixed(1)}%`,
           fontSize,
           "400",
