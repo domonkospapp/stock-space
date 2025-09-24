@@ -65,8 +65,10 @@ export default function PositionsTreemap({
 
       // Setup dimensions
       const containerWidth = svgRef.current?.parentElement?.clientWidth || 800;
-      const width = Math.max(containerWidth - 40, 600);
-      const height = Math.max(window.innerHeight - 200, 600); // Screen height minus menu/padding
+      const containerHeight =
+        svgRef.current?.parentElement?.clientHeight || 600;
+      const width = containerWidth;
+      const height = containerHeight;
 
       // Create SVG
       const svg = d3
