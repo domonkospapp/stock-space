@@ -169,8 +169,12 @@ export default function PortfolioHistory() {
 
                     <div className="space-y-3">
                       {groupedTransactions[date].map((transaction, index) => {
+                        // Calculate the actual transaction value (shares * price)
+                        const transactionValue = Math.abs(
+                          transaction.amount * transaction.price
+                        );
                         const amountInSelectedCurrency = convertCurrency(
-                          Math.abs(transaction.amount),
+                          transactionValue,
                           transaction.currency,
                           selectedCurrency
                         );
@@ -192,9 +196,7 @@ export default function PortfolioHistory() {
                                 <div>
                                   <h3 className="text-white font-[hagrid] text-lg">
                                     {transaction.type}{" "}
-                                    {Math.abs(
-                                      transaction.amount / transaction.price
-                                    ).toFixed(0)}{" "}
+                                    {Math.abs(transaction.amount).toFixed(0)}{" "}
                                     shares
                                   </h3>
                                   <p className="text-gray-300 font-[urbanist] text-sm">
@@ -219,10 +221,12 @@ export default function PortfolioHistory() {
                                 )}
                               </div>
                               <div className="text-gray-400 font-[urbanist] text-sm">
-                                {formatCurrency(
-                                  Math.abs(transaction.price),
-                                  transaction.currency as Currency
-                                )}{" "}
+                                {transaction.price.toLocaleString("en-US", {
+                                  style: "currency",
+                                  currency: transaction.currency as Currency,
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}{" "}
                                 per share
                               </div>
                             </div>
