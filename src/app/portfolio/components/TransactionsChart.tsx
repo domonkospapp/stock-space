@@ -200,27 +200,30 @@ export default function TransactionsChart({ transactions }: Props) {
       <div className="space-y-4">
         {chartData.map((data) => {
           const progressPercentage = (data.cumulativeShares / maxShares) * 100;
-          const totalSegments = 40; // Total number of segments in the bar
+          const totalSegments = 66; // Total number of segments in the bar
           const filledSegments = Math.round(
             (progressPercentage / 100) * totalSegments
           );
 
           return (
             <div key={data.monthYear} className="relative">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-white">
+              <div className="flex items-center justify-between my-2">
+                <span className="text-white text-lg font-[hagrid]">
                   {data.monthYear}
                 </span>
-                <span className="text-sm text-white">
-                  {data.cumulativeShares.toLocaleString()} shares
+                <span className="text-white font-[hagrid]">
+                  <span className="font-bold">
+                    {data.cumulativeShares.toLocaleString()}
+                  </span>{" "}
+                  shares
                 </span>
               </div>
               <div className="flex gap-1">
                 {[...Array(totalSegments)].map((_, i) => (
                   <div
                     key={i}
-                    className={`h-8 w-2 rounded-full ${
-                      i < filledSegments ? "" : "bg-gray-600"
+                    className={`h-12 w-4 rounded-full ${
+                      i < filledSegments ? "" : "bg-[#504F4F]"
                     }`}
                     style={{
                       backgroundColor:
