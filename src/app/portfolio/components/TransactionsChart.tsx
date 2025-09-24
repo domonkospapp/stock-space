@@ -10,12 +10,12 @@ type Props = {
 export default function TransactionsChart({ transactions }: Props) {
   if (!transactions.length) {
     return (
-      <div className="mt-8 bg-gray-900 p-6 rounded-lg border border-gray-700 shadow-xl">
+      <div className="mt-10 p-6 rounded-[32px] border border-white shadow-xl">
         <div className="text-center py-12">
-          <div className="text-gray-400 text-lg mb-2">
-            👆 Select a position to view its purchase history
+          <div className="text-white text-xl font-[hagrid] mb-2">
+            Select a position to view its purchase history
           </div>
-          <div className="text-gray-500 text-sm">
+          <div className="text-white font-[hagrid] text-sm">
             You will see all transactions, current shares, and average price for
             the selected stock
           </div>
@@ -193,8 +193,8 @@ export default function TransactionsChart({ transactions }: Props) {
   const maxShares = Math.max(...chartData.map((d) => d.cumulativeShares), 1);
 
   return (
-    <div className="mt-8">
-      <h3 className="text-lg font-semibold text-white mb-4">
+    <div className="mt-10">
+      <h3 className="font-semibold text-white mb-4 font-[hagrid] text-2xl">
         Cumulative Stock Count Over Time
       </h3>
       <div className="space-y-4">
