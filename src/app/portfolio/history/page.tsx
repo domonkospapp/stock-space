@@ -182,7 +182,7 @@ export default function PortfolioHistory() {
                         return (
                           <div
                             key={`${transaction.date}-${index}`}
-                            className="flex items-center justify-between p-4 rounded-lg border border-ci-purple"
+                            className="flex items-center justify-between p-4 rounded-lg border border-white"
                           >
                             <div className="flex-1">
                               <div className="flex items-center space-x-4">
@@ -272,7 +272,7 @@ export default function PortfolioHistory() {
                     className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
                       count > 0
                         ? "border-ci-yellow bg-ci-yellow/10 hover:bg-ci-yellow/20"
-                        : "border-gray-600 bg-gray-700 hover:bg-gray-600"
+                        : "border-white bg-transparent hover:bg-white/10"
                     }`}
                   >
                     <div className="text-center">
