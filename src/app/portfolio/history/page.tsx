@@ -11,6 +11,7 @@ export default function PortfolioHistory() {
   const [selectedYear, setSelectedYear] = useState<number>(
     new Date().getFullYear()
   );
+  const [selectedStock, setSelectedStock] = useState<string>("all");
 
   const processedTransactions = usePortfolioStore(
     (s) => s.processedTransactions
@@ -65,14 +66,38 @@ export default function PortfolioHistory() {
     ).sort((a, b) => b - a),
   ];
 
-  // Filter transactions by selected year (or show all if "All Years" is selected)
-  const filteredTransactions =
-    selectedYear === 0
-      ? processedTransactions
-      : processedTransactions.filter((transaction) => {
-          const [day, month, year] = transaction.date.split(".");
-          return parseInt(year) === selectedYear;
-        });
+  // Get available stocks from transactions
+  const availableStocks = [
+    { value: "all", label: "All Stocks" },
+    ...Array.from(
+      new Map(
+        processedTransactions.map((transaction) => [
+          transaction.isin,
+          {
+            value: transaction.isin,
+            label: `${transaction.stockName} (${transaction.isin})`,
+          },
+        ])
+      ).values()
+    ).sort((a, b) => a.label.localeCompare(b.label)),
+  ];
+
+  // Filter transactions by selected year and stock
+  const filteredTransactions = processedTransactions.filter((transaction) => {
+    // Year filter
+    const yearMatch =
+      selectedYear === 0 ||
+      (() => {
+        const [day, month, year] = transaction.date.split(".");
+        return parseInt(year) === selectedYear;
+      })();
+
+    // Stock filter
+    const stockMatch =
+      selectedStock === "all" || transaction.isin === selectedStock;
+
+    return yearMatch && stockMatch;
+  });
 
   // Group transactions by date
   const groupedTransactions = filteredTransactions.reduce(
@@ -249,26 +274,62 @@ export default function PortfolioHistory() {
           {/* Calendar Layout */}
           <div className="lg:col-span-1">
             <div className="p-6 sticky top-8">
-              {/* Year Selector */}
-              <div className="flex items-center justify-between mb-6">
+              {/* Filters */}
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-white font-[hagrid] mb-4">
+                  Filters
+                </h3>
+
+                {/* Stock Selector */}
+                <div className="mb-4">
+                  <label className="block text-gray-300 font-[urbanist] text-sm mb-2">
+                    Stock
+                  </label>
+                  <select
+                    value={selectedStock}
+                    onChange={(e) => setSelectedStock(e.target.value)}
+                    className="w-full bg-transparent border border-white text-white px-3 py-2 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
+                  >
+                    {availableStocks.map((stock) => (
+                      <option
+                        key={stock.value}
+                        value={stock.value}
+                        className="bg-background text-white"
+                      >
+                        {stock.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Year Selector */}
+                <div className="mb-4">
+                  <label className="block text-gray-300 font-[urbanist] text-sm mb-2">
+                    Year
+                  </label>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    className="w-full bg-transparent border border-white text-white px-3 py-2 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
+                  >
+                    {availableYears.map((year) => (
+                      <option
+                        key={year}
+                        value={year}
+                        className="bg-background text-white"
+                      >
+                        {year === 0 ? "All Years" : year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Calendar Header */}
+              <div className="mb-4">
                 <h3 className="text-xl font-bold text-white font-[hagrid]">
                   Calendar
                 </h3>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                  className="bg-transparent border border-white text-white px-3 py-1 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
-                >
-                  {availableYears.map((year) => (
-                    <option
-                      key={year}
-                      value={year}
-                      className="bg-background text-white"
-                    >
-                      {year === 0 ? "All Years" : year}
-                    </option>
-                  ))}
-                </select>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -307,9 +368,17 @@ export default function PortfolioHistory() {
         {filteredTransactions.length > 0 && (
           <div className="mt-12 p-6 rounded-lg border border-white">
             <h3 className="text-xl font-bold text-white font-[hagrid] mb-4">
-              {selectedYear === 0
-                ? "Summary - All Years"
-                : `Summary for ${selectedYear}`}
+              {(() => {
+                const yearText =
+                  selectedYear === 0 ? "All Years" : `${selectedYear}`;
+                const stockText =
+                  selectedStock === "all"
+                    ? "All Stocks"
+                    : availableStocks
+                        .find((s) => s.value === selectedStock)
+                        ?.label.split(" (")[0] || "Unknown Stock";
+                return `Summary - ${yearText}, ${stockText}`;
+              })()}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
