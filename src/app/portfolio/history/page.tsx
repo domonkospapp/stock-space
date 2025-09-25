@@ -53,20 +53,26 @@ export default function PortfolioHistory() {
   };
 
   // Get available years from transactions
-  const availableYears = Array.from(
-    new Set(
-      processedTransactions.map((transaction) => {
-        const [day, month, year] = transaction.date.split(".");
-        return parseInt(year);
-      })
-    )
-  ).sort((a, b) => b - a);
+  const availableYears = [
+    0, // "All Years" option
+    ...Array.from(
+      new Set(
+        processedTransactions.map((transaction) => {
+          const [day, month, year] = transaction.date.split(".");
+          return parseInt(year);
+        })
+      )
+    ).sort((a, b) => b - a),
+  ];
 
-  // Filter transactions by selected year
-  const filteredTransactions = processedTransactions.filter((transaction) => {
-    const [day, month, year] = transaction.date.split(".");
-    return parseInt(year) === selectedYear;
-  });
+  // Filter transactions by selected year (or show all if "All Years" is selected)
+  const filteredTransactions =
+    selectedYear === 0
+      ? processedTransactions
+      : processedTransactions.filter((transaction) => {
+          const [day, month, year] = transaction.date.split(".");
+          return parseInt(year) === selectedYear;
+        });
 
   // Group transactions by date
   const groupedTransactions = filteredTransactions.reduce(
@@ -101,12 +107,12 @@ export default function PortfolioHistory() {
 
   // Create monthly transaction counts for calendar
   const monthlyCounts = Array.from({ length: 12 }, (_, monthIndex) => {
-    const monthName = new Date(selectedYear, monthIndex).toLocaleDateString(
-      "en-US",
-      {
-        month: "short",
-      }
-    );
+    const monthName = new Date(
+      selectedYear || new Date().getFullYear(),
+      monthIndex
+    ).toLocaleDateString("en-US", {
+      month: "short",
+    });
     const count = filteredTransactions.filter((transaction) => {
       const [day, month, year] = transaction.date.split(".");
       return parseInt(month) === monthIndex + 1;
@@ -259,7 +265,7 @@ export default function PortfolioHistory() {
                       value={year}
                       className="bg-background text-white"
                     >
-                      {year}
+                      {year === 0 ? "All Years" : year}
                     </option>
                   ))}
                 </select>
@@ -301,7 +307,9 @@ export default function PortfolioHistory() {
         {filteredTransactions.length > 0 && (
           <div className="mt-12 p-6 rounded-lg border border-white">
             <h3 className="text-xl font-bold text-white font-[hagrid] mb-4">
-              Summary for {selectedYear}
+              {selectedYear === 0
+                ? "Summary - All Years"
+                : `Summary for ${selectedYear}`}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
