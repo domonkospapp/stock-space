@@ -298,15 +298,15 @@ export default function PortfolioHistory() {
         </div>
 
         {/* Summary Stats */}
-        {processedTransactions.length > 0 && (
-          <div className="mt-12 p-6 rounded-lg border border-ci-purple">
+        {filteredTransactions.length > 0 && (
+          <div className="mt-12 p-6 rounded-lg border border-white">
             <h3 className="text-xl font-bold text-white font-[hagrid] mb-4">
-              Summary
+              Summary for {selectedYear}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="text-2xl font-bold text-white font-[hagrid]">
-                  {processedTransactions.length}
+                  {filteredTransactions.length}
                 </div>
                 <div className="text-gray-300 font-[urbanist] text-sm">
                   Total Transactions
@@ -314,7 +314,7 @@ export default function PortfolioHistory() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-white font-[hagrid]">
-                  {new Set(processedTransactions.map((t) => t.isin)).size}
+                  {new Set(filteredTransactions.map((t) => t.isin)).size}
                 </div>
                 <div className="text-gray-300 font-[urbanist] text-sm">
                   Unique Securities
@@ -322,7 +322,7 @@ export default function PortfolioHistory() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-white font-[hagrid]">
-                  {new Set(processedTransactions.map((t) => t.date)).size}
+                  {new Set(filteredTransactions.map((t) => t.date)).size}
                 </div>
                 <div className="text-gray-300 font-[urbanist] text-sm">
                   Trading Days
