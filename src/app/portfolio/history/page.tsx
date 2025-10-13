@@ -363,51 +363,6 @@ export default function PortfolioHistory() {
             </div>
           </div>
         </div>
-
-        {/* Summary Stats */}
-        {filteredTransactions.length > 0 && (
-          <div className="mt-12 p-6 rounded-lg border border-white">
-            <h3 className="text-xl font-bold text-white font-[hagrid] mb-4">
-              {(() => {
-                const yearText =
-                  selectedYear === 0 ? "All Years" : `${selectedYear}`;
-                const stockText =
-                  selectedStock === "all"
-                    ? "All Stocks"
-                    : availableStocks
-                        .find((s) => s.value === selectedStock)
-                        ?.label.split(" (")[0] || "Unknown Stock";
-                return `Summary - ${yearText}, ${stockText}`;
-              })()}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white font-[hagrid]">
-                  {filteredTransactions.length}
-                </div>
-                <div className="text-gray-300 font-[urbanist] text-sm">
-                  Total Transactions
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white font-[hagrid]">
-                  {new Set(filteredTransactions.map((t) => t.isin)).size}
-                </div>
-                <div className="text-gray-300 font-[urbanist] text-sm">
-                  Unique Securities
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white font-[hagrid]">
-                  {new Set(filteredTransactions.map((t) => t.date)).size}
-                </div>
-                <div className="text-gray-300 font-[urbanist] text-sm">
-                  Trading Days
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
