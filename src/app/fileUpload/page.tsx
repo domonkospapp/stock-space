@@ -103,7 +103,7 @@ export default function FileUpload() {
   };
 
   const tabs = [
-    { id: "original", label: "Original Data", color: "bg-amber-300" },
+    { id: "original", label: "Raw Data", color: "bg-amber-300" },
     { id: "processed", label: "Processed Data", color: "bg-purple-500" },
     { id: "summary", label: "Portfolio Summary", color: "bg-emerald-300" },
   ];
