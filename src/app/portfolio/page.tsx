@@ -30,6 +30,16 @@ export default function Portfolio() {
     }
 
     setLoading(false);
+
+    // Listen for currency changes
+    const handleCurrencyChange = (event: Event) => {
+      const customEvent = event as CustomEvent<Currency>;
+      setSelectedCurrency(customEvent.detail);
+    };
+
+    window.addEventListener("currencyChange", handleCurrencyChange);
+    return () =>
+      window.removeEventListener("currencyChange", handleCurrencyChange);
   }, []);
 
   const handleStockSelect = (isin: string) => {

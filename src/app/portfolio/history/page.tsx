@@ -25,6 +25,16 @@ export default function PortfolioHistory() {
     if (savedCurrency && (savedCurrency === "EUR" || savedCurrency === "USD")) {
       setSelectedCurrency(savedCurrency);
     }
+
+    // Listen for currency changes
+    const handleCurrencyChange = (event: Event) => {
+      const customEvent = event as CustomEvent<Currency>;
+      setSelectedCurrency(customEvent.detail);
+    };
+
+    window.addEventListener("currencyChange", handleCurrencyChange);
+    return () =>
+      window.removeEventListener("currencyChange", handleCurrencyChange);
   }, []);
 
   const formatCurrency = (amount: number, currency: Currency): string => {

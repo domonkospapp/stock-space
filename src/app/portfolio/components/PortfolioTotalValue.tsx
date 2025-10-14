@@ -21,7 +21,7 @@ export default function PortfolioTotalValue() {
   const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
   const isAllCalculated = usePortfolioStore((s) => s.isAllCalculated());
 
-  // Load saved currency preference
+  // Load saved currency preference and listen for changes
   useEffect(() => {
     const savedCurrency = localStorage.getItem(
       "portfolio-currency"
@@ -29,14 +29,27 @@ export default function PortfolioTotalValue() {
     if (savedCurrency && (savedCurrency === "EUR" || savedCurrency === "USD")) {
       setSelectedCurrency(savedCurrency);
     }
+
+    // Listen for currency changes from settings or other components
+    const handleCurrencyChangeEvent = (event: Event) => {
+      const customEvent = event as CustomEvent<Currency>;
+      setSelectedCurrency(customEvent.detail);
+    };
+
+    window.addEventListener("currencyChange", handleCurrencyChangeEvent);
+    return () =>
+      window.removeEventListener("currencyChange", handleCurrencyChangeEvent);
   }, []);
+
+  const totalInUSD = roundedTotalUSD || 0;
+  const totalInEUR = convertCurrency(totalInUSD, "USD", "EUR");
 
   return (
     <div>
       <h1 className="text-8xl font-bold text-white font-[hagrid]">
         {isAllCalculated ? (
           formatCurrency(
-            convertCurrency(roundedTotalUSD || 0, "USD", selectedCurrency),
+            selectedCurrency === "USD" ? totalInUSD : totalInEUR,
             selectedCurrency
           )
         ) : (
@@ -46,4 +59,3 @@ export default function PortfolioTotalValue() {
     </div>
   );
 }
-

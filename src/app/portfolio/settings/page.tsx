@@ -21,12 +21,27 @@ export default function PortfolioSettings() {
     if (savedCurrency && (savedCurrency === "EUR" || savedCurrency === "USD")) {
       setSelectedCurrency(savedCurrency);
     }
+
+    // Listen for currency changes from other components
+    const handleCurrencyChangeEvent = (event: Event) => {
+      const customEvent = event as CustomEvent<Currency>;
+      setSelectedCurrency(customEvent.detail);
+    };
+
+    window.addEventListener("currencyChange", handleCurrencyChangeEvent);
+    return () =>
+      window.removeEventListener("currencyChange", handleCurrencyChangeEvent);
   }, []);
 
   // Save currency preference to localStorage
   const handleCurrencyChange = (currency: Currency) => {
     setSelectedCurrency(currency);
     localStorage.setItem("portfolio-currency", currency);
+
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(
+      new CustomEvent("currencyChange", { detail: currency })
+    );
   };
 
   return (
