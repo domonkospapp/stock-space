@@ -19,9 +19,17 @@ export default function PortfolioTotalValue() {
   const roundedTotalUSD = usePortfolioStore((s) => s.roundedTotalUSD);
   const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
   const isAllCalculated = usePortfolioStore((s) => s.isAllCalculated());
+  const positions = usePortfolioStore((s) => s.positions);
 
   const totalInUSD = roundedTotalUSD || 0;
   const totalInEUR = convertCurrency(totalInUSD, "USD", "EUR");
+
+  // Show 0 if no portfolio data
+  if (positions.length === 0) {
+    return (
+      <h1 className="text-8xl font-bold text-white font-[hagrid]">$ 0.00</h1>
+    );
+  }
 
   return (
     <div>
