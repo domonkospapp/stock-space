@@ -12,7 +12,7 @@ export default function PortfolioNavigation() {
   };
 
   return (
-    <div className="p-4 mb-6">
+    <div className="">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-6">
           <h2 className="text-xl font-bold text-white font-[hagrid]">
