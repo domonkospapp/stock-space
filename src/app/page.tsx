@@ -306,7 +306,7 @@ export default function Home() {
       </section>
 
       {/* Footer Branding */}
-      <footer className="px-8 py-16">
+      <footer className="px-8 pt-16">
         <div className="max-w-6xl mx-auto">
           <div className="bg-ci-yellow rounded-b-[4rem] p-48 relative">
             <div className="absolute top-20 left-8 w-12 h-12 border-l-4 border-t-4 border-background"></div>
