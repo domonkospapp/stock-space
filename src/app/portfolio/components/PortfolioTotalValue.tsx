@@ -40,7 +40,7 @@ export default function PortfolioTotalValue() {
             selectedCurrency
           )
         ) : (
-          <span className="text-gray-400">Calculating...</span>
+          <span className="text-white">Calculating...</span>
         )}
       </h1>
     </div>
