@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePortfolioStore } from "../../../store/portfolioStore";
+import { clearAllPortfolioData } from "../../../utils/localStorage";
 
 type Currency = "EUR" | "USD";
 
 export default function PortfolioSettings() {
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const router = useRouter();
 
   const ratesToUSD = usePortfolioStore((s) => s.ratesToUSD);
@@ -42,6 +44,12 @@ export default function PortfolioSettings() {
     window.dispatchEvent(
       new CustomEvent("currencyChange", { detail: currency })
     );
+  };
+
+  const handleClearData = () => {
+    clearAllPortfolioData();
+    setShowConfirmDialog(false);
+    router.push("/fileUpload");
   };
 
   return (
@@ -119,19 +127,39 @@ export default function PortfolioSettings() {
             Data Management
           </h2>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-white font-[hagrid]">
-              Portfolio Data
-            </h3>
-            <p className="text-gray-300 font-[urbanist]">
-              Manage your portfolio data and upload new CSV files.
-            </p>
-            <button
-              onClick={() => router.push("/fileUpload")}
-              className="bg-ci-yellow hover:bg-ci-yellow/80 text-ci-black px-6 py-3 rounded-lg transition-colors font-[urbanist] font-bold"
-            >
-              📁 Upload New Data
-            </button>
+          <div className="space-y-6">
+            {/* Upload New Data */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-white font-[hagrid]">
+                Portfolio Data
+              </h3>
+              <p className="text-gray-300 font-[urbanist]">
+                Manage your portfolio data and upload new CSV files.
+              </p>
+              <button
+                onClick={() => router.push("/fileUpload")}
+                className="bg-ci-yellow hover:bg-ci-yellow/80 text-ci-black px-6 py-3 rounded-lg transition-colors font-[urbanist] font-bold"
+              >
+                📁 Upload New Data
+              </button>
+            </div>
+
+            {/* Clear All Data */}
+            <div className="space-y-4 border-t border-red-500/30 pt-6">
+              <h3 className="text-lg font-medium text-red-400 font-[hagrid]">
+                Clear Financial Data
+              </h3>
+              <p className="text-gray-300 font-[urbanist]">
+                Remove all portfolio data, transactions, settings, and cached
+                calculations from browser storage. This action cannot be undone.
+              </p>
+              <button
+                onClick={() => setShowConfirmDialog(true)}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors font-[urbanist] font-bold"
+              >
+                🗑️ Clear All Data
+              </button>
+            </div>
           </div>
         </div>
 
@@ -159,6 +187,45 @@ export default function PortfolioSettings() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg p-8 max-w-md mx-4 border-2 border-red-500">
+            <h3 className="text-2xl font-bold text-white font-[hagrid] mb-4">
+              ⚠️ Confirm Data Deletion
+            </h3>
+            <p className="text-gray-300 font-[urbanist] mb-6">
+              Are you sure you want to delete all your portfolio data? This will
+              remove:
+            </p>
+            <ul className="text-gray-300 font-[urbanist] mb-6 list-disc list-inside space-y-2">
+              <li>All transaction history</li>
+              <li>Portfolio holdings</li>
+              <li>Exchange rates</li>
+              <li>Cached calculations</li>
+              <li>Currency preferences</li>
+            </ul>
+            <p className="text-red-400 font-[urbanist] font-bold mb-6">
+              This action cannot be undone!
+            </p>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleClearData}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors font-[urbanist] font-bold"
+              >
+                Yes, Delete Everything
+              </button>
+              <button
+                onClick={() => setShowConfirmDialog(false)}
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-[urbanist] font-bold"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

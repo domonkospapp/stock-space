@@ -5,6 +5,10 @@ import { Position, Transaction } from "utils/types";
 import {
   hasPortfolioData,
   loadPortfolioFromLocalStorage,
+  loadExchangeRates,
+  loadCalculatedData,
+  saveExchangeRates,
+  saveCalculatedData,
 } from "utils/localStorage";
 import getStockPrice from "../actions/getStockPrice";
 import getExchangeRate from "../actions/getExchangeRate";
@@ -53,18 +57,58 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
 
   initFromLocalStorage: () => {
     if (!hasPortfolioData()) return;
+
+    // Load portfolio data
     const data = loadPortfolioFromLocalStorage();
+
+    // Load cached exchange rates
+    const cachedRates = loadExchangeRates();
+
+    // Load cached calculated data
+    const cachedData = loadCalculatedData();
+
+    // If we have cached calculated data, use it
     const initialHoldings: Record<string, Position> = {};
-    data.portfolioSummary.forEach((p) => {
-      initialHoldings[p.isin] = { ...p };
-    });
+    if (Object.keys(cachedData.holdingsMap).length > 0) {
+      // Use cached holdings with all calculated prices
+      data.portfolioSummary.forEach((p) => {
+        initialHoldings[p.isin] = cachedData.holdingsMap[p.isin] || { ...p };
+      });
+    } else {
+      // No cache, start with basic holdings
+      data.portfolioSummary.forEach((p) => {
+        initialHoldings[p.isin] = { ...p };
+      });
+    }
+
+    // Calculate totals from cached data if available
+    let totalCurrentValueUSD = 0;
+    let investedUSD = 0;
+
+    if (Object.keys(cachedData.calculatedIsins).length > 0) {
+      totalCurrentValueUSD = Object.values(initialHoldings).reduce(
+        (sum, p) => sum + (p.currentValue || 0),
+        0
+      );
+
+      // Calculate invested with cached rates
+      investedUSD = data.portfolioSummary.reduce((sum, p) => {
+        const cur = normalizeCurrencyCode(p.currency);
+        const rate = cur === "USD" ? 1 : cachedRates[cur] || 1;
+        return sum + p.totalShares * p.averagePrice * rate;
+      }, 0);
+    }
+
     set({
       positions: data.portfolioSummary,
       processedTransactions: data.processedTransactions,
       holdingsMap: initialHoldings,
-      calculatedIsins: {},
-      investedUSD: 0,
-      totalCurrentValueUSD: 0,
+      calculatedIsins: cachedData.calculatedIsins,
+      ratesToUSD: cachedRates,
+      investedUSD,
+      totalCurrentValueUSD,
+      roundedTotalUSD: Math.round(totalCurrentValueUSD),
+      lastPriceUpdate: cachedData.lastUpdate,
     });
   },
 
@@ -88,9 +132,9 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
         .map(async (cur) => {
           try {
             const rate = await getExchangeRate(cur, "USD");
-            set((s) => ({
-              ratesToUSD: { ...s.ratesToUSD, [cur]: rate, USD: 1 },
-            }));
+            const newRates = { ...get().ratesToUSD, [cur]: rate, USD: 1 };
+            set({ ratesToUSD: newRates });
+            saveExchangeRates(newRates);
           } catch {
             // best-effort; leave unset
           }
@@ -111,13 +155,13 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
             let r = get().ratesToUSD[normalizedPriceCurrency];
             if (!r) {
               r = await getExchangeRate(normalizedPriceCurrency, "USD");
-              set((s) => ({
-                ratesToUSD: {
-                  ...s.ratesToUSD,
-                  [normalizedPriceCurrency]: r,
-                  USD: 1,
-                },
-              }));
+              const newRates = {
+                ...get().ratesToUSD,
+                [normalizedPriceCurrency]: r,
+                USD: 1,
+              };
+              set({ ratesToUSD: newRates });
+              saveExchangeRates(newRates);
             }
             ratePriceToUSD = r;
           }
@@ -152,9 +196,13 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
               let r = get().ratesToUSD[normalized];
               if (!r) {
                 r = await getExchangeRate(normalized, "USD");
-                set((s) => ({
-                  ratesToUSD: { ...s.ratesToUSD, [normalized]: r, USD: 1 },
-                }));
+                const newRates = {
+                  ...get().ratesToUSD,
+                  [normalized]: r,
+                  USD: 1,
+                };
+                set({ ratesToUSD: newRates });
+                saveExchangeRates(newRates);
               }
               rateToUSD = r;
             } catch {
@@ -262,6 +310,13 @@ export const usePortfolioStore = create<PortfolioState>((set, get) => ({
         lastPriceUpdate: new Date(),
         isCalculating: false,
       });
+
+      // Save calculated data to local storage
+      const {
+        holdingsMap: finalHoldingsMap,
+        calculatedIsins: finalCalculatedIsins,
+      } = get();
+      saveCalculatedData(finalHoldingsMap, finalCalculatedIsins);
     } else {
       set({ isCalculating: false });
     }
