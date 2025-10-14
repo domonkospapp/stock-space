@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { usePortfolioStore } from "../../../store/portfolioStore";
-import PortfolioNavigation from "../components/PortfolioNavigation";
 
 type Currency = "EUR" | "USD";
 
@@ -17,21 +16,16 @@ export default function PortfolioHistory() {
     (s) => s.processedTransactions
   );
   const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
-  const initFromLocalStorage = usePortfolioStore((s) => s.initFromLocalStorage);
-  const roundedTotalUSD = usePortfolioStore((s) => s.roundedTotalUSD);
-  const isAllCalculated = usePortfolioStore((s) => s.isAllCalculated());
 
   // Load saved currency preference
   useEffect(() => {
-    initFromLocalStorage();
-
     const savedCurrency = localStorage.getItem(
       "portfolio-currency"
     ) as Currency;
     if (savedCurrency && (savedCurrency === "EUR" || savedCurrency === "USD")) {
       setSelectedCurrency(savedCurrency);
     }
-  }, [initFromLocalStorage]);
+  }, []);
 
   const formatCurrency = (amount: number, currency: Currency): string => {
     return amount.toLocaleString("en-US", {
@@ -146,224 +140,202 @@ export default function PortfolioHistory() {
   });
 
   return (
-    <div className="min-h-screen p-8" style={{ backgroundColor: "#292929" }}>
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-start justify-between mb-8">
-          <PortfolioNavigation />
-          <div>
-            <h1 className="text-8xl font-bold text-white font-[hagrid]">
-              {isAllCalculated ? (
-                formatCurrency(
-                  convertCurrency(
-                    roundedTotalUSD || 0,
-                    "USD",
-                    selectedCurrency
-                  ),
-                  selectedCurrency
-                )
-              ) : (
-                <span className="text-gray-400">Calculating...</span>
-              )}
-            </h1>
-          </div>
+    <>
+      {/* Header */}
+      <div className="mb-8">
+        <div className="mb-6">
+          <h2 className="text-4xl font-bold text-white font-[hagrid]">
+            Transaction History
+          </h2>
+          <p className="text-gray-300 font-[urbanist] mt-2">
+            Complete history of all your portfolio transactions
+          </p>
         </div>
+      </div>
 
-        {/* Header */}
-        <div className="mb-8">
-          <div className="mb-6">
-            <h2 className="text-4xl font-bold text-white font-[hagrid]">
-              Transaction History
-            </h2>
-            <p className="text-gray-300 font-[urbanist] mt-2">
-              Complete history of all your portfolio transactions
-            </p>
-          </div>
-        </div>
+      {/* Split View: Transaction List and Calendar */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Transaction History */}
+        <div className="lg:col-span-2">
+          <div className="space-y-8">
+            {sortedDates.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400 font-[urbanist] text-lg">
+                  No transaction history found
+                </p>
+              </div>
+            ) : (
+              sortedDates.map((date) => (
+                <div key={date}>
+                  <h2 className="text-2xl font-bold text-white font-[hagrid] mb-4">
+                    {formatDate(date)}
+                  </h2>
 
-        {/* Split View: Transaction List and Calendar */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Transaction History */}
-          <div className="lg:col-span-2">
-            <div className="space-y-8">
-              {sortedDates.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-400 font-[urbanist] text-lg">
-                    No transaction history found
-                  </p>
-                </div>
-              ) : (
-                sortedDates.map((date) => (
-                  <div key={date}>
-                    <h2 className="text-2xl font-bold text-white font-[hagrid] mb-4">
-                      {formatDate(date)}
-                    </h2>
+                  <div className="space-y-3">
+                    {groupedTransactions[date].map((transaction, index) => {
+                      // Calculate the actual transaction value (shares * price)
+                      const transactionValue = Math.abs(
+                        transaction.amount * transaction.price
+                      );
+                      const amountInSelectedCurrency = convertCurrency(
+                        transactionValue,
+                        transaction.currency,
+                        selectedCurrency
+                      );
 
-                    <div className="space-y-3">
-                      {groupedTransactions[date].map((transaction, index) => {
-                        // Calculate the actual transaction value (shares * price)
-                        const transactionValue = Math.abs(
-                          transaction.amount * transaction.price
-                        );
-                        const amountInSelectedCurrency = convertCurrency(
-                          transactionValue,
-                          transaction.currency,
-                          selectedCurrency
-                        );
-
-                        return (
-                          <div
-                            key={`${transaction.date}-${index}`}
-                            className="flex items-center justify-between p-4 rounded-lg border border-white"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-4">
-                                <div
-                                  className={`w-3 h-3 rounded-full ${
-                                    transaction.type === "BUY"
-                                      ? "bg-green-500"
-                                      : "bg-red-500"
-                                  }`}
-                                />
-                                <div>
-                                  <h3 className="text-white font-[hagrid] text-lg">
-                                    {transaction.type}{" "}
-                                    {Math.abs(transaction.amount).toFixed(0)}{" "}
-                                    shares
-                                  </h3>
-                                  <p className="text-gray-300 font-[urbanist] text-sm">
-                                    {transaction.isin} • {transaction.stockName}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="text-right">
+                      return (
+                        <div
+                          key={`${transaction.date}-${index}`}
+                          className="flex items-center justify-between p-4 rounded-lg border border-white"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-4">
                               <div
-                                className={`font-[hagrid] text-lg ${
+                                className={`w-3 h-3 rounded-full ${
                                   transaction.type === "BUY"
-                                    ? "text-red-400"
-                                    : "text-green-400"
+                                    ? "bg-green-500"
+                                    : "bg-red-500"
                                 }`}
-                              >
-                                {transaction.type === "BUY" ? "-" : "+"}
-                                {formatCurrency(
-                                  amountInSelectedCurrency,
-                                  selectedCurrency
-                                )}
-                              </div>
-                              <div className="text-gray-400 font-[urbanist] text-sm">
-                                {transaction.price.toLocaleString("en-US", {
-                                  style: "currency",
-                                  currency: transaction.currency as Currency,
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                })}{" "}
-                                per share
+                              />
+                              <div>
+                                <h3 className="text-white font-[hagrid] text-lg">
+                                  {transaction.type}{" "}
+                                  {Math.abs(transaction.amount).toFixed(0)}{" "}
+                                  shares
+                                </h3>
+                                <p className="text-gray-300 font-[urbanist] text-sm">
+                                  {transaction.isin} • {transaction.stockName}
+                                </p>
                               </div>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
+
+                          <div className="text-right">
+                            <div
+                              className={`font-[hagrid] text-lg ${
+                                transaction.type === "BUY"
+                                  ? "text-red-400"
+                                  : "text-green-400"
+                              }`}
+                            >
+                              {transaction.type === "BUY" ? "-" : "+"}
+                              {formatCurrency(
+                                amountInSelectedCurrency,
+                                selectedCurrency
+                              )}
+                            </div>
+                            <div className="text-gray-400 font-[urbanist] text-sm">
+                              {transaction.price.toLocaleString("en-US", {
+                                style: "currency",
+                                currency: transaction.currency as Currency,
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              per share
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                ))
-              )}
-            </div>
+                </div>
+              ))
+            )}
           </div>
+        </div>
 
-          {/* Calendar Layout */}
-          <div className="lg:col-span-1">
-            <div className="p-6 sticky top-8">
-              {/* Filters */}
-              <div className="mb-6">
-                <h3 className="text-xl font-bold text-white font-[hagrid] mb-4">
-                  Filters
-                </h3>
+        {/* Calendar Layout */}
+        <div className="lg:col-span-1">
+          <div className="p-6 sticky top-8">
+            {/* Filters */}
+            <div className="mb-6">
+              <h3 className="text-xl font-bold text-white font-[hagrid] mb-4">
+                Filters
+              </h3>
 
-                {/* Stock Selector */}
-                <div className="mb-4">
-                  <label className="block text-gray-300 font-[urbanist] text-sm mb-2">
-                    Stock
-                  </label>
-                  <select
-                    value={selectedStock}
-                    onChange={(e) => setSelectedStock(e.target.value)}
-                    className="w-full bg-transparent border border-white text-white px-3 py-2 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
-                  >
-                    {availableStocks.map((stock) => (
-                      <option
-                        key={stock.value}
-                        value={stock.value}
-                        className="bg-background text-white"
-                      >
-                        {stock.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Year Selector */}
-                <div className="mb-4">
-                  <label className="block text-gray-300 font-[urbanist] text-sm mb-2">
-                    Year
-                  </label>
-                  <select
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                    className="w-full bg-transparent border border-white text-white px-3 py-2 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
-                  >
-                    {availableYears.map((year) => (
-                      <option
-                        key={year}
-                        value={year}
-                        className="bg-background text-white"
-                      >
-                        {year === 0 ? "All Years" : year}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Calendar Header */}
+              {/* Stock Selector */}
               <div className="mb-4">
-                <h3 className="text-xl font-bold text-white font-[hagrid]">
-                  Calendar
-                </h3>
+                <label className="block text-gray-300 font-[urbanist] text-sm mb-2">
+                  Stock
+                </label>
+                <select
+                  value={selectedStock}
+                  onChange={(e) => setSelectedStock(e.target.value)}
+                  className="w-full bg-transparent border border-white text-white px-3 py-2 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
+                >
+                  {availableStocks.map((stock) => (
+                    <option
+                      key={stock.value}
+                      value={stock.value}
+                      className="bg-background text-white"
+                    >
+                      {stock.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                {monthlyCounts.map(({ month, count, monthIndex }) => (
-                  <div
-                    key={monthIndex}
-                    className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                      count > 0
-                        ? "border-ci-yellow bg-ci-yellow/10 hover:bg-ci-yellow/20"
-                        : "border-white bg-transparent hover:bg-white/10"
-                    }`}
-                  >
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-white font-[hagrid] mb-1">
-                        {month}
-                      </div>
-                      <div
-                        className={`text-2xl font-bold font-[hagrid] ${
-                          count > 0 ? "text-ci-yellow" : "text-gray-400"
-                        }`}
-                      >
-                        {count}
-                      </div>
-                      <div className="text-xs text-gray-400 font-[urbanist] mt-1">
-                        {count}
-                      </div>
+              {/* Year Selector */}
+              <div className="mb-4">
+                <label className="block text-gray-300 font-[urbanist] text-sm mb-2">
+                  Year
+                </label>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                  className="w-full bg-transparent border border-white text-white px-3 py-2 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
+                >
+                  {availableYears.map((year) => (
+                    <option
+                      key={year}
+                      value={year}
+                      className="bg-background text-white"
+                    >
+                      {year === 0 ? "All Years" : year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Calendar Header */}
+            <div className="mb-4">
+              <h3 className="text-xl font-bold text-white font-[hagrid]">
+                Calendar
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              {monthlyCounts.map(({ month, count, monthIndex }) => (
+                <div
+                  key={monthIndex}
+                  className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                    count > 0
+                      ? "border-ci-yellow bg-ci-yellow/10 hover:bg-ci-yellow/20"
+                      : "border-white bg-transparent hover:bg-white/10"
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-white font-[hagrid] mb-1">
+                      {month}
+                    </div>
+                    <div
+                      className={`text-2xl font-bold font-[hagrid] ${
+                        count > 0 ? "text-ci-yellow" : "text-gray-400"
+                      }`}
+                    >
+                      {count}
+                    </div>
+                    <div className="text-xs text-gray-400 font-[urbanist] mt-1">
+                      {count}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
