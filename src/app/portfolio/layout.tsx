@@ -10,16 +10,14 @@ export default function PortfolioLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const initFromLocalStorage = usePortfolioStore((s) => s.initFromLocalStorage);
   const positions = usePortfolioStore((s) => s.positions);
   const startCalculations = usePortfolioStore((s) => s.startCalculations);
 
   useEffect(() => {
-    initFromLocalStorage();
-  }, [initFromLocalStorage]);
-
-  useEffect(() => {
-    startCalculations();
+    // Start calculations on mount and when positions change
+    if (positions.length > 0) {
+      startCalculations();
+    }
   }, [positions.length, startCalculations]);
 
   return (

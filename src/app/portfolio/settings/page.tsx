@@ -1,53 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePortfolioStore } from "../../../store/portfolioStore";
-import { clearAllPortfolioData } from "../../../utils/localStorage";
+import { useSettingsStore } from "../../../store/settingsStore";
 
 type Currency = "EUR" | "USD";
 
 export default function PortfolioSettings() {
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const router = useRouter();
 
+  const selectedCurrency = useSettingsStore((s) => s.selectedCurrency);
+  const setSelectedCurrency = useSettingsStore((s) => s.setSelectedCurrency);
+  const clearSettings = useSettingsStore((s) => s.clearSettings);
+
+  const clearPortfolioData = usePortfolioStore((s) => s.clearAllData);
   const ratesToUSD = usePortfolioStore((s) => s.ratesToUSD);
   const lastPriceUpdate = usePortfolioStore((s) => s.lastPriceUpdate);
 
-  // Load saved currency preference from localStorage
-  useEffect(() => {
-    const savedCurrency = localStorage.getItem(
-      "portfolio-currency"
-    ) as Currency;
-    if (savedCurrency && (savedCurrency === "EUR" || savedCurrency === "USD")) {
-      setSelectedCurrency(savedCurrency);
-    }
-
-    // Listen for currency changes from other components
-    const handleCurrencyChangeEvent = (event: Event) => {
-      const customEvent = event as CustomEvent<Currency>;
-      setSelectedCurrency(customEvent.detail);
-    };
-
-    window.addEventListener("currencyChange", handleCurrencyChangeEvent);
-    return () =>
-      window.removeEventListener("currencyChange", handleCurrencyChangeEvent);
-  }, []);
-
-  // Save currency preference to localStorage
-  const handleCurrencyChange = (currency: Currency) => {
-    setSelectedCurrency(currency);
-    localStorage.setItem("portfolio-currency", currency);
-
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(
-      new CustomEvent("currencyChange", { detail: currency })
-    );
-  };
-
   const handleClearData = () => {
-    clearAllPortfolioData();
+    clearPortfolioData();
+    clearSettings();
     setShowConfirmDialog(false);
     router.push("/fileUpload");
   };
@@ -83,7 +57,7 @@ export default function PortfolioSettings() {
               </span>
               <div className="flex bg-gray-600 rounded-lg p-1">
                 <button
-                  onClick={() => handleCurrencyChange("USD")}
+                  onClick={() => setSelectedCurrency("USD")}
                   className={`px-4 py-2 rounded-md font-medium transition-colors font-[urbanist] ${
                     selectedCurrency === "USD"
                       ? "bg-ci-yellow text-ci-black"
@@ -93,7 +67,7 @@ export default function PortfolioSettings() {
                   USD
                 </button>
                 <button
-                  onClick={() => handleCurrencyChange("EUR")}
+                  onClick={() => setSelectedCurrency("EUR")}
                   className={`px-4 py-2 rounded-md font-medium transition-colors font-[urbanist] ${
                     selectedCurrency === "EUR"
                       ? "bg-ci-yellow text-ci-black"

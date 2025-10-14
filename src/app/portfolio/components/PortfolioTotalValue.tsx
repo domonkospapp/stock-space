@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePortfolioStore } from "../../../store/portfolioStore";
+import { useSettingsStore } from "../../../store/settingsStore";
 
 type Currency = "EUR" | "USD";
 
@@ -15,31 +15,10 @@ const formatCurrency = (amount: number, currency: Currency): string => {
 };
 
 export default function PortfolioTotalValue() {
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
-
+  const selectedCurrency = useSettingsStore((s) => s.selectedCurrency);
   const roundedTotalUSD = usePortfolioStore((s) => s.roundedTotalUSD);
   const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
   const isAllCalculated = usePortfolioStore((s) => s.isAllCalculated());
-
-  // Load saved currency preference and listen for changes
-  useEffect(() => {
-    const savedCurrency = localStorage.getItem(
-      "portfolio-currency"
-    ) as Currency;
-    if (savedCurrency && (savedCurrency === "EUR" || savedCurrency === "USD")) {
-      setSelectedCurrency(savedCurrency);
-    }
-
-    // Listen for currency changes from settings or other components
-    const handleCurrencyChangeEvent = (event: Event) => {
-      const customEvent = event as CustomEvent<Currency>;
-      setSelectedCurrency(customEvent.detail);
-    };
-
-    window.addEventListener("currencyChange", handleCurrencyChangeEvent);
-    return () =>
-      window.removeEventListener("currencyChange", handleCurrencyChangeEvent);
-  }, []);
 
   const totalInUSD = roundedTotalUSD || 0;
   const totalInEUR = convertCurrency(totalInUSD, "USD", "EUR");

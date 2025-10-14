@@ -1,17 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { hasPortfolioData } from "utils/localStorage";
+import { useState } from "react";
 import { usePortfolioStore } from "../../store/portfolioStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import PositionsTreemap from "./components/PositionsTreemap";
 import TransactionsChart from "./components/TransactionsChart";
 
-type Currency = "EUR" | "USD";
-
 export default function Portfolio() {
-  const [loading, setLoading] = useState(true);
   const [selectedStock, setSelectedStock] = useState<string | null>(null);
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
 
   const positions = usePortfolioStore((s) => s.positions);
   const holdingsMap = usePortfolioStore((s) => s.holdingsMap);
@@ -19,42 +15,13 @@ export default function Portfolio() {
   const getTransactionsForStock = usePortfolioStore(
     (s) => s.getTransactionsForStock
   );
-
-  useEffect(() => {
-    // Load saved currency preference
-    const savedCurrency = localStorage.getItem(
-      "portfolio-currency"
-    ) as Currency;
-    if (savedCurrency && (savedCurrency === "EUR" || savedCurrency === "USD")) {
-      setSelectedCurrency(savedCurrency);
-    }
-
-    setLoading(false);
-
-    // Listen for currency changes
-    const handleCurrencyChange = (event: Event) => {
-      const customEvent = event as CustomEvent<Currency>;
-      setSelectedCurrency(customEvent.detail);
-    };
-
-    window.addEventListener("currencyChange", handleCurrencyChange);
-    return () =>
-      window.removeEventListener("currencyChange", handleCurrencyChange);
-  }, []);
+  const selectedCurrency = useSettingsStore((s) => s.selectedCurrency);
 
   const handleStockSelect = (isin: string) => {
     setSelectedStock(selectedStock === isin ? null : isin);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl font-[hagrid]">Loading portfolio...</div>
-      </div>
-    );
-  }
-
-  if (!hasPortfolioData() || positions.length === 0) {
+  if (positions.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">

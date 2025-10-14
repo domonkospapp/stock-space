@@ -1,41 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePortfolioStore } from "../../../store/portfolioStore";
+import { useSettingsStore } from "../../../store/settingsStore";
 
 type Currency = "EUR" | "USD";
 
 export default function PortfolioHistory() {
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>("USD");
   const [selectedYear, setSelectedYear] = useState<number>(
     new Date().getFullYear()
   );
   const [selectedStock, setSelectedStock] = useState<string>("all");
 
+  const selectedCurrency = useSettingsStore((s) => s.selectedCurrency);
   const processedTransactions = usePortfolioStore(
     (s) => s.processedTransactions
   );
   const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
-
-  // Load saved currency preference
-  useEffect(() => {
-    const savedCurrency = localStorage.getItem(
-      "portfolio-currency"
-    ) as Currency;
-    if (savedCurrency && (savedCurrency === "EUR" || savedCurrency === "USD")) {
-      setSelectedCurrency(savedCurrency);
-    }
-
-    // Listen for currency changes
-    const handleCurrencyChange = (event: Event) => {
-      const customEvent = event as CustomEvent<Currency>;
-      setSelectedCurrency(customEvent.detail);
-    };
-
-    window.addEventListener("currencyChange", handleCurrencyChange);
-    return () =>
-      window.removeEventListener("currencyChange", handleCurrencyChange);
-  }, []);
 
   const formatCurrency = (amount: number, currency: Currency): string => {
     return amount.toLocaleString("en-US", {

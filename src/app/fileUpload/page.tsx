@@ -5,7 +5,7 @@ import { useState } from "react";
 import { CsvTransaction, Transaction, Position } from "utils/types";
 import processedTransactions from "utils/transactions/processTransactions";
 import { createPortfolioSummary } from "utils/transactions/createPortfolioSummary";
-import { savePortfolioToLocalStorage } from "utils/localStorage";
+import { usePortfolioStore } from "../../store/portfolioStore";
 // import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -19,6 +19,8 @@ export default function FileUpload() {
   const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const router = useRouter();
+
+  const setPortfolioData = usePortfolioStore((s) => s.setPortfolioData);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -302,10 +304,7 @@ export default function FileUpload() {
                 <button
                   className="bg-background hover:bg-gray-200 text-ci-yellow text-xl font-bold font-[urbanist] px-8 py-4 rounded-full transition-colors inline-flex items-center space-x-3"
                   onClick={() => {
-                    savePortfolioToLocalStorage(
-                      portfolioSummary,
-                      processedData
-                    );
+                    setPortfolioData(portfolioSummary, processedData);
                     router.push("/portfolio");
                   }}
                 >
