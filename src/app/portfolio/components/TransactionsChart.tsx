@@ -10,8 +10,8 @@ type Props = {
 export default function TransactionsChart({ transactions }: Props) {
   if (!transactions.length) {
     return (
-      <div className="mt-10 p-6 rounded-[32px] border border-white shadow-xl">
-        <div className="text-center py-12">
+      <div className="mt-4 p-6">
+        <div className="text-center py-8">
           <div className="text-white text-xl font-[hagrid] mb-2">
             Select a position to view its purchase history
           </div>
