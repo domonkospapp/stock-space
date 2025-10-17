@@ -74,20 +74,22 @@ export default function Home() {
         <div className="max-w-6xl mx-auto grow flex items-start justify-between ">
           <div className="w-[60%] h-full items-start">
             <h1 className="text-8xl font-bold font-[hagrid] mb-8 leading-tight">
-              Launch your portfolio
+              See what flatex won’t show you.
             </h1>
             <p className="text-3xl font-[urbanist] my-16 text-gray-300 mr-24">
-              Upload your Flatex CSV and see your portfolio like never before.
+              Drop your flatex export and get clear!
+              <br /> Interactive insights on your allocation, returns, and
+              trends. Instantly, privately, and effortlessly.
             </p>
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-row items-center space-x-4">
               <Link
                 href="/fileUpload"
-                className="bg-foreground hover:bg-ci-yellow text-background text-xl font-bold font-[urbanist] px-6 py-2 rounded-full transition-colors flex items-center space-x-2 w-fit h-16"
+                className="bg-foreground hover:bg-ci-yellow text-background text-xl font-bold font-[urbanist] px-6 py-2 rounded-full transition-colors flex items-center space-x-2 h-16"
               >
-                <span>Upload Your Flatex CSV</span>
+                <span>Upload your file</span>
                 <svg
-                  width="53"
-                  height="53"
+                  width="24"
+                  height="24"
                   viewBox="0 0 53 53"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -111,7 +113,7 @@ export default function Home() {
                   </defs>
                 </svg>
               </Link>
-              <button className="border border-foreground text-foreground px-6 py-2 cursor-pointer rounded-full font-[urbanist] hover:bg-foreground hover:text-background text-xl font-bold transition-colors w-fit h-16">
+              <button className="border border-foreground text-foreground px-6 py-2 cursor-pointer rounded-full font-[urbanist] hover:bg-foreground hover:text-background text-xl font-bold transition-colors h-16">
                 Try Demo Portfolio
               </button>
             </div>
@@ -133,8 +135,151 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Features / Benefits Section */}
+      <section id="about" className="px-8 py-16">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-7xl font-bold font-[hagrid] mb-6 leading-tight">
+            Everything your Flatex account{" "}
+            <span className="text-ci-yellow underline">should </span> show
+          </h2>
+          <p className="text-2xl font-[urbanist] text-gray-300 mb-16 max-w-4xl">
+            stck.space turns your Flatex export into clear, interactive
+            insights. No clutter. No spreadsheets. Just your portfolio, fully
+            visualized — instantly and privately.
+          </p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Feature 1: Portfolio Overview */}
+            <div className="bg-ci-purple p-8 rounded-2xl h-full">
+              <div className="text-center mb-6">
+                <img
+                  src="/why/1.png"
+                  alt="Portfolio overview showing stock holdings and percentages"
+                  className="w-full max-w-sm h-auto rounded-lg shadow-lg mx-auto mb-6"
+                />
+                <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                  See your portfolio at a glance
+                </h3>
+                <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                  Instantly visualize how your portfolio is distributed across
+                  your holdings. A clean pie chart shows the percentage of each
+                  asset — simple, clear, and easy to understand.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 2: Performance & Returns */}
+            <div className="bg-ci-purple p-8 rounded-2xl h-full">
+              <div className="text-center mb-6">
+                <img
+                  src="/why/2.png"
+                  alt="Performance chart showing growth over time"
+                  className="w-full max-w-sm h-auto rounded-lg shadow-lg mx-auto mb-6"
+                />
+                <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                  Track your growth over time
+                </h3>
+                <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                  See how your portfolio performed over weeks, months, or the
+                  year. Quickly check your total returns and trends without
+                  manually calculating or reading complicated tables.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 3: Monthly Activity */}
+            <div className="bg-ci-purple p-8 rounded-2xl h-full">
+              <div className="text-center mb-6">
+                <img
+                  src="/why/3.png"
+                  alt="Monthly activity chart showing buying patterns"
+                  className="w-full max-w-sm h-auto rounded-lg shadow-lg mx-auto mb-6"
+                />
+                <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                  Know your buying patterns
+                </h3>
+                <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                  Understand when you bought the most and get a quick overview
+                  of your transactions over time. Simple charts help you spot
+                  trends and patterns in your investing activity.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 4: Instant & Private */}
+            <div className="bg-ci-purple p-8 rounded-2xl h-full">
+              <div className="text-center mb-6">
+                <img
+                  src="/why/4.png"
+                  alt="Privacy and instant processing visualization"
+                  className="w-full max-w-sm h-auto rounded-lg shadow-lg mx-auto mb-6"
+                />
+                <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
+                  Insights in seconds, 100% on your device
+                </h3>
+                <p className="text-xl font-[urbanist] text-background leading-relaxed">
+                  No cloud. No registration. Your data stays on your device at
+                  all times. Upload your flatex export and explore instantly,
+                  safely, and privately.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* End CTA Section */}
+      <section className="px-8 py-16">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-6xl font-bold font-[hagrid] mb-12">
+            Transform your Flatex data into insights.
+          </h2>
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-row items-center gap-4">
+              <Link
+                href="/fileUpload"
+                className="bg-foreground hover:bg-ci-yellow text-background text-xl font-bold font-[urbanist] px-6 py-2 rounded-full transition-colors inline-flex items-center space-x-2 h-16"
+              >
+                <span>Upload CSV Now</span>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 53 53"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g clipPath="url(#clip0_67_2009)">
+                    <path
+                      d="M13.8913 14.9227C15.134 16.1654 18.2077 16.811 20.9968 17.1456C24.588 17.5759 28.2308 17.4464 31.7363 16.6234C34.3619 16.0064 37.2948 15.0014 38.8763 13.4199M37.4026 38.434C36.1599 37.1912 35.5142 34.1176 35.1797 31.3285C34.7494 27.7373 34.8789 24.0945 35.7019 20.5889C36.3189 17.9634 37.3239 15.0305 38.9054 13.449M38.8909 13.4344L-69.4685 121.794"
+                      stroke="#292929"
+                      strokeWidth="3"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_67_2009">
+                      <rect
+                        width="36"
+                        height="38"
+                        fill="white"
+                        transform="translate(0 25.4551) rotate(-45)"
+                      />
+                    </clipPath>
+                  </defs>
+                </svg>
+              </Link>
+              <button className="border border-foreground text-foreground px-6 py-2 cursor-pointer rounded-full font-[urbanist] hover:bg-foreground hover:text-background text-xl font-bold transition-colors h-16">
+                Try Demo Portfolio
+              </button>
+            </div>
+            <p className="mt-2 text-gray-400 font-[urbanist] text-lg">
+              100% private & instant — all processing happens in your browser.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Feature Highlights */}
-      <section id="features" className="px-8 py-16">
+      {/* <section id="features" className="px-8 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Advantage
@@ -154,7 +299,7 @@ export default function Home() {
             />
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Three Steps Section */}
       <section id="steps" className="px-8 py-16">
@@ -189,119 +334,53 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why Stock Space Section */}
-      <section id="about" className="px-8 py-16">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-7xl font-bold font-[hagrid] mb-12">
-            Why Stock Space?
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-ci-purple p-8 rounded-2xl">
-              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
-                Beyond Basic Charts
-              </h3>
-              <p className="text-xl font-[urbanist] text-background leading-relaxed">
-                Flatex gives you basic portfolio data, but Stock Space
-                transforms it into actionable insights. See your portfolio
-                allocation, performance trends, and risk metrics in beautiful,
-                interactive visualizations.
-              </p>
-            </div>
-
-            <div className="bg-ci-purple p-8 rounded-2xl">
-              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
-                Privacy First
-              </h3>
-              <p className="text-xl font-[urbanist] text-background leading-relaxed">
-                Your financial data never leaves your browser. All calculations
-                happen locally, ensuring complete privacy while giving you
-                powerful analytics tools.
-              </p>
-            </div>
-
-            <div className="bg-ci-purple p-8 rounded-2xl">
-              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
-                No Account Required
-              </h3>
-              <p className="text-xl font-[urbanist] text-background leading-relaxed">
-                Upload your CSV and start analyzing immediately. No sign-ups, no
-                subscriptions, no data collection. Just pure portfolio insights.
-              </p>
-            </div>
-
-            <div className="bg-ci-purple p-8 rounded-2xl">
-              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
-                Modern Interface
-              </h3>
-              <p className="text-xl font-[urbanist] text-background leading-relaxed">
-                Built with modern web technologies for a smooth, responsive
-                experience. Clean design that makes complex financial data easy
-                to understand.
-              </p>
-            </div>
-
-            <div className="bg-ci-purple p-8 rounded-2xl">
-              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
-                Comprehensive Analysis
-              </h3>
-              <p className="text-xl font-[urbanist] text-background leading-relaxed">
-                From pie charts showing asset allocation to treemaps visualizing
-                position sizes, get the insights you need to make informed
-                investment decisions.
-              </p>
-            </div>
-
-            <div className="bg-ci-purple p-8 rounded-2xl">
-              <h3 className="text-3xl font-bold font-[hagrid] mb-4 text-background">
-                Always Up-to-Date
-              </h3>
-              <p className="text-xl font-[urbanist] text-background leading-relaxed">
-                Import fresh data whenever you want. No waiting for platform
-                updates or delayed reporting. Your portfolio analysis is always
-                current.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Closing CTA Section */}
       <section className="px-8 py-16">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-6xl font-bold font-[hagrid] mb-12">
             Ready to see your portfolio the way it should be?
           </h2>
-          <Link
-            href="/fileUpload"
-            className="bg-foreground hover:bg-ci-yellow text-background text-2xl font-bold font-[urbanist] px-12 py-6 rounded-full transition-colors inline-flex items-center space-x-4"
-          >
-            <span>Upload CSV Now</span>
-            <svg
-              width="53"
-              height="53"
-              viewBox="0 0 53 53"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g clipPath="url(#clip0_67_2009)">
-                <path
-                  d="M13.8913 14.9227C15.134 16.1654 18.2077 16.811 20.9968 17.1456C24.588 17.5759 28.2308 17.4464 31.7363 16.6234C34.3619 16.0064 37.2948 15.0014 38.8763 13.4199M37.4026 38.434C36.1599 37.1912 35.5142 34.1176 35.1797 31.3285C34.7494 27.7373 34.8789 24.0945 35.7019 20.5889C36.3189 17.9634 37.3239 15.0305 38.9054 13.449M38.8909 13.4344L-69.4685 121.794"
-                  stroke="#292929"
-                  strokeWidth="3"
-                />
-              </g>
-              <defs>
-                <clipPath id="clip0_67_2009">
-                  <rect
-                    width="36"
-                    height="38"
-                    fill="white"
-                    transform="translate(0 25.4551) rotate(-45)"
-                  />
-                </clipPath>
-              </defs>
-            </svg>
-          </Link>
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-row items-center gap-4">
+              <Link
+                href="/fileUpload"
+                className="bg-foreground hover:bg-ci-yellow text-background text-xl font-bold font-[urbanist] px-6 py-2 rounded-full transition-colors inline-flex items-center space-x-2 h-16"
+              >
+                <span>Upload CSV Now</span>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 53 53"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g clipPath="url(#clip0_67_2009)">
+                    <path
+                      d="M13.8913 14.9227C15.134 16.1654 18.2077 16.811 20.9968 17.1456C24.588 17.5759 28.2308 17.4464 31.7363 16.6234C34.3619 16.0064 37.2948 15.0014 38.8763 13.4199M37.4026 38.434C36.1599 37.1912 35.5142 34.1176 35.1797 31.3285C34.7494 27.7373 34.8789 24.0945 35.7019 20.5889C36.3189 17.9634 37.3239 15.0305 38.9054 13.449M38.8909 13.4344L-69.4685 121.794"
+                      stroke="#292929"
+                      strokeWidth="3"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_67_2009">
+                      <rect
+                        width="36"
+                        height="38"
+                        fill="white"
+                        transform="translate(0 25.4551) rotate(-45)"
+                      />
+                    </clipPath>
+                  </defs>
+                </svg>
+              </Link>
+              <button className="border border-foreground text-foreground px-6 py-2 cursor-pointer rounded-full font-[urbanist] hover:bg-foreground hover:text-background text-xl font-bold transition-colors h-16">
+                Try Demo Portfolio
+              </button>
+            </div>
+            <p className="mt-2 text-gray-400 font-[urbanist] text-lg">
+              100% private & instant — all processing happens in your browser.
+            </p>
+          </div>
         </div>
       </section>
 
