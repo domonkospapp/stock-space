@@ -676,7 +676,7 @@ const Header = () => {
         </button>
         <button
           className="font-urbanist text-xl text-white px-6 py-2 border border-white rounded-full hover:bg-white hover:text-background transition-all cursor-pointer"
-          onClick={() => scrollToSection("features")}
+          onClick={() => scrollToSection("about")}
         >
           features
         </button>
@@ -684,13 +684,7 @@ const Header = () => {
           className="font-urbanist text-xl text-white px-6 py-2 border border-white rounded-full hover:bg-white hover:text-background transition-all cursor-pointer"
           onClick={() => scrollToSection("steps")}
         >
-          steps
-        </button>
-        <button
-          className="font-urbanist text-xl text-white px-6 py-2 border border-white rounded-full hover:bg-white hover:text-background transition-all cursor-pointer"
-          onClick={() => scrollToSection("about")}
-        >
-          about
+          how it works
         </button>
       </nav>
       {/*<Link
