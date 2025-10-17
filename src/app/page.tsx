@@ -392,7 +392,7 @@ export default function Home() {
               Trusted by investors who value their privacy
             </h2>
             <p className="text-xl font-[urbanist] text-gray-300">
-              Join thousands of users who've discovered the power of clear
+              Join thousands of users who&apos;ve discovered the power of clear
               portfolio insights
             </p>
           </div>
@@ -414,9 +414,9 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-background font-[urbanist] text-lg mb-4 leading-relaxed">
-                "Finally! I can see my portfolio allocation clearly. Flatex's
-                interface was so cluttered, but this gives me exactly what I
-                need in seconds."
+                &quot;Finally! I can see my portfolio allocation clearly.
+                Flatex&apos;s interface was so cluttered, but this gives me
+                exactly what I need in seconds.&quot;
               </p>
               <div className="text-background/80 font-[urbanist]">
                 <div className="font-bold">Sarah M.</div>
@@ -440,9 +440,9 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-background font-[urbanist] text-lg mb-4 leading-relaxed">
-                "Love that my data never leaves my computer. The privacy-first
-                approach gives me peace of mind while getting the insights I
-                need."
+                &quot;Love that my data never leaves my computer. The
+                privacy-first approach gives me peace of mind while getting the
+                insights I need.&quot;
               </p>
               <div className="text-background/80 font-[urbanist]">
                 <div className="font-bold">Michael K.</div>
@@ -466,9 +466,9 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-background font-[urbanist] text-lg mb-4 leading-relaxed">
-                "Simple, fast, and exactly what I was looking for. No
+                &quot;Simple, fast, and exactly what I was looking for. No
                 complicated setup, just upload and explore. Perfect for my
-                investment tracking."
+                investment tracking.&quot;
               </p>
               <div className="text-background/80 font-[urbanist]">
                 <div className="font-bold">Anna L.</div>
