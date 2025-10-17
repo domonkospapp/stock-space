@@ -334,7 +334,180 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Closing CTA Section */}
+      {/* Upload CTA Section */}
+      <section className="px-8 py-16">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-6xl font-bold font-[hagrid] mb-12">
+            Transform your Flatex data into insights.
+          </h2>
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-row items-center gap-4">
+              <Link
+                href="/fileUpload"
+                className="bg-foreground hover:bg-ci-yellow text-background text-xl font-bold font-[urbanist] px-6 py-2 rounded-full transition-colors inline-flex items-center space-x-2 h-16"
+              >
+                <span>Upload CSV Now</span>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 53 53"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g clipPath="url(#clip0_67_2009)">
+                    <path
+                      d="M13.8913 14.9227C15.134 16.1654 18.2077 16.811 20.9968 17.1456C24.588 17.5759 28.2308 17.4464 31.7363 16.6234C34.3619 16.0064 37.2948 15.0014 38.8763 13.4199M37.4026 38.434C36.1599 37.1912 35.5142 34.1176 35.1797 31.3285C34.7494 27.7373 34.8789 24.0945 35.7019 20.5889C36.3189 17.9634 37.3239 15.0305 38.9054 13.449M38.8909 13.4344L-69.4685 121.794"
+                      stroke="#292929"
+                      strokeWidth="3"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_67_2009">
+                      <rect
+                        width="36"
+                        height="38"
+                        fill="white"
+                        transform="translate(0 25.4551) rotate(-45)"
+                      />
+                    </clipPath>
+                  </defs>
+                </svg>
+              </Link>
+              <button className="border border-foreground text-foreground px-6 py-2 cursor-pointer rounded-full font-[urbanist] hover:bg-foreground hover:text-background text-xl font-bold transition-colors h-16">
+                Try Demo Portfolio
+              </button>
+            </div>
+            <p className="mt-2 text-gray-400 font-[urbanist] text-lg">
+              100% private & instant — all processing happens in your browser.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Section */}
+      <section className="px-8 py-16 bg-ci-black">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl font-bold font-[hagrid] mb-4">
+              Trusted by investors who value their privacy
+            </h2>
+            <p className="text-xl font-[urbanist] text-gray-300">
+              Join thousands of users who've discovered the power of clear
+              portfolio insights
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Review 1 */}
+            <div className="bg-ci-purple p-6 rounded-2xl">
+              <div className="flex items-center mb-4">
+                <div className="flex text-ci-yellow">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className="w-5 h-5 fill-current"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+              <p className="text-background font-[urbanist] text-lg mb-4 leading-relaxed">
+                "Finally! I can see my portfolio allocation clearly. Flatex's
+                interface was so cluttered, but this gives me exactly what I
+                need in seconds."
+              </p>
+              <div className="text-background/80 font-[urbanist]">
+                <div className="font-bold">Sarah M.</div>
+                <div className="text-sm">Long-term investor</div>
+              </div>
+            </div>
+
+            {/* Review 2 */}
+            <div className="bg-ci-purple p-6 rounded-2xl">
+              <div className="flex items-center mb-4">
+                <div className="flex text-ci-yellow">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className="w-5 h-5 fill-current"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+              <p className="text-background font-[urbanist] text-lg mb-4 leading-relaxed">
+                "Love that my data never leaves my computer. The privacy-first
+                approach gives me peace of mind while getting the insights I
+                need."
+              </p>
+              <div className="text-background/80 font-[urbanist]">
+                <div className="font-bold">Michael K.</div>
+                <div className="text-sm">Privacy-conscious trader</div>
+              </div>
+            </div>
+
+            {/* Review 3 */}
+            <div className="bg-ci-purple p-6 rounded-2xl">
+              <div className="flex items-center mb-4">
+                <div className="flex text-ci-yellow">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className="w-5 h-5 fill-current"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+              <p className="text-background font-[urbanist] text-lg mb-4 leading-relaxed">
+                "Simple, fast, and exactly what I was looking for. No
+                complicated setup, just upload and explore. Perfect for my
+                investment tracking."
+              </p>
+              <div className="text-background/80 font-[urbanist]">
+                <div className="font-bold">Anna L.</div>
+                <div className="text-sm">Portfolio manager</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold font-[hagrid] text-ci-yellow mb-2">
+                10K+
+              </div>
+              <div className="text-xl font-[urbanist] text-gray-300">
+                Portfolios analyzed
+              </div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold font-[hagrid] text-ci-yellow mb-2">
+                100%
+              </div>
+              <div className="text-xl font-[urbanist] text-gray-300">
+                Privacy guaranteed
+              </div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold font-[hagrid] text-ci-yellow mb-2">
+                &lt;30s
+              </div>
+              <div className="text-xl font-[urbanist] text-gray-300">
+                Average upload time
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
       <section className="px-8 py-16">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-6xl font-bold font-[hagrid] mb-12">
