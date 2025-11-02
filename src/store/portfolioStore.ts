@@ -2,13 +2,16 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Position, Transaction } from "utils/types";
+import { Position, Transaction, MonthlyHoldingValue } from "utils/types";
 import getStockPrice from "../actions/getStockPrice";
 import getExchangeRate from "../actions/getExchangeRate";
+import { calculateMonthlyHoldings } from "../utils/transactions/calculateMonthlyHoldings";
+import { getHistoricalStockPrice } from "../actions/getHistoricalStockPrice";
 
 type PortfolioState = {
   positions: Position[];
   processedTransactions: Transaction[];
+  monthlyHoldingValues: MonthlyHoldingValue[];
   holdingsMap: Record<string, Position>;
   calculatedIsins: Record<string, boolean>;
   errors: Record<string, string | undefined>;
@@ -17,13 +20,24 @@ type PortfolioState = {
   totalCurrentValueUSD: number;
   roundedTotalUSD: number;
   lastPriceUpdate: Date | null;
+  lastGrowthDataUpdate: Date | null;
   isCalculating: boolean;
+  isGrowthDataCalculating: boolean;
   setPortfolioData: (
     positions: Position[],
     transactions: Transaction[]
   ) => void;
   clearAllData: () => void;
   startCalculations: () => Promise<void>;
+  startGrowthDataCalculations: (
+    processedTransactions: Transaction[],
+    selectedCurrency: string,
+    convertCurrency: (
+      amount: number,
+      fromCurrency: string,
+      toCurrency: string
+    ) => number
+  ) => Promise<void>;
   isAllCalculated: () => boolean;
   convertCurrency: (
     amount: number,
@@ -44,6 +58,7 @@ export const usePortfolioStore = create<PortfolioState>()(
     (set, get) => ({
       positions: [],
       processedTransactions: [],
+      monthlyHoldingValues: [],
       holdingsMap: {},
       calculatedIsins: {},
       errors: {},
@@ -52,7 +67,9 @@ export const usePortfolioStore = create<PortfolioState>()(
       totalCurrentValueUSD: 0,
       roundedTotalUSD: 0,
       lastPriceUpdate: null,
+      lastGrowthDataUpdate: null,
       isCalculating: false,
+      isGrowthDataCalculating: false,
 
       setPortfolioData: (
         positions: Position[],
@@ -85,7 +102,10 @@ export const usePortfolioStore = create<PortfolioState>()(
           totalCurrentValueUSD: 0,
           roundedTotalUSD: 0,
           lastPriceUpdate: null,
+          lastGrowthDataUpdate: null,
           isCalculating: false,
+          isGrowthDataCalculating: false,
+          monthlyHoldingValues: [],
         });
       },
 
@@ -326,13 +346,113 @@ export const usePortfolioStore = create<PortfolioState>()(
         const { processedTransactions } = get();
         return processedTransactions.filter((t) => t.isin === isin);
       },
+
+      startGrowthDataCalculations: async (
+        processedTransactions: Transaction[],
+        selectedCurrency: string,
+        convertCurrency: (
+          amount: number,
+          fromCurrency: string,
+          toCurrency: string
+        ) => number
+      ) => {
+        set({ isGrowthDataCalculating: true });
+
+        const monthlyHoldings = calculateMonthlyHoldings(processedTransactions);
+        const newMonthlyHoldingValues: MonthlyHoldingValue[] = [];
+
+        const currentMonthString = `${new Date().getFullYear()}-${(
+          new Date().getMonth() + 1
+        )
+          .toString()
+          .padStart(2, "0")}`;
+
+        for (const monthData of monthlyHoldings) {
+          let totalMonthlyValue = 0;
+          const holdingsWithValues = await Promise.all(
+            monthData.holdings.map(async (holding) => {
+              const [year, month] = monthData.date.split("-");
+
+              let dateToFetch: string;
+              if (monthData.date === currentMonthString) {
+                // For the current month, fetch price for today's date
+                dateToFetch = new Date().toISOString().split("T")[0];
+              } else {
+                // For past months, fetch price for the last day of the month
+                dateToFetch = new Date(parseInt(year), parseInt(month), 0)
+                  .toISOString()
+                  .split("T")[0];
+              }
+
+              const historicalPrice = await getHistoricalStockPrice(
+                holding.isin,
+                dateToFetch,
+                holding.stockName // Pass stockName here
+              );
+
+              let convertedPrice = historicalPrice?.price || null;
+              let priceCurrency = historicalPrice?.currency || null;
+
+              const originalPrice = historicalPrice?.price || null;
+              const originalPriceCurrency = historicalPrice?.currency || null;
+
+              if (
+                convertedPrice &&
+                priceCurrency &&
+                priceCurrency !== selectedCurrency
+              ) {
+                convertedPrice = convertCurrency(
+                  convertedPrice,
+                  priceCurrency,
+                  selectedCurrency
+                );
+                priceCurrency = selectedCurrency;
+              }
+
+              const value = convertedPrice
+                ? holding.totalShares * convertedPrice
+                : null;
+              if (value) {
+                totalMonthlyValue += value;
+              }
+              return {
+                ...holding,
+                value,
+                currency: priceCurrency,
+                price: convertedPrice, // Converted historical price
+                originalPrice: originalPrice, // Original historical price
+                originalPriceCurrency: originalPriceCurrency, // Original currency of the historical price
+              };
+            })
+          );
+
+          newMonthlyHoldingValues.push({
+            date: monthData.date,
+            totalMonthlyValue,
+            holdings: holdingsWithValues,
+          });
+        }
+        set({
+          monthlyHoldingValues: newMonthlyHoldingValues,
+          lastGrowthDataUpdate: new Date(),
+          isGrowthDataCalculating: false,
+        });
+      },
     }),
     {
       name: "portfolio-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => localStorage, {
+        reviver: (key, value) => {
+          if (key === "lastPriceUpdate" || key === "lastGrowthDataUpdate") {
+            return value ? new Date(value) : null;
+          }
+          return value;
+        },
+      }),
       partialize: (state) => ({
         positions: state.positions,
         processedTransactions: state.processedTransactions,
+        monthlyHoldingValues: state.monthlyHoldingValues,
         holdingsMap: state.holdingsMap,
         calculatedIsins: state.calculatedIsins,
         ratesToUSD: state.ratesToUSD,
@@ -340,6 +460,7 @@ export const usePortfolioStore = create<PortfolioState>()(
         totalCurrentValueUSD: state.totalCurrentValueUSD,
         roundedTotalUSD: state.roundedTotalUSD,
         lastPriceUpdate: state.lastPriceUpdate,
+        lastGrowthDataUpdate: state.lastGrowthDataUpdate,
       }),
     }
   )

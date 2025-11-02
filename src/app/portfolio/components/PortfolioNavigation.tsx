@@ -22,6 +22,16 @@ export default function PortfolioNavigation() {
           {/* Navigation Links */}
           <nav className="flex space-x-4">
             <Link
+              href="/portfolio/growth"
+              className={`font-urbanist text-xl px-6 py-2 border border-white rounded-full transition-all cursor-pointer ${
+                isActive("/portfolio/growth")
+                  ? "bg-white text-background"
+                  : "text-white hover:bg-white hover:text-background"
+              }`}
+            >
+              value
+            </Link>
+            <Link
               href="/portfolio"
               className={`font-urbanist text-xl px-6 py-2 border border-white rounded-full transition-all cursor-pointer ${
                 isActive("/portfolio")

@@ -40,23 +40,43 @@ export default async function getStockPrice(isin: string) {
     if (isinParts.length > 0) {
       try {
         const companySearch = isinParts[0];
+        console.log(
+          `[getStockPrice] Attempting alternative search with: ${companySearch}`
+        );
         const results = await yahooFinance.search(companySearch);
+        console.log(
+          `[getStockPrice] Alternative search results for ${companySearch}:`,
+          results
+        );
 
         if (results.quotes.length > 0) {
           const stock = results.quotes[0];
           if (stock.isYahooFinance && stock.symbol) {
+            console.log(
+              `[getStockPrice] Found ticker ${stock.symbol} via alternative search.`
+            );
             const quote = await yahooFinance.quote(stock.symbol);
-            if (quote.regularMarketPrice) {
-              return {
-                ticker: stock.symbol,
-                price: quote.regularMarketPrice,
-                currency: quote.currency,
-              };
+            if (!quote.regularMarketPrice) {
+              console.log(
+                `[getStockPrice] No price found for ${stock.symbol} via alternative search.`
+              );
+              throw new Error(`No price found for ${stock.symbol}`);
             }
+            return {
+              ticker: stock.symbol,
+              price: quote.regularMarketPrice,
+              currency: quote.currency,
+            };
           }
         }
+        console.log(
+          `[getStockPrice] Alternative search for ${companySearch} did not yield a valid Yahoo Finance stock.`
+        );
       } catch (altError) {
-        console.log(`Alternative search also failed for ${isin}`);
+        console.error(
+          `[getStockPrice] Alternative search also failed for ${isin}:`,
+          altError
+        );
       }
     }
 
