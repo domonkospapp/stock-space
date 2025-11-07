@@ -7,6 +7,7 @@ import getStockPrice from "../actions/getStockPrice";
 import getExchangeRate from "../actions/getExchangeRate";
 import { calculateMonthlyHoldings } from "../utils/transactions/calculateMonthlyHoldings";
 import { getHistoricalStockPrice } from "../actions/getHistoricalStockPrice";
+import { shouldFetchMarketData, isBrowserOnline } from "../utils/marketUtils";
 
 type PortfolioState = {
   positions: Position[];
@@ -110,8 +111,20 @@ export const usePortfolioStore = create<PortfolioState>()(
       },
 
       startCalculations: async () => {
-        const { positions, ratesToUSD } = get();
+        const { positions, ratesToUSD, holdingsMap } = get();
         if (!positions.length) return;
+
+        // Check if we have existing data
+        const hasExistingData = Object.keys(holdingsMap).length > 0;
+
+        // If we have existing data and conditions aren't met, don't fetch
+        if (hasExistingData && !shouldFetchMarketData()) {
+          console.log(
+            `[startCalculations] Skipping fetch - browser offline: ${!isBrowserOnline()}, markets likely closed: ${!shouldFetchMarketData()}`
+          );
+          return;
+        }
+
         set({ isCalculating: true });
 
         // Ensure we have EUR->USD rate pre-fetched for header display
@@ -139,8 +152,10 @@ export const usePortfolioStore = create<PortfolioState>()(
         );
 
         // Fetch prices for each position concurrently and update holdings map progressively
+        // Only update if fetch succeeds - preserve existing data on failure
         await Promise.allSettled(
           positions.map(async (position) => {
+            const existingHolding = get().holdingsMap[position.isin];
             try {
               const price = await getStockPrice(position.isin);
               const priceCurrencyRaw = price.currency ?? "USD";
@@ -187,7 +202,27 @@ export const usePortfolioStore = create<PortfolioState>()(
                 },
               }));
             } catch (e: any) {
-              // On error, mark calculated with fallback to invested value in USD
+              // If we have existing data for this position, preserve it instead of overwriting
+              if (existingHolding && existingHolding.currentPrice) {
+                console.log(
+                  `[startCalculations] Preserving existing data for ${position.isin} due to fetch error:`,
+                  e?.message
+                );
+                // Mark as calculated but keep existing data
+                set((s) => ({
+                  calculatedIsins: {
+                    ...s.calculatedIsins,
+                    [position.isin]: true,
+                  },
+                  errors: {
+                    ...s.errors,
+                    [position.isin]: e?.message || "Price fetch failed",
+                  },
+                }));
+                return;
+              }
+
+              // On error with no existing data, mark calculated with fallback to invested value in USD
               // Use position currency rate to USD (best-effort)
               let rateToUSD = 1;
               const normalized = normalizeCurrencyCode(position.currency);
@@ -356,6 +391,20 @@ export const usePortfolioStore = create<PortfolioState>()(
           toCurrency: string
         ) => number
       ) => {
+        const { monthlyHoldingValues } = get();
+
+        // Check if we have existing data
+        const hasExistingData = monthlyHoldingValues.length > 0;
+
+        // If we have existing data and browser is offline, don't fetch
+        // (Historical data fetching doesn't depend on market hours)
+        if (hasExistingData && !isBrowserOnline()) {
+          console.log(
+            `[startGrowthDataCalculations] Skipping fetch - browser offline`
+          );
+          return;
+        }
+
         set({ isGrowthDataCalculating: true });
 
         const monthlyHoldings = calculateMonthlyHoldings(processedTransactions);
@@ -369,8 +418,19 @@ export const usePortfolioStore = create<PortfolioState>()(
 
         for (const monthData of monthlyHoldings) {
           let totalMonthlyValue = 0;
+
+          // Check if we have existing data for this month
+          const existingMonthData = monthlyHoldingValues.find(
+            (m) => m.date === monthData.date
+          );
+
           const holdingsWithValues = await Promise.all(
             monthData.holdings.map(async (holding) => {
+              // Check if we have existing data for this holding
+              const existingHolding = existingMonthData?.holdings.find(
+                (h) => h.isin === holding.isin
+              );
+
               const [year, month] = monthData.date.split("-");
 
               let dateToFetch: string;
@@ -384,11 +444,24 @@ export const usePortfolioStore = create<PortfolioState>()(
                   .split("T")[0];
               }
 
-              const historicalPrice = await getHistoricalStockPrice(
-                holding.isin,
-                dateToFetch,
-                holding.stockName // Pass stockName here
-              );
+              let historicalPrice;
+              try {
+                historicalPrice = await getHistoricalStockPrice(
+                  holding.isin,
+                  dateToFetch,
+                  holding.stockName // Pass stockName here
+                );
+              } catch (error) {
+                // If fetch fails and we have existing data, use it
+                if (existingHolding && existingHolding.price) {
+                  console.log(
+                    `[startGrowthDataCalculations] Preserving existing data for ${holding.isin} on ${dateToFetch} due to fetch error`
+                  );
+                  return existingHolding;
+                }
+                // Otherwise, continue with null price
+                historicalPrice = null;
+              }
 
               let convertedPrice = historicalPrice?.price || null;
               let priceCurrency = historicalPrice?.currency || null;
@@ -426,17 +499,35 @@ export const usePortfolioStore = create<PortfolioState>()(
             })
           );
 
-          newMonthlyHoldingValues.push({
-            date: monthData.date,
-            totalMonthlyValue,
-            holdings: holdingsWithValues,
+          // If we have existing data and couldn't fetch new data, preserve the existing month data
+          if (
+            existingMonthData &&
+            totalMonthlyValue === 0 &&
+            existingMonthData.totalMonthlyValue > 0
+          ) {
+            newMonthlyHoldingValues.push(existingMonthData);
+          } else {
+            newMonthlyHoldingValues.push({
+              date: monthData.date,
+              totalMonthlyValue,
+              holdings: holdingsWithValues,
+            });
+          }
+        }
+
+        // Only update if we successfully fetched some data, otherwise preserve existing
+        if (newMonthlyHoldingValues.length > 0) {
+          set({
+            monthlyHoldingValues: newMonthlyHoldingValues,
+            lastGrowthDataUpdate: new Date(),
+            isGrowthDataCalculating: false,
+          });
+        } else {
+          // If no new data was fetched, preserve existing data
+          set({
+            isGrowthDataCalculating: false,
           });
         }
-        set({
-          monthlyHoldingValues: newMonthlyHoldingValues,
-          lastGrowthDataUpdate: new Date(),
-          isGrowthDataCalculating: false,
-        });
       },
     }),
     {
@@ -444,7 +535,15 @@ export const usePortfolioStore = create<PortfolioState>()(
       storage: createJSONStorage(() => localStorage, {
         reviver: (key, value) => {
           if (key === "lastPriceUpdate" || key === "lastGrowthDataUpdate") {
-            return value ? new Date(value) : null;
+            if (
+              value &&
+              (typeof value === "string" ||
+                typeof value === "number" ||
+                value instanceof Date)
+            ) {
+              return new Date(value);
+            }
+            return null;
           }
           return value;
         },
