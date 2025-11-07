@@ -474,21 +474,33 @@ export default function FileUpload() {
                                 {transaction.stockName}
                               </td>
                               <td className="py-4 pr-6 text-white">
-                                {transaction.amount}
+                                {transaction.amount.toLocaleString("en-US", {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                })}
                               </td>
                               <td className="py-4 pr-6">
                                 <span
                                   className={`px-3 py-1 rounded-full text-sm font-medium ${
                                     transaction.type === "BUY"
                                       ? "bg-green-500/20 text-green-400"
-                                      : "bg-red-500/20 text-red-400"
+                                      : transaction.type === "SELL"
+                                      ? "bg-red-500/20 text-red-400"
+                                      : transaction.type === "TRANSFER"
+                                      ? "bg-blue-500/20 text-blue-400"
+                                      : "bg-gray-500/20 text-gray-400"
                                   }`}
                                 >
                                   {transaction.type}
                                 </span>
                               </td>
                               <td className="py-4 pr-6 text-white">
-                                {transaction.price}
+                                {transaction.price.toLocaleString("en-US", {
+                                  style: "currency",
+                                  currency: transaction.currency,
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
                               </td>
                               <td className="py-4 pr-6 text-gray-300">
                                 {transaction.currency}

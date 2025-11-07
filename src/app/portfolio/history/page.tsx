@@ -185,7 +185,11 @@ export default function PortfolioHistory() {
                                 className={`w-3 h-3 rounded-full ${
                                   transaction.type === "BUY"
                                     ? "bg-green-500"
-                                    : "bg-red-500"
+                                    : transaction.type === "SELL"
+                                    ? "bg-red-500"
+                                    : transaction.type === "TRANSFER"
+                                    ? "bg-blue-500"
+                                    : "bg-gray-500"
                                 }`}
                               />
                               <div>
@@ -206,10 +210,18 @@ export default function PortfolioHistory() {
                               className={`font-[hagrid] text-lg ${
                                 transaction.type === "BUY"
                                   ? "text-red-400"
-                                  : "text-green-400"
+                                  : transaction.type === "SELL"
+                                  ? "text-green-400"
+                                  : transaction.type === "TRANSFER"
+                                  ? "text-blue-400"
+                                  : "text-gray-400"
                               }`}
                             >
-                              {transaction.type === "BUY" ? "-" : "+"}
+                              {transaction.type === "BUY"
+                                ? "-"
+                                : transaction.type === "SELL"
+                                ? "+"
+                                : ""}
                               {formatCurrency(
                                 amountInSelectedCurrency,
                                 selectedCurrency

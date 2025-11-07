@@ -12,10 +12,11 @@ export type SplitTransaction = {
 const getTransactionType = (transaction: CsvTransaction): TransactionType => {
   const cleanInfo = transaction.transactionInfo.toLowerCase();
 
-  if (cleanInfo.includes("kauf") || cleanInfo.includes("buy")) {
-    return "BUY";
-  } else if (cleanInfo.includes("verkauf") || cleanInfo.includes("sell")) {
+  // Check transaction info text first (most explicit)
+  if (cleanInfo.includes("verkauf") || cleanInfo.includes("sell")) {
     return "SELL";
+  } else if (cleanInfo.includes("kauf") || cleanInfo.includes("buy")) {
+    return "BUY";
   } else if (
     cleanInfo.includes("wp-eingang") ||
     cleanInfo.includes("wp-ausgang") ||
@@ -23,6 +24,13 @@ const getTransactionType = (transaction: CsvTransaction): TransactionType => {
   ) {
     return "TRANSFER";
   } else {
+    // Fallback: use amount sign to determine buy/sell
+    // Negative amounts typically indicate sells (unless it's a transfer)
+    if (transaction.amount < 0) {
+      return "SELL";
+    } else if (transaction.amount > 0) {
+      return "BUY";
+    }
     return "OTHER";
   }
 };
