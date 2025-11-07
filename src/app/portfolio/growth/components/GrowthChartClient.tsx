@@ -78,7 +78,7 @@ export default function GrowthChartClient() {
   return (
     <div className="flex flex-col space-y-8">
       {isGrowthDataCalculating && monthlyHoldingValues.length > 0 && (
-        <p className="text-white font-urbanist text-lg mt-4">
+        <p className="text-gray-400 font-urbanist text-sm text-right">
           Updating data in background... 🔄
         </p>
       )}
