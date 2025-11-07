@@ -517,9 +517,17 @@ export default function FileUpload() {
               {/* Portfolio Summary Tab */}
               {activeTab === "summary" && (
                 <div>
-                  <h2 className="text-3xl font-bold font-[hagrid] mb-8 text-center">
-                    Portfolio Summary
-                  </h2>
+                  <div className="mb-8 text-center">
+                    <h2 className="text-3xl font-bold font-[hagrid] mb-2">
+                      Portfolio Summary
+                    </h2>
+                    <p className="text-gray-300 font-[urbanist]">
+                      {portfolioSummary.length.toLocaleString("en-US", {
+                        maximumFractionDigits: 0,
+                      })}{" "}
+                      {portfolioSummary.length === 1 ? "stock" : "stocks"}
+                    </p>
+                  </div>
                   <div className="overflow-x-auto">
                     {portfolioSummary.length > 0 && (
                       <table className="w-full text-left">
@@ -543,41 +551,43 @@ export default function FileUpload() {
                           </tr>
                         </thead>
                         <tbody>
-                          {portfolioSummary.map((position, index) => (
-                            <tr
-                              key={`summary-${index}`}
-                              className="border-b border-white"
-                            >
-                              <td className="py-4 pr-6 text-white font-medium">
-                                {position.stockName}
-                              </td>
-                              <td className="py-4 pr-6 text-gray-300">
-                                {position.isin}
-                              </td>
-                              <td className="py-4 pr-6">
-                                <span
-                                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    position.totalShares == 0
-                                      ? "bg-red-500/20 text-red-400"
-                                      : "bg-green-500/20 text-green-400"
-                                  }`}
-                                >
-                                  {position.totalShares == 0
-                                    ? "Sold Out"
-                                    : position.totalShares}
-                                </span>
-                              </td>
-                              <td className="py-4 pr-6 text-white">
-                                {position.averagePrice == 0
-                                  ? "N/A"
-                                  : Math.round(position.averagePrice * 100) /
-                                    100}
-                              </td>
-                              <td className="py-4 pr-6 text-gray-300">
-                                {position.currency}
-                              </td>
-                            </tr>
-                          ))}
+                          {portfolioSummary
+                            .sort((a, b) => b.totalShares - a.totalShares)
+                            .map((position, index) => (
+                              <tr
+                                key={`summary-${index}`}
+                                className="border-b border-white"
+                              >
+                                <td className="py-4 pr-6 text-white font-medium">
+                                  {position.stockName}
+                                </td>
+                                <td className="py-4 pr-6 text-gray-300">
+                                  {position.isin}
+                                </td>
+                                <td className="py-4 pr-6">
+                                  <span
+                                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                      position.totalShares == 0
+                                        ? "bg-red-500/20 text-red-400"
+                                        : "bg-green-500/20 text-green-400"
+                                    }`}
+                                  >
+                                    {position.totalShares == 0
+                                      ? "Sold Out"
+                                      : position.totalShares}
+                                  </span>
+                                </td>
+                                <td className="py-4 pr-6 text-white">
+                                  {position.averagePrice == 0
+                                    ? "N/A"
+                                    : Math.round(position.averagePrice * 100) /
+                                      100}
+                                </td>
+                                <td className="py-4 pr-6 text-gray-300">
+                                  {position.currency}
+                                </td>
+                              </tr>
+                            ))}
                         </tbody>
                       </table>
                     )}

@@ -141,7 +141,22 @@ export function createPortfolioSummary(
           sum + lot.shares * lot.price,
         0
       );
-      stock.averagePrice = totalValue / stock.totalShares;
+      // Use sum of lot shares instead of totalShares to ensure accuracy
+      // This handles edge cases where totalShares might not match due to rounding or precision issues
+      const totalSharesFromLots = stock.lots.reduce(
+        (sum: number, lot: { shares: number; price: number }) =>
+          sum + lot.shares,
+        0
+      );
+      
+      // Safety check: ensure we don't divide by zero
+      if (totalSharesFromLots > 0) {
+        stock.averagePrice = totalValue / totalSharesFromLots;
+        // Update totalShares to match the actual lot shares (fixes any discrepancies)
+        stock.totalShares = totalSharesFromLots;
+      } else {
+        stock.averagePrice = 0;
+      }
     }
   });
 
