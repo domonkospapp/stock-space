@@ -90,7 +90,7 @@ export default function GrowthChartClient() {
         }))}
         selectedCurrency={selectedCurrency}
       />
-      <h1 className="text-white font-urbanist text-3xl font-bold">
+      {/* <h1 className="text-white font-urbanist text-3xl font-bold">
         Growth History
       </h1>
       <h2 className="text-4xl font-bold text-white font-[hagrid]">
@@ -154,7 +154,7 @@ export default function GrowthChartClient() {
             ))}
           </div>
         </div>
-      ))}
+      ))} */}
     </div>
   );
 }

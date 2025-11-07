@@ -22,7 +22,7 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
     marginTop: 20,
     marginRight: 30,
     marginBottom: 60,
-    marginLeft: 80,
+    marginLeft: 50,
   });
 
   useEffect(() => {
@@ -32,7 +32,15 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       const parentWidth = svgRef.current?.parentElement?.clientWidth || 800; // Default width
       const newWidth =
         parentWidth - chartDimensions.marginLeft - chartDimensions.marginRight;
-      const newHeight = Math.max(200, newWidth * 0.5); // Maintain aspect ratio, minimum height 200
+      // Use full viewport height minus margins and some padding
+      const viewportHeight = window.innerHeight;
+      const newHeight = Math.max(
+        200,
+        viewportHeight -
+          chartDimensions.marginTop -
+          chartDimensions.marginBottom -
+          200 // Account for header, navigation, and other UI elements
+      );
 
       setChartDimensions((prev) => ({
         ...prev,
@@ -47,7 +55,12 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [chartDimensions.marginLeft, chartDimensions.marginRight]);
+  }, [
+    chartDimensions.marginLeft,
+    chartDimensions.marginRight,
+    chartDimensions.marginTop,
+    chartDimensions.marginBottom,
+  ]);
 
   useEffect(() => {
     if (!data || data.length === 0 || chartDimensions.width === 0) return;
@@ -100,7 +113,11 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
     svg
       .append("g")
       .attr("transform", `translate(0,${chartDimensions.height})`)
-      .call(d3.axisBottom(xScale).tickFormat(d3.timeFormat("%Y-%m")))
+      .call(
+        d3
+          .axisBottom(xScale)
+          .tickFormat((d) => d3.timeFormat("%Y-%m")(d as Date))
+      )
       .selectAll("text")
       .attr("transform", "translate(-10,0)rotate(-45)")
       .style("text-anchor", "end")
@@ -112,17 +129,6 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       .call(d3.axisLeft(yScale).tickFormat((d) => d3.format("~s")(d)))
       .selectAll("text")
       .style("fill", "#9CA3AF"); // Light gray for axis labels
-
-    // Add Y-axis label
-    svg
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 - chartDimensions.marginLeft + 20)
-      .attr("x", 0 - chartDimensions.height / 2)
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .style("fill", "#F3F4F6") // White color
-      .text(`Total Value (${selectedCurrency})`);
 
     // Add the line
     const line = d3
@@ -177,7 +183,10 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       const i = bisectDate(formattedData, x0, 1);
       const d0 = formattedData[i - 1];
       const d1 = formattedData[i];
-      const d = x0 - d0.date.getTime() > d1.date.getTime() - x0 ? d1 : d0;
+      const d =
+        x0.getTime() - d0.date.getTime() > d1.date.getTime() - x0.getTime()
+          ? d1
+          : d0;
 
       focus.attr(
         "transform",
