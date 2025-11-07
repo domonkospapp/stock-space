@@ -44,8 +44,8 @@ export default function PortfolioHistory() {
     ...Array.from(
       new Set(
         processedTransactions.map((transaction) => {
-          const [day, month, year] = transaction.date.split(".");
-          return parseInt(year);
+          const parts = transaction.date.split(".");
+          return parseInt(parts[2]);
         })
       )
     ).sort((a, b) => b - a),
@@ -73,8 +73,8 @@ export default function PortfolioHistory() {
     const yearMatch =
       selectedYear === 0 ||
       (() => {
-        const [day, month, year] = transaction.date.split(".");
-        return parseInt(year) === selectedYear;
+        const parts = transaction.date.split(".");
+        return parseInt(parts[2]) === selectedYear;
       })();
 
     // Stock filter
@@ -124,8 +124,8 @@ export default function PortfolioHistory() {
       month: "short",
     });
     const count = filteredTransactions.filter((transaction) => {
-      const [day, month, year] = transaction.date.split(".");
-      return parseInt(month) === monthIndex + 1;
+      const parts = transaction.date.split(".");
+      return parseInt(parts[1]) === monthIndex + 1;
     }).length;
     return { month: monthName, count, monthIndex };
   });

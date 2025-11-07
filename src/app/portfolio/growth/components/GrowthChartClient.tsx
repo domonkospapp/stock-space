@@ -43,6 +43,7 @@ export default function GrowthChartClient() {
     startGrowthDataCalculations,
     isGrowthDataCalculating,
     lastGrowthDataUpdate,
+    monthlyHoldingValues.length,
   ]);
 
   const isLoadingInitialData =

@@ -110,13 +110,11 @@ export default function PositionsTreemap({
         .style("stroke", "white")
         .style("strokeWidth", "1px")
         .style("rx", (d) => {
-          const width = (d as any).x1 - (d as any).x0;
           const height = (d as any).y1 - (d as any).y0;
           // Use height/2 as max radius to prevent weird distortions
           return Math.min(height / 2 - 18, 36);
         })
         .style("ry", (d) => {
-          const width = (d as any).x1 - (d as any).x0;
           const height = (d as any).y1 - (d as any).y0;
           // Use height/2 as max radius to prevent weird distortions
           return Math.min(height / 2 - 18, 36);
@@ -436,7 +434,7 @@ export default function PositionsTreemap({
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [positions, selectedCurrency, convert, onPositionClick]);
+  }, [positions, selectedCurrency, convert, onPositionClick, selectedPosition]);
 
   if (positions.length === 0) {
     return <div className="text-red-500">No positions to display</div>;

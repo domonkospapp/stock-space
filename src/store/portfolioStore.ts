@@ -451,7 +451,7 @@ export const usePortfolioStore = create<PortfolioState>()(
                   dateToFetch,
                   holding.stockName // Pass stockName here
                 );
-              } catch (error) {
+              } catch {
                 // If fetch fails and we have existing data, use it
                 if (existingHolding && existingHolding.price) {
                   console.log(

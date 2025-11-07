@@ -62,10 +62,9 @@ async function searchAndFetchHistoricalData(
 
     for (const stock of results.quotes) {
       if (!stock.isYahooFinance || !stock.symbol) {
+        const stockIdentifier = (stock as any).symbol || (stock as any).name || (stock as any).shortname || "unknown";
         console.log(
-          `[getHistoricalStockPrice] Skipping non-Yahoo Finance or missing symbol stock: ${
-            stock.name || stock.symbol
-          }`
+          `[getHistoricalStockPrice] Skipping non-Yahoo Finance or missing symbol stock: ${stockIdentifier}`
         );
         continue;
       }

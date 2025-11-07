@@ -7,6 +7,7 @@ import {
   LockIcon,
 } from "@phosphor-icons/react";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useRef } from "react";
 
 export default function Home() {
@@ -96,7 +97,7 @@ export default function Home() {
           </div>
           <div className="col-span-4 h-full pl-8 flex flex-col justify-between pb-12">
             <h1 className="text-8xl font-[hagrid] leading-tight font-bold">
-              WON'T SHOW.
+              WON&apos;T SHOW.
             </h1>
             <div className="flex flex-col gap-6">
               <p className="text-3xl font-[urbanist] text-gray-300">
@@ -576,38 +577,6 @@ const StepExplanation = ({
   );
 };
 
-const Advantage = ({
-  title,
-  text,
-  color,
-}: {
-  title: string;
-  text: string;
-  color: string;
-}) => {
-  return (
-    <div className={`p-6 rounded-4xl relative ${color}`}>
-      <div className="absolute top-4 right-4 w-8 h-8 bg-background rounded-full flex items-center justify-center">
-        <svg
-          className="w-4 h-4 text-foreground"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </div>
-      <h3 className="text-3xl font-bold font-urbanist mb-4 text-background">
-        {title}
-      </h3>
-
-      <p className="font-urbanist text-background text-lg mb-2">{text}</p>
-    </div>
-  );
-};
 
 const Header = () => {
   const scrollToSection = (sectionId: string) => {
@@ -664,9 +633,11 @@ const FeatureCard = ({
       <p className="text-xl font-[urbanist] text-foreground leading-relaxed">
         {description}
       </p>
-      <img
+      <Image
         src={image}
         alt={title}
+        width={800}
+        height={600}
         className="w-full h-auto rounded-2xl shadow-lg mx-auto"
       />
     </div>

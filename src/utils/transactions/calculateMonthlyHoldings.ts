@@ -1,4 +1,4 @@
-import { Transaction, Position } from "utils/types";
+import { Transaction } from "utils/types";
 
 interface MonthlyHolding {
   date: string; // YYYY-MM format
@@ -57,7 +57,7 @@ export function calculateMonthlyHoldings(
     )
   );
 
-  let currentMonth = new Date(
+  const currentMonth = new Date(
     firstTransactionDate.getFullYear(),
     firstTransactionDate.getMonth(),
     1

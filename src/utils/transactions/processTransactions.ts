@@ -42,7 +42,7 @@ function removeStornoItems(transactions: CsvTransaction[]): CsvTransaction[] {
   const transactionsToRemove = new Set<number>();
   const processedGroups = new Set<string>();
 
-  transactions.forEach((transaction, index) => {
+  transactions.forEach((transaction) => {
     // Create a key for this ISIN+price combination
     const groupKey = `${transaction.isin}_${transaction.price}`;
 
@@ -93,9 +93,10 @@ export default function processedTransactions(
   const stornoRemoved = removeStornoItems(transactions);
   const splitProcessed = processSplits(stornoRemoved);
 
-  return splitProcessed.map((transaction) => {
+  return splitProcessed.map((transaction, index) => {
     const transactionType = getTransactionType(transaction);
     return {
+      id: `${transaction.date}-${transaction.isin}-${index}-${transaction.amount}-${transaction.price}`,
       date: transaction.date,
       stockName: transaction.stockName,
       isin: transaction.isin,

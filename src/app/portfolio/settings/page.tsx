@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { usePortfolioStore } from "../../../store/portfolioStore";
 import { useSettingsStore } from "../../../store/settingsStore";
 
-type Currency = "EUR" | "USD";
-
 export default function PortfolioSettings() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const router = useRouter();
