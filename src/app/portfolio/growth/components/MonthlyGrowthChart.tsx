@@ -215,20 +215,22 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       tooltip
         .html(
           `
-          <div style="padding: 8px; border-radius: 4px; background-color: #374151; color: #F3F4F6; font-family: 'Urbanist', sans-serif;">
-            <strong>Month:</strong> ${d3.timeFormat("%Y-%m")(d.date)}<br/>
-            <strong>Value:</strong> ${d.totalMonthlyValue.toLocaleString(
-              "en-US",
-              {
+          <div style="padding: 12px 16px; border-radius: 16px; background-color: #292929; color: #F3F4F6; font-family: 'Urbanist', sans-serif; border: 2px solid white;">
+            <div style="font-size: 12px; color: white; margin-bottom: 4px; font-weight: 500;">
+              ${d3.timeFormat("%B %Y")(d.date)}
+            </div>
+            <div style="font-size: 18px; font-weight: 600; color: #E1FF8E;">
+              ${d.totalMonthlyValue.toLocaleString("en-US", {
                 style: "currency",
                 currency: selectedCurrency,
-              }
-            )}
+              })}
+            </div>
           </div>
           `
         )
         .style("left", `${event.pageX + 15}px`)
-        .style("top", `${event.pageY - 28}px`);
+        .style("top", `${event.pageY - 28}px`)
+        .style("z-index", "1000");
     }
 
     // Add some basic styling for the hover lines (can be moved to CSS)
@@ -242,7 +244,7 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
   }, [data, selectedCurrency, chartDimensions]);
 
   return (
-    <div className="flex flex-col p-4 bg-dark-blue rounded-lg">
+    <div className="flex flex-col p-4">
       {/* <h2 className="text-xl font-bold text-white mb-4">
         Monthly Portfolio Value
       </h2> */}
