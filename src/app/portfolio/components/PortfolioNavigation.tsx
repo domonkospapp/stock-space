@@ -29,7 +29,7 @@ export default function PortfolioNavigation() {
                   : "text-white hover:bg-white hover:text-background"
               }`}
             >
-              value
+              growth
             </Link>
             <Link
               href="/portfolio"
