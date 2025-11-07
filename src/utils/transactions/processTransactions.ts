@@ -27,11 +27,63 @@ const getTransactionType = (transaction: CsvTransaction): TransactionType => {
   }
 };
 
+// Remove storno items before processing splits
+// Storno items are identified by matching ISIN and exact price
+// Removes BOTH the storno transaction AND the original transaction it cancels
+function removeStornoItems(transactions: CsvTransaction[]): CsvTransaction[] {
+  const transactionsToRemove = new Set<number>();
+  const processedGroups = new Set<string>();
+
+  transactions.forEach((transaction, index) => {
+    // Create a key for this ISIN+price combination
+    const groupKey = `${transaction.isin}_${transaction.price}`;
+
+    // Skip if we've already processed this group
+    if (processedGroups.has(groupKey)) return;
+
+    // Find all transactions with exact same ISIN and price (including current)
+    const matchingTransactions = transactions
+      .map((t, i) => ({
+        transaction: t,
+        index: i,
+      }))
+      .filter(
+        ({ transaction: t }) =>
+          t.isin === transaction.isin && t.price === transaction.price
+      );
+
+    // If we found multiple matches, check if one is a storno
+    if (matchingTransactions.length > 1) {
+      // Check if any transaction has "storno" in the transaction info
+      const stornoTransaction = matchingTransactions.find(
+        ({ transaction: t }) =>
+          t.transactionInfo.toLowerCase().includes("storno")
+      );
+
+      // If we found a storno, remove BOTH the storno and all matching transactions
+      if (stornoTransaction) {
+        // Remove all transactions with matching ISIN and price (both storno and original)
+        matchingTransactions.forEach(({ index: idx }) => {
+          transactionsToRemove.add(idx);
+        });
+      }
+    }
+
+    // Mark this group as processed
+    processedGroups.add(groupKey);
+  });
+
+  return transactions.filter((_, index) => !transactionsToRemove.has(index));
+}
+
 export default function processedTransactions(
   csvTransaction: CsvTransaction[]
 ): Transaction[] {
   const transactions = structuredClone(csvTransaction);
-  const splitProcessed = processSplits(transactions);
+  // Remove storno items FIRST, before processing splits
+  // This ensures prices match exactly before they get adjusted by splits
+  const stornoRemoved = removeStornoItems(transactions);
+  const splitProcessed = processSplits(stornoRemoved);
 
   return splitProcessed.map((transaction) => {
     const transactionType = getTransactionType(transaction);
