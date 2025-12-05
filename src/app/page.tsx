@@ -4,6 +4,7 @@ import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef } from "react";
+import Astronaut3D from "./components/Astronaut3D";
 
 export default function Home() {
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
@@ -82,14 +83,8 @@ export default function Home() {
         <div className="flex-1 flex items-center">
           <div className="grid grid-cols-12 gap-8 w-full items-center">
             {/* Astronaut on left */}
-            <div className="col-span-5 flex justify-center">
-              <Image
-                src="/astronaut.svg"
-                alt="Astronaut"
-                width={387}
-                height={419}
-                className="w-full h-auto max-w-xs"
-              />
+            <div className="col-span-5 flex justify-center items-center">
+              <Astronaut3D />
             </div>
 
             {/* Content on right */}
