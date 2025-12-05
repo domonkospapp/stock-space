@@ -200,69 +200,37 @@ export default function Home() {
       {/* Mid-Page Heading */}
       <section className="px-8 py-16">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-6xl font-bold font-hagrid uppercase tracking-tight">
-            PRIVATE INSTANT ACCESS BUYING PATTERNS
+          <h2 className="text-6xl font-bold font-hagrid uppercase tracking-tight leading-tight">
+            <div>PRIVATE</div>
+            <div>INSTANT ACCESS</div>
+            <div>BUYING PATTERNS</div>
           </h2>
+          <div className="mt-8 space-y-2">
+            <p className="text-lg font-space-mono text-gray-300">
+              All calculations run in your browser.
+            </p>
+            <p className="text-lg font-space-mono text-gray-300">
+              Your data never leaves your device.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Data Visualization Section (Lower) */}
       <section className="px-8 py-16">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-            {/* Left Visual */}
-            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
-              <div className="text-2xl font-bold font-hagrid mb-2">$8,800</div>
-              <div className="text-xl font-hagrid mb-4">24.5%</div>
-              <div className="h-32 flex items-center justify-center bg-[#1A1A1A] rounded-lg">
-                <div className="text-sm font-space-mono text-gray-400">
-                  Line Graph
-                </div>
-              </div>
-            </div>
-
-            {/* Middle Text */}
-            <div className="text-center">
-              <p className="text-lg font-space-mono text-gray-300">
-                Upload your Flatex CSV and see your portfolio like never before.
-              </p>
-            </div>
-
-            {/* Right Visual */}
-            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
-              <div className="text-xl font-hagrid mb-2">DYNATRACE INC</div>
-              <div className="text-2xl font-bold font-hagrid mb-2">€750.00</div>
-              <div className="text-sm font-space-mono text-gray-400 mb-1">
-                8 shares
-              </div>
-              <div className="text-sm font-space-mono text-gray-400 mb-4">
-                €57.00 avg
-              </div>
-              <div className="text-3xl font-bold font-hagrid text-ci-yellow mb-4">
-                6.4%
-              </div>
-              <button className="text-sm font-space-mono text-gray-300 hover:text-foreground flex items-center space-x-1">
-                <span>Click to view purchase history</span>
-                <ArrowUpRightIcon className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Bottom Visual */}
-          <div className="mt-8 bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
-            <div className="h-48 flex items-center justify-center bg-[#1A1A1A] rounded-lg">
-              <div className="text-center w-full">
-                <div className="text-sm font-space-mono text-gray-400 mb-4">
-                  Bar Chart - 2025
-                </div>
-                <div className="text-xs font-space-mono text-gray-500 space-y-1">
-                  <div>dec: 147 sh</div>
-                  <div>okt: 132 sh</div>
-                  <div>nov: 112 sh</div>
-                  <div>aug: 90 sh</div>
-                </div>
-              </div>
-            </div>
+        <div className="max-w-7xl mx-auto relative">
+          <Image
+            src="/group.png"
+            alt="Portfolio visualization"
+            width={1200}
+            height={800}
+            className="w-full h-auto"
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="text-lg font-space-mono text-gray-300 text-center">
+              Upload your Flatex CSV and <br /> enter a clearer view of
+              <br /> your portfolio.
+            </p>
           </div>
         </div>
       </section>
