@@ -11,7 +11,8 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-urbanist: var(--font-urbanist);
-  --font-space-mono: var(--font-space-mono);
+  --font-space-mono: var(--font-space-mono), monospace;
+  --font-hagrid: "hagrid", system-ui, sans-serif;
 
   --color-ci-yellow: #E1FF8E;
   --color-ci-black: #292929;
