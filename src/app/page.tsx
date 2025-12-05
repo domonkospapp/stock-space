@@ -36,7 +36,7 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen bg-[#1A1A1A] text-white relative"
+      className="min-h-screen bg-[#1A1A1A] text-foreground relative"
       onMouseMove={handleMouseMove}
       style={{
         backgroundImage: `
@@ -100,12 +100,12 @@ export default function Home() {
               <div className="flex flex-wrap items-center gap-4">
                 <Link
                   href="/fileUpload"
-                  className="bg-[#E1FF8E] hover:bg-[#E1FF8E]/80 text-[#1A1A1A] text-lg font-bold font-space-mono px-8 py-4 rounded-full transition-colors flex items-center space-x-2 shadow-lg"
+                  className="bg-ci-yellow hover:bg-ci-yellow/80 text-[#1A1A1A] text-lg font-bold font-space-mono px-8 py-4 rounded-full transition-colors flex items-center space-x-2 shadow-lg"
                 >
                   <span>Upload Flatex CSV</span>
                   <ArrowUpRightIcon className="w-5 h-5" weight="bold" />
                 </Link>
-                <button className="border border-white text-white px-6 py-4 cursor-pointer rounded-full font-space-mono hover:bg-white hover:text-[#1A1A1A] text-lg font-bold transition-colors">
+                <button className="border border-foreground text-foreground px-6 py-4 cursor-pointer rounded-full font-space-mono hover:bg-foreground hover:text-[#1A1A1A] text-lg font-bold transition-colors">
                   Try Demo Portfolio
                 </button>
               </div>
@@ -132,7 +132,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Card 1: Distribution */}
-            <div className="bg-[#2A2A2A] border border-white/10 rounded-2xl p-6">
+            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
               <div className="text-3xl font-bold font-hagrid mb-2">
                 $1,247,890
               </div>
@@ -152,7 +152,7 @@ export default function Home() {
             </div>
 
             {/* Card 2: Growth */}
-            <div className="bg-[#2A2A2A] border border-white/10 rounded-2xl p-6">
+            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
               <div className="text-3xl font-bold font-hagrid mb-2">
                 $1,247,890
               </div>
@@ -172,7 +172,7 @@ export default function Home() {
             </div>
 
             {/* Card 3: Stock Count */}
-            <div className="bg-[#2A2A2A] border border-white/10 rounded-2xl p-6">
+            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
               <h3 className="text-xl font-hagrid mb-2 text-gray-300">
                 Cumulative PUNT Stock Count Over Time
               </h3>
@@ -211,7 +211,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
             {/* Left Visual */}
-            <div className="bg-[#2A2A2A] border border-white/10 rounded-2xl p-6">
+            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
               <div className="text-2xl font-bold font-hagrid mb-2">$8,800</div>
               <div className="text-xl font-hagrid mb-4">24.5%</div>
               <div className="h-32 flex items-center justify-center bg-[#1A1A1A] rounded-lg">
@@ -229,7 +229,7 @@ export default function Home() {
             </div>
 
             {/* Right Visual */}
-            <div className="bg-[#2A2A2A] border border-white/10 rounded-2xl p-6">
+            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
               <div className="text-xl font-hagrid mb-2">DYNATRACE INC</div>
               <div className="text-2xl font-bold font-hagrid mb-2">€750.00</div>
               <div className="text-sm font-space-mono text-gray-400 mb-1">
@@ -238,10 +238,10 @@ export default function Home() {
               <div className="text-sm font-space-mono text-gray-400 mb-4">
                 €57.00 avg
               </div>
-              <div className="text-3xl font-bold font-hagrid text-[#E1FF8E] mb-4">
+              <div className="text-3xl font-bold font-hagrid text-ci-yellow mb-4">
                 6.4%
               </div>
-              <button className="text-sm font-space-mono text-gray-300 hover:text-white flex items-center space-x-1">
+              <button className="text-sm font-space-mono text-gray-300 hover:text-foreground flex items-center space-x-1">
                 <span>Click to view purchase history</span>
                 <ArrowUpRightIcon className="w-4 h-4" />
               </button>
@@ -249,7 +249,7 @@ export default function Home() {
           </div>
 
           {/* Bottom Visual */}
-          <div className="mt-8 bg-[#2A2A2A] border border-white/10 rounded-2xl p-6">
+          <div className="mt-8 bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
             <div className="h-48 flex items-center justify-center bg-[#1A1A1A] rounded-lg">
               <div className="text-center w-full">
                 <div className="text-sm font-space-mono text-gray-400 mb-4">
@@ -332,17 +332,19 @@ const StepExplanation = ({
           0{rowIndex}
         </span>
         <div>
-          <h3 className="text-2xl font-space-mono mb-1 text-white">{title}</h3>
+          <h3 className="text-2xl font-space-mono mb-1 text-foreground">
+            {title}
+          </h3>
           <p className="text-gray-400 font-space-mono">{description}</p>
         </div>
       </div>
       <button
-        className="w-16 h-16 border-white/30 border rounded-full flex items-center justify-center hover:bg-white/10 group transition-colors cursor-pointer"
+        className="w-16 h-16 border-foreground/30 border rounded-full flex items-center justify-center hover:bg-foreground/10 group transition-colors cursor-pointer"
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
         <svg
-          className="w-6 h-6 text-white ml-0.5"
+          className="w-6 h-6 text-foreground ml-0.5"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -372,25 +374,27 @@ const Header = () => {
           height={32}
           className="w-8 h-8"
         />
-        <span className="font-space-mono text-xl text-white">stck.space</span>
+        <span className="font-space-mono text-xl text-foreground">
+          stck.space
+        </span>
       </div>
 
       {/* Navigation */}
       <nav className="flex space-x-2">
         <button
-          className="font-space-mono text-lg text-white px-4 py-2 hover:text-gray-300 transition-colors cursor-pointer lowercase"
+          className="font-space-mono text-lg text-foreground px-4 py-2 hover:text-gray-300 transition-colors cursor-pointer lowercase"
           onClick={() => scrollToSection("hero")}
         >
           home
         </button>
         <button
-          className="font-space-mono text-lg text-white px-4 py-2 hover:text-gray-300 transition-colors cursor-pointer lowercase"
+          className="font-space-mono text-lg text-foreground px-4 py-2 hover:text-gray-300 transition-colors cursor-pointer lowercase"
           onClick={() => scrollToSection("about")}
         >
           about
         </button>
         <button
-          className="font-space-mono text-lg text-white px-4 py-2 hover:text-gray-300 transition-colors cursor-pointer lowercase"
+          className="font-space-mono text-lg text-foreground px-4 py-2 hover:text-gray-300 transition-colors cursor-pointer lowercase"
           onClick={() => scrollToSection("steps")}
         >
           demo
@@ -400,7 +404,7 @@ const Header = () => {
       {/* Login */}
       <Link
         href="/login"
-        className="font-space-mono text-lg text-white hover:text-gray-300 transition-colors lowercase"
+        className="font-space-mono text-lg text-foreground hover:text-gray-300 transition-colors lowercase"
       >
         login
       </Link>
