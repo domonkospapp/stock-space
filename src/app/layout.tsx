@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Urbanist } from "next/font/google";
+import { Geist, Geist_Mono, Urbanist, Space_Mono } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,6 +15,12 @@ const geistMono = Geist_Mono({
 const urbanist = Urbanist({
   variable: "--font-urbanist",
   subsets: ["latin"],
+});
+
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -33,7 +39,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://use.typekit.net/xzz8ngf.css" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${urbanist.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${urbanist.variable} ${spaceMono.variable} antialiased`}
       >
         {children}
       </body>
