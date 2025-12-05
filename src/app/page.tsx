@@ -147,68 +147,53 @@ export default function Home() {
       {/* Data Visualization Section (Upper) */}
       <section id="about" className="px-8 py-16">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
             {/* Card 1: Distribution */}
-            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
-              <div className="text-3xl font-bold font-hagrid mb-2">
-                $1,247,890
+            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl overflow-hidden flex flex-col">
+              <div className="flex-1">
+                <Image
+                  src="/peaks/page1.png"
+                  alt="Distribution chart"
+                  width={600}
+                  height={400}
+                  className="w-full h-auto"
+                />
               </div>
-              <h3 className="text-xl font-hagrid mb-4 text-gray-300">
-                Your distribution at a glance
-              </h3>
-              <div className="h-64 flex items-center justify-center bg-[#1A1A1A] rounded-lg">
-                <div className="text-center">
-                  <div className="text-sm font-space-mono text-gray-400 mb-2">
-                    Pie Chart Placeholder
-                  </div>
-                  <div className="text-xs font-space-mono text-gray-500">
-                    DYN 7.4% • TSLA 68.2% • AMD 8.5% • PUNT 9.4% • 6.4%
-                  </div>
-                </div>
-              </div>
+              <p className="p-6 text-center text-lg font-space-mono text-foreground">
+                Distribution at glance
+              </p>
             </div>
 
             {/* Card 2: Growth */}
-            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
-              <div className="text-3xl font-bold font-hagrid mb-2">
-                $1,247,890
+            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl overflow-hidden flex flex-col">
+              <div className="flex-1">
+                <Image
+                  src="/peaks/page2.png"
+                  alt="Growth chart"
+                  width={600}
+                  height={400}
+                  className="w-full h-auto"
+                />
               </div>
-              <h3 className="text-xl font-hagrid mb-4 text-gray-300">
+              <p className="p-6 text-center text-lg font-space-mono text-foreground">
                 Your growth over time
-              </h3>
-              <div className="h-64 flex items-center justify-center bg-[#1A1A1A] rounded-lg">
-                <div className="text-center">
-                  <div className="text-sm font-space-mono text-gray-400 mb-2">
-                    Line Graph Placeholder
-                  </div>
-                  <div className="text-xs font-space-mono text-gray-500">
-                    Jan 2018 - May 2024
-                  </div>
-                </div>
-              </div>
+              </p>
             </div>
 
             {/* Card 3: Stock Count */}
-            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl p-6">
-              <h3 className="text-xl font-hagrid mb-2 text-gray-300">
-                Cumulative PUNT Stock Count Over Time
-              </h3>
-              <div className="text-sm font-space-mono text-gray-400 mb-4">
-                Sany
+            <div className="bg-[#2A2A2A] border border-foreground/10 rounded-2xl overflow-hidden flex flex-col">
+              <div className="flex-1">
+                <Image
+                  src="/peaks/page3.png"
+                  alt="Stock count chart"
+                  width={600}
+                  height={400}
+                  className="w-full h-auto"
+                />
               </div>
-              <div className="h-64 flex items-center justify-center bg-[#1A1A1A] rounded-lg">
-                <div className="text-center w-full">
-                  <div className="text-sm font-space-mono text-gray-400 mb-2">
-                    Bar Chart Placeholder
-                  </div>
-                  <div className="text-xs font-space-mono text-gray-500 space-y-1">
-                    <div>dec: 147 sh</div>
-                    <div>okt: 132 sh</div>
-                    <div>nov: 112 sh</div>
-                    <div>aug: 90 sh</div>
-                  </div>
-                </div>
-              </div>
+              <p className="p-6 text-center text-lg font-space-mono text-foreground">
+                Cumulative stock count
+              </p>
             </div>
           </div>
         </div>
