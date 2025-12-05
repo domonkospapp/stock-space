@@ -127,6 +127,23 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Your Flatex data, decoded Section */}
+      <section className="px-8 py-16">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-6xl font-bold font-hagrid text-foreground mb-6">
+            Your Flatex data, decoded.
+          </h2>
+          <div className="space-y-2">
+            <p className="text-lg font-space-mono text-gray-300">
+              Instant visual insight.
+            </p>
+            <p className="text-lg font-space-mono text-gray-300">
+              Zero accounts. Zero servers
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Data Visualization Section (Upper) */}
       <section id="about" className="px-8 py-16">
         <div className="max-w-7xl mx-auto">
