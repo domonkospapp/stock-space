@@ -241,7 +241,8 @@ export default function Home() {
       <section id="steps" className="px-8 py-16">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-7xl font-bold font-hagrid mb-12">
-            Three simple steps to get started:
+            Three simple steps
+            <br /> to get started:
           </h2>
           <div className="border-t border-foreground/30">
             <StepExplanation
