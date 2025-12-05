@@ -270,31 +270,34 @@ export default function Home() {
       {/* Three Steps Section */}
       <section id="steps" className="px-8 py-16">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-7xl font-bold font-hagrid mb-12 uppercase">
+          <h2 className="text-7xl font-bold font-hagrid mb-12">
             Three simple steps to get started:
           </h2>
-          <div className="space-y-8">
+          <div className="border-t border-foreground/30">
             <StepExplanation
               rowIndex={1}
               title="Export CSV from Flatex"
-              description="Download your portfolio file directly from Flatex."
+              description="Download your portfolio CSV."
               onMouseEnter={() => handlePlayButtonHover(1)}
               onMouseLeave={handlePlayButtonLeave}
             />
+            <div className="border-t border-foreground/30"></div>
             <StepExplanation
               rowIndex={2}
-              title="Export CSV from Flatex"
-              description="Download your portfolio file directly from Flatex."
+              title="Import to STCK.SPACE"
+              description="Load the file directly into your browser."
               onMouseEnter={() => handlePlayButtonHover(2)}
               onMouseLeave={handlePlayButtonLeave}
             />
+            <div className="border-t border-foreground/30"></div>
             <StepExplanation
               rowIndex={3}
-              title="Export CSV from Flatex"
-              description="Download your portfolio file directly from Flatex."
+              title="Analyze your data"
+              description="View distribution, growth, and buying patterns."
               onMouseEnter={() => handlePlayButtonHover(3)}
               onMouseLeave={handlePlayButtonLeave}
             />
+            <div className="border-t border-foreground/30"></div>
           </div>
         </div>
       </section>
@@ -326,20 +329,20 @@ const StepExplanation = ({
   description: string;
 }) => {
   return (
-    <div className="flex items-center justify-between py-4">
+    <div className="flex items-center justify-between py-6">
       <div className="flex items-center space-x-8">
-        <span className="text-7xl font-bold font-hagrid text-gray-600">
+        <span className="text-7xl font-bold font-hagrid text-foreground">
           0{rowIndex}
         </span>
         <div>
-          <h3 className="text-2xl font-space-mono mb-1 text-foreground">
+          <h3 className="text-2xl font-bold font-space-mono mb-1 text-foreground">
             {title}
           </h3>
-          <p className="text-gray-400 font-space-mono">{description}</p>
+          <p className="text-foreground font-space-mono">{description}</p>
         </div>
       </div>
       <button
-        className="w-16 h-16 border-foreground/30 border rounded-full flex items-center justify-center hover:bg-foreground/10 group transition-colors cursor-pointer"
+        className="w-16 h-16 border border-foreground rounded-full flex items-center justify-center hover:bg-foreground/10 group transition-colors cursor-pointer"
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
