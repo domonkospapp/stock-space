@@ -2,12 +2,61 @@
 
 import React from "react";
 import { Transaction } from "utils/types";
+import { usePortfolioStore } from "../../../store/portfolioStore";
 
 type Props = {
   transactions: Transaction[];
 };
 
+// Helper function to extract ticker from stock name
+function extractTicker(stockName: string): string {
+  // Try to find a ticker-like pattern (all caps, 2-5 letters)
+  const tickerMatch = stockName.match(/\b[A-Z]{2,5}\b/);
+  if (tickerMatch) {
+    return tickerMatch[0];
+  }
+
+  // Fallback: take first word and clean it
+  const words = stockName.split(" ");
+  if (words.length > 0) {
+    let firstWord = words[0]
+      .replace(/\.(COM|INC|CORP|LTD|LLC|ADR|AG|SA|NV|SE)$/i, "")
+      .replace(/[^A-Z0-9]/g, "")
+      .substring(0, 5)
+      .toUpperCase();
+
+    if (firstWord.length >= 2) {
+      return firstWord;
+    }
+  }
+
+  // Last resort: use first 4 characters of stock name
+  return stockName.substring(0, 4).toUpperCase();
+}
+
+// Helper function to format month as lowercase abbreviation
+function formatMonthAbbrev(date: Date): string {
+  const monthNames = [
+    "jan",
+    "feb",
+    "mar",
+    "apr",
+    "may",
+    "jun",
+    "jul",
+    "aug",
+    "sep",
+    "oct",
+    "nov",
+    "dec",
+  ];
+  return monthNames[date.getMonth()];
+}
+
 export default function TransactionsChart({ transactions }: Props) {
+  const positions = usePortfolioStore((s) => s.positions);
+  const holdingsMap = usePortfolioStore((s) => s.holdingsMap);
+
   if (!transactions.length) {
     return (
       <div className="mt-4 p-6">
@@ -23,6 +72,16 @@ export default function TransactionsChart({ transactions }: Props) {
       </div>
     );
   }
+
+  // Get stock info from first transaction
+  const stockName = transactions[0]?.stockName || "";
+  const ticker = extractTicker(stockName);
+
+  // Calculate total portfolio shares for percentage calculation
+  const totalPortfolioShares = Object.values(holdingsMap).reduce(
+    (sum, pos) => sum + pos.totalShares,
+    0
+  );
 
   const cumulativeData = transactions.reduce((acc, transaction) => {
     // Parse DD.MM.YYYY format
@@ -187,50 +246,126 @@ export default function TransactionsChart({ transactions }: Props) {
 
   const chartData = sortedData.map((item) => {
     const cumulativeShares = monthlyPositions.get(item.monthYear) || 0;
-    return { ...item, cumulativeShares };
+    // Parse monthYear to get Date object
+    const [month, year] = item.monthYear.split(" ");
+    const monthIndex = new Date(`${month} 1, ${year}`).getMonth();
+    const date = new Date(parseInt(year), monthIndex, 1);
+    return { ...item, cumulativeShares, date, year: parseInt(year) };
   });
+
+  // Sort by date (newest first, like in the image)
+  chartData.sort((a, b) => b.date.getTime() - a.date.getTime());
 
   const maxShares = Math.max(...chartData.map((d) => d.cumulativeShares), 1);
 
+  // Get current year (or latest year from data)
+  const currentYear =
+    chartData.length > 0
+      ? chartData[0].date.getFullYear()
+      : new Date().getFullYear();
+
+  // Calculate percentage of total portfolio
+  const latestShares = chartData.length > 0 ? chartData[0].cumulativeShares : 0;
+  const percentage =
+    totalPortfolioShares > 0 ? (latestShares / totalPortfolioShares) * 100 : 0;
+
+  // Group data by year
+  const dataByYear = chartData.reduce((acc, item) => {
+    if (!acc[item.year]) {
+      acc[item.year] = [];
+    }
+    acc[item.year].push(item);
+    return acc;
+  }, {} as Record<number, typeof chartData>);
+
+  // Sort years descending
+  const years = Object.keys(dataByYear)
+    .map(Number)
+    .sort((a, b) => b - a);
+
   return (
-    <div className="mt-10">
-      <h3 className="font-semibold text-white mb-4 font-[hagrid] text-2xl">
-        Cumulative Stock Count Over Time
-      </h3>
-      <div className="space-y-4">
-        {chartData.map((data) => {
-          const progressPercentage = (data.cumulativeShares / maxShares) * 100;
-          const totalSegments = 66; // Total number of segments in the bar
-          const filledSegments = Math.round(
-            (progressPercentage / 100) * totalSegments
+    <div className="mt-24">
+      {/* Title with ticker highlight and percentage */}
+      <div className="mb-12 flex items-start justify-between border-b-2 border-foreground pb-2">
+        <h3 className="text-foreground font-[hagrid] text-4xl">
+          Cumulative{" "}
+          <span className="bg-foreground text-background px-2 text-3xl rounded-xl">
+            {ticker}
+          </span>{" "}
+          share count <br /> over time
+        </h3>
+        <div>
+          <h4 className="font-[hagrid] text-4xl text-foreground">
+            Allocation: {percentage.toFixed(1)}%
+          </h4>
+        </div>
+      </div>
+
+      {/* Monthly data grouped by year */}
+      <div className="space-y-6">
+        {years.map((year) => {
+          const yearData = dataByYear[year];
+          const yearMaxShares = Math.max(
+            ...yearData.map((d) => d.cumulativeShares),
+            1
           );
 
           return (
-            <div key={data.monthYear} className="relative">
-              <div className="flex items-center justify-between my-2">
-                <span className="text-white text-lg font-[hagrid]">
-                  {data.monthYear}
-                </span>
-                <span className="text-white font-[hagrid]">
-                  <span className="font-bold">
-                    {data.cumulativeShares.toLocaleString()}
-                  </span>{" "}
-                  shares
+            <div key={year}>
+              {/* Year header (show for all years) */}
+              <div className="mb-3">
+                <span className="text-white font-[hagrid] text-2xl">
+                  {year}
                 </span>
               </div>
-              <div className="flex gap-1">
-                {[...Array(totalSegments)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-12 w-4 rounded-full ${
-                      i < filledSegments ? "" : "bg-[#504F4F]"
-                    }`}
-                    style={{
-                      backgroundColor:
-                        i < filledSegments ? "#A3A2F9" : undefined,
-                    }}
-                  />
-                ))}
+
+              {/* Monthly bars for this year */}
+              <div className="space-y-0">
+                {yearData.map((data, index) => {
+                  // Use global maxShares so bars reflect actual share count across all years
+                  const progressPercentage =
+                    (data.cumulativeShares / maxShares) * 100;
+                  const monthAbbrev = formatMonthAbbrev(data.date);
+
+                  // Calculate progressively darker background for each bar
+                  // Start from off-white and get darker
+                  const baseLightness = 90; // Off-white starting point
+                  const darkenStep = 3; // Darken by 3% per row
+                  const barLightness = Math.max(
+                    20,
+                    baseLightness - index * darkenStep
+                  );
+                  const barBgColor = `hsl(0, 0%, ${barLightness}%)`;
+                  const barEndColor = `hsl(0, 0%, ${Math.max(
+                    15,
+                    barLightness - 10
+                  )}%)`;
+
+                  return (
+                    <div key={data.monthYear} className="flex items-center">
+                      {/* Horizontal bar with gradient - width proportional to share count */}
+                      <div className="flex-1 h-16 relative flex items-center">
+                        <div
+                          className="h-full flex items-center px-4 gap-4"
+                          style={{
+                            width: `${Math.max(progressPercentage, 2)}%`,
+                            maxWidth: "100%",
+                            minWidth: "fit-content",
+                            background: `linear-gradient(to right, ${barBgColor}, ${barEndColor})`,
+                          }}
+                        >
+                          <span className="text-background font-[hagrid] text-xl lowercase min-w-[60px]">
+                            {monthAbbrev}
+                          </span>
+                          <div className="h-full w-0.5 bg-background flex-shrink-0"></div>
+                          <span className="text-background font-[hagrid] text-lg font-medium whitespace-nowrap ml-auto">
+                            {data.cumulativeShares} shares
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
