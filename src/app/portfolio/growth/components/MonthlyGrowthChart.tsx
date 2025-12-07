@@ -19,19 +19,22 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
   const [chartDimensions, setChartDimensions] = useState({
     width: 0,
     height: 0,
-    marginTop: 20,
-    marginRight: 30,
-    marginBottom: 60,
-    marginLeft: 50,
+    marginTop: 40,
+    marginRight: 0,
+    marginBottom: 40,
+    marginLeft: 0,
   });
 
   useEffect(() => {
     if (!svgRef.current) return;
 
     const handleResize = () => {
-      const parentWidth = svgRef.current?.parentElement?.clientWidth || 800; // Default width
+      // Use full viewport width for full screen width
+      const viewportWidth = window.innerWidth;
       const newWidth =
-        parentWidth - chartDimensions.marginLeft - chartDimensions.marginRight;
+        viewportWidth -
+        chartDimensions.marginLeft -
+        chartDimensions.marginRight;
       // Use full viewport height minus margins and some padding
       const viewportHeight = window.innerHeight;
       const newHeight = Math.max(
@@ -68,7 +71,7 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
     // Clear previous chart
     d3.select(svgRef.current).selectAll("*").remove();
 
-    const svg = d3
+    const mainSvg = d3
       .select(svgRef.current)
       .attr(
         "width",
@@ -81,7 +84,31 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
         chartDimensions.height +
           chartDimensions.marginTop +
           chartDimensions.marginBottom
-      )
+      );
+
+    // Create gradient definition in main SVG (before the translated group)
+    const gradient = mainSvg
+      .append("defs")
+      .append("linearGradient")
+      .attr("id", "area-gradient")
+      .attr("x1", "0%")
+      .attr("y1", "0%")
+      .attr("x2", "0%")
+      .attr("y2", "100%");
+
+    gradient
+      .append("stop")
+      .attr("offset", "0%")
+      .attr("stop-color", "rgba(255, 255, 255, 0.3)")
+      .attr("stop-opacity", 1);
+
+    gradient
+      .append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", "rgba(255, 255, 255, 0)")
+      .attr("stop-opacity", 0);
+
+    const svg = mainSvg
       .append("g")
       .attr(
         "transform",
@@ -103,34 +130,196 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       .domain(d3.extent(formattedData, (d) => d.date) as [Date, Date])
       .range([0, chartDimensions.width]);
 
+    // Calculate a nice round number close to the max value (use full chart height)
+    const maxValue = d3.max(formattedData, (d) => d.totalMonthlyValue) || 0;
+    const niceMaxValue = (() => {
+      if (maxValue === 0) return 100;
+      // Add minimal padding (5%) and round to a nice number that's close
+      const paddedMax = maxValue * 1.05; // Only 5% padding
+      const magnitude = Math.pow(10, Math.floor(Math.log10(paddedMax)));
+      const normalized = paddedMax / magnitude;
+      let rounded;
+      // Round to the closest nice number, not always up
+      if (normalized <= 1.1) rounded = 1;
+      else if (normalized <= 1.5) rounded = 1.5;
+      else if (normalized <= 2) rounded = 2;
+      else if (normalized <= 3) rounded = 3;
+      else if (normalized <= 5) rounded = 5;
+      else rounded = Math.ceil(normalized);
+      return rounded * magnitude;
+    })();
+
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(formattedData, (d) => d.totalMonthlyValue) || 0])
-      .nice()
+      .domain([0, niceMaxValue])
       .range([chartDimensions.height, 0]);
 
-    // Add X-axis
-    svg
+    // Add X-axis with lowercase month abbreviations
+    const monthNames = [
+      "jan",
+      "feb",
+      "mar",
+      "apr",
+      "may",
+      "jun",
+      "jul",
+      "aug",
+      "sep",
+      "oct",
+      "nov",
+      "dec",
+    ];
+
+    // Create a map of dates to their formatted labels
+    const tickLabels = new Map<string, string>();
+    let prevYear: number | null = null;
+
+    // Pre-calculate labels for all ticks
+    const ticks = xScale.ticks();
+    ticks.forEach((date) => {
+      const month = date.getMonth();
+      const year = date.getFullYear();
+      const dateKey = date.getTime().toString();
+
+      // Show year when it changes or for January
+      if (prevYear === null || prevYear !== year || month === 0) {
+        prevYear = year;
+        tickLabels.set(dateKey, year.toString());
+      } else {
+        tickLabels.set(dateKey, monthNames[month]);
+      }
+    });
+
+    // Create x-axis and get tick positions
+    const xAxis = d3.axisBottom(xScale).tickFormat((d) => {
+      const date = d as Date;
+      return (
+        tickLabels.get(date.getTime().toString()) || monthNames[date.getMonth()]
+      );
+    });
+
+    const xAxisGroup = svg
       .append("g")
       .attr("transform", `translate(0,${chartDimensions.height})`)
-      .call(
-        d3
-          .axisBottom(xScale)
-          .tickFormat((d) => d3.timeFormat("%Y-%m")(d as Date))
-      )
-      .selectAll("text")
-      .attr("transform", "translate(-10,0)rotate(-45)")
-      .style("text-anchor", "end")
-      .style("fill", "#9CA3AF"); // Light gray for axis labels
+      .call(xAxis);
 
-    // Add Y-axis
+    // Remove only the tick lines (small indication lines), keep the bottom axis line
+    xAxisGroup.selectAll("line").remove();
+
+    // Keep the axis path (the main bottom line) but style it
+    xAxisGroup
+      .selectAll("path")
+      .attr("stroke", "rgba(255, 255, 255, 0.1)")
+      .attr("stroke-width", 1);
+
+    xAxisGroup
+      .selectAll("text")
+      .style("fill", "rgba(255, 255, 255, 0.6)")
+      .style("font-size", "16px")
+      .style("font-family", "var(--font-space-mono), 'Space Mono', monospace")
+      .style("text-transform", "lowercase")
+      .attr("text-anchor", "middle"); // Center text on tick marks for edge labels
+
+    // Get x-axis tick positions for vertical lines
+    const xTickPositions = xScale.ticks().map((d) => xScale(d));
+
+    // Add vertical grid lines at x-axis tick positions
     svg
-      .append("g")
-      .call(d3.axisLeft(yScale).tickFormat((d) => d3.format("~s")(d)))
-      .selectAll("text")
-      .style("fill", "#9CA3AF"); // Light gray for axis labels
+      .selectAll(".vertical-grid-line")
+      .data(xTickPositions)
+      .enter()
+      .append("line")
+      .attr("class", "vertical-grid-line")
+      .attr("x1", (d) => d)
+      .attr("x2", (d) => d)
+      .attr("y1", 0)
+      .attr("y2", chartDimensions.height)
+      .attr("stroke", "rgba(255, 255, 255, 0.1)")
+      .attr("stroke-width", 1);
 
-    // Add the line
+    // Calculate average spacing between vertical lines to create square grid
+    let verticalSpacing = chartDimensions.width;
+    if (xTickPositions.length > 1) {
+      const spacings: number[] = [];
+      for (let i = 1; i < xTickPositions.length; i++) {
+        spacings.push(xTickPositions[i] - xTickPositions[i - 1]);
+      }
+      verticalSpacing = spacings.reduce((a, b) => a + b, 0) / spacings.length;
+    }
+
+    // Add horizontal grid lines to create squares with vertical lines
+    const numHorizontalLines = Math.ceil(
+      chartDimensions.height / verticalSpacing
+    );
+    const horizontalPositions = Array.from(
+      { length: numHorizontalLines + 1 },
+      (_, i) => i * verticalSpacing
+    ).filter((y) => y <= chartDimensions.height);
+
+    svg
+      .selectAll(".horizontal-grid-line")
+      .data(horizontalPositions)
+      .enter()
+      .append("line")
+      .attr("class", "horizontal-grid-line")
+      .attr("x1", 0)
+      .attr("x2", chartDimensions.width)
+      .attr("y1", (d) => d)
+      .attr("y2", (d) => d)
+      .attr("stroke", "rgba(255, 255, 255, 0.1)")
+      .attr("stroke-width", 1);
+
+    // Add Y-axis with only one label at the top (max value)
+    const formatLabel = (value: number) => {
+      // Format as abbreviated number (e.g., 1M, 500K, etc.)
+      if (value >= 1000000) {
+        return `${(value / 1000000).toFixed(value >= 10000000 ? 0 : 1)}M`;
+      } else if (value >= 1000) {
+        return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}K`;
+      }
+      return value.toString();
+    };
+
+    // Add only the top label (max value) inside the chart
+    svg
+      .append("text")
+      .attr("x", 4) // Position text 4px to the right of the axis line (reduced for edge-to-edge)
+      .attr("y", 0)
+      .attr("dy", "0.71em") // Align with top
+      .style("fill", "rgba(255, 255, 255, 0.6)")
+      .style("font-size", "16px")
+      .style("font-family", "var(--font-space-mono), 'Space Mono', monospace")
+      .text(formatLabel(niceMaxValue));
+
+    // Add subtle Y-axis line (no ticks, just the line)
+    svg
+      .append("line")
+      .attr("x1", 0)
+      .attr("x2", 0)
+      .attr("y1", 0)
+      .attr("y2", chartDimensions.height)
+      .attr("stroke", "rgba(255, 255, 255, 0.1)")
+      .attr("stroke-width", 1);
+
+    // Create area generator for filled area beneath the line
+    const area = d3
+      .area<{
+        date: Date;
+        totalMonthlyValue: number;
+        currency: string;
+      }>()
+      .x((d) => xScale(d.date))
+      .y0(chartDimensions.height)
+      .y1((d) => yScale(d.totalMonthlyValue));
+
+    // Add the filled area with gradient
+    svg
+      .append("path")
+      .datum(formattedData)
+      .attr("fill", "url(#area-gradient)")
+      .attr("d", area);
+
+    // Add the white line
     const line = d3
       .line<{
         date: Date;
@@ -144,8 +333,8 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       .append("path")
       .datum(formattedData)
       .attr("fill", "none")
-      .attr("stroke", "#34D399") // Green color for the line
-      .attr("stroke-width", 2)
+      .attr("stroke", "#FFFFFF") // White color for the line
+      .attr("stroke-width", 3) // Thicker line
       .attr("d", line);
 
     // Add tooltips
@@ -156,7 +345,7 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       .attr("class", "focus")
       .style("display", "none");
 
-    focus.append("circle").attr("r", 5).style("fill", "#34D399");
+    focus.append("circle").attr("r", 5).style("fill", "#FFFFFF");
     focus.append("line").attr("class", "x-hover-line hover-line");
     focus.append("line").attr("class", "y-hover-line hover-line");
 
@@ -199,7 +388,7 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
         .attr("y1", 0)
         .attr("y2", 0)
         .attr("stroke-width", 1)
-        .attr("stroke", "#9CA3AF")
+        .attr("stroke", "rgba(255, 255, 255, 0.3)")
         .attr("stroke-dasharray", "3,3");
 
       focus
@@ -209,17 +398,30 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
         .attr("y1", 0)
         .attr("y2", chartDimensions.height - yScale(d.totalMonthlyValue))
         .attr("stroke-width", 1)
-        .attr("stroke", "#9CA3AF")
+        .attr("stroke", "rgba(255, 255, 255, 0.3)")
         .attr("stroke-dasharray", "3,3");
+
+      // Calculate position above the point on the line
+      const pointX = xScale(d.date);
+      const pointY = yScale(d.totalMonthlyValue);
+
+      // Get SVG position relative to viewport
+      const svgRect = svgRef.current?.getBoundingClientRect();
+      if (!svgRect) return;
+
+      // Calculate tooltip position above the point (centered horizontally, positioned above)
+      // Use fixed positioning with viewport coordinates
+      const tooltipX = svgRect.left + chartDimensions.marginLeft + pointX;
+      const tooltipY = svgRect.top + chartDimensions.marginTop + pointY;
 
       tooltip
         .html(
           `
-          <div style="padding: 12px 16px; border-radius: 16px; background-color: #292929; color: #F3F4F6; font-family: 'Urbanist', sans-serif; border: 2px solid white;">
-            <div style="font-size: 12px; color: white; margin-bottom: 4px; font-weight: 500;">
+          <div style="padding: 12px 16px; border-radius: 16px; background-color: #292929; color: #F3F4F6; font-family: var(--font-space-mono), 'Space Mono', monospace; border: 2px solid white;">
+            <div style="font-size: 14px; color: white; margin-bottom: 4px; font-weight: 500;">
               ${d3.timeFormat("%B %Y")(d.date)}
             </div>
-            <div style="font-size: 18px; font-weight: 600; color: #E1FF8E;">
+            <div style="font-size: 20px; font-weight: 600; color: #E1FF8E;">
               ${d.totalMonthlyValue.toLocaleString("en-US", {
                 style: "currency",
                 currency: selectedCurrency,
@@ -228,15 +430,18 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
           </div>
           `
         )
-        .style("left", `${event.pageX + 15}px`)
-        .style("top", `${event.pageY - 28}px`)
-        .style("z-index", "1000");
+        .style("position", "fixed")
+        .style("left", `${tooltipX}px`)
+        .style("top", `${tooltipY}px`)
+        .style("transform", "translate(-50%, calc(-100% - 15px))") // Center horizontally and position 15px above the point
+        .style("z-index", "1000")
+        .style("pointer-events", "none");
     }
 
-    // Add some basic styling for the hover lines (can be moved to CSS)
+    // Add some basic styling for the hover lines
     d3.select(svgRef.current).append("style").text(`
       .hover-line {
-        stroke: #9CA3AF;
+        stroke: rgba(255, 255, 255, 0.3);
         stroke-width: 1px;
         stroke-dasharray: 3,3;
       }
@@ -244,29 +449,32 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
   }, [data, selectedCurrency, chartDimensions]);
 
   return (
-    <div className="flex flex-col p-4">
-      {/* <h2 className="text-xl font-bold text-white mb-4">
-        Monthly Portfolio Value
-      </h2> */}
-      <h2 className="text-4xl font-bold text-white font-[hagrid]">
+    <div className="flex flex-col relative w-full" style={{ width: "100vw" }}>
+      <h2 className="text-4xl font-bold text-white font-[hagrid] mb-4 px-0">
         Monthly Portfolio Value
       </h2>
-      <svg
-        ref={svgRef}
-        style={{
-          display: "block",
-          width: "100%",
-          height: `${
-            chartDimensions.height +
-            chartDimensions.marginTop +
-            chartDimensions.marginBottom
-          }px`,
-        }}
-      ></svg>
-      <div
-        ref={tooltipRef}
-        style={{ position: "absolute", pointerEvents: "none", display: "none" }}
-      ></div>
+      <div className="relative w-full">
+        <svg
+          ref={svgRef}
+          style={{
+            display: "block",
+            width: "100%",
+            height: `${
+              chartDimensions.height +
+              chartDimensions.marginTop +
+              chartDimensions.marginBottom
+            }px`,
+          }}
+        ></svg>
+        <div
+          ref={tooltipRef}
+          style={{
+            position: "fixed",
+            pointerEvents: "none",
+            display: "none",
+          }}
+        ></div>
+      </div>
     </div>
   );
 };

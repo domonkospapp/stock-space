@@ -138,16 +138,24 @@ export default function GrowthChartClient() {
   }
 
   return (
-    <div className="flex flex-col space-y-8">
+    <div className="flex flex-col space-y-8 w-full">
       {isGrowthDataCalculating && monthlyHoldingValues.length > 0 && (
         <p className="text-gray-400 font-urbanist text-sm text-right">
           Updating data in background... 🔄
         </p>
       )}
-      <MonthlyGrowthChart
-        data={chartData}
-        selectedCurrency={selectedCurrency}
-      />
+      <div
+        className="w-screen relative"
+        style={{
+          marginLeft: "calc(-50vw + 50%)",
+          marginRight: "calc(-50vw + 50%)",
+        }}
+      >
+        <MonthlyGrowthChart
+          data={chartData}
+          selectedCurrency={selectedCurrency}
+        />
+      </div>
 
       {/* Debug Screen */}
       <div className="mt-8 bg-[#2A2A2A] border border-foreground/20 rounded-2xl p-6 overflow-auto max-h-[600px]">
