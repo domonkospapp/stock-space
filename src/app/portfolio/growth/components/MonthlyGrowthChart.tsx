@@ -24,6 +24,10 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
     marginBottom: 40,
     marginLeft: 0,
   });
+  const [hoveredData, setHoveredData] = useState<{
+    date: Date;
+    value: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -612,11 +616,10 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       .style("pointer-events", "all")
       .on("mouseover", () => {
         focus.style("display", null);
-        tooltip.style("display", null);
       })
       .on("mouseout", () => {
         focus.style("display", "none");
-        tooltip.style("display", "none");
+        setHoveredData(null);
       })
       .on("mousemove", mousemove);
 
@@ -663,33 +666,11 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       const svgRect = svgRef.current?.getBoundingClientRect();
       if (!svgRect) return;
 
-      // Calculate tooltip position above the point (centered horizontally, positioned above)
-      // Use fixed positioning with viewport coordinates
-      const tooltipX = svgRect.left + chartDimensions.marginLeft + pointX;
-      const tooltipY = svgRect.top + chartDimensions.marginTop + pointY;
-
-      tooltip
-        .html(
-          `
-          <div style="padding: 12px 16px; border-radius: 16px; background-color: #292929; color: #F3F4F6; font-family: var(--font-space-mono), 'Space Mono', monospace; border: 2px solid white;">
-            <div style="font-size: 14px; color: white; margin-bottom: 4px; font-weight: 500;">
-              ${d3.timeFormat("%B %Y")(d.date)}
-            </div>
-            <div style="font-size: 20px; font-weight: 600; color: #E1FF8E;">
-              ${d.totalMonthlyValue.toLocaleString("en-US", {
-                style: "currency",
-                currency: selectedCurrency,
-              })}
-            </div>
-          </div>
-          `
-        )
-        .style("position", "fixed")
-        .style("left", `${tooltipX}px`)
-        .style("top", `${tooltipY}px`)
-        .style("transform", "translate(-50%, calc(-100% - 15px))") // Center horizontally and position 15px above the point
-        .style("z-index", "1000")
-        .style("pointer-events", "none");
+      // Update hovered data state instead of showing tooltip
+      setHoveredData({
+        date: d.date,
+        value: d.totalMonthlyValue,
+      });
     }
 
     // Add some basic styling for the hover lines
@@ -707,7 +688,7 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       {/* <h2 className="text-4xl font-bold text-white font-[hagrid] mb-4 px-0">
         Monthly Portfolio Value
       </h2> */}
-      <div className="relative w-full">
+      <div className="relative w-full" style={{ position: "relative" }}>
         <svg
           ref={svgRef}
           style={{
@@ -729,6 +710,82 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
           }}
         ></div>
       </div>
+
+      {/* Fixed display for month and value - positioned below main money value at top right */}
+      {hoveredData && (
+        <div
+          style={{
+            position: "fixed",
+            top: "180px", // Position a bit below on the grid
+            left: "2rem", // Match layout's p-8 padding
+            right: "2rem", // Match layout's p-8 padding
+            width: "auto",
+            maxWidth: "80rem", // max-w-7xl (80rem = 1280px)
+            marginLeft: "auto",
+            marginRight: "auto",
+            zIndex: 10,
+            pointerEvents: "none", // Allow clicks to pass through
+          }}
+        >
+          <div
+            className="flex items-start justify-between"
+            style={{ width: "100%" }}
+          >
+            <div style={{ flex: 1 }}></div>
+            {/* Right side - matches PortfolioTotalValue position */}
+            <div
+              style={{
+                pointerEvents: "auto",
+              }}
+            >
+              <div className="flex gap-3">
+                {/* Month box */}
+                <div
+                  className="px-8 py-1 rounded-2xl border-2 bg-[#292929]"
+                  style={{
+                    borderColor: "rgba(255, 255, 255, 0.3)", // Off-white border
+                    minWidth: "280px", // Prevent jumping, increased for larger text
+                  }}
+                >
+                  <div
+                    className="text-white font-[hagrid] text-center"
+                    style={{
+                      fontSize: "28px",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {d3.timeFormat("%B %Y")(hoveredData.date)}
+                  </div>
+                </div>
+
+                {/* Value box */}
+                <div
+                  className="px-8 py-1 rounded-2xl border-2 bg-[#292929]"
+                  style={{
+                    borderColor: "rgba(255, 255, 255, 0.3)", // Off-white border
+                    minWidth: "280px", // Prevent jumping, increased for larger text
+                  }}
+                >
+                  <div
+                    className="text-white font-[hagrid] text-center"
+                    style={{
+                      fontSize: "28px",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {Math.ceil(hoveredData.value).toLocaleString("en-US", {
+                      style: "currency",
+                      currency: selectedCurrency,
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
