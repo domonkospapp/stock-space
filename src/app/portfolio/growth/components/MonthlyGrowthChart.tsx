@@ -506,13 +506,30 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
 
     // Add Y-axis with only one label at the top (max value)
     const formatLabel = (value: number) => {
-      // Format as abbreviated number (e.g., 1M, 500K, etc.)
+      // Round to a nice whole number first
+      let roundedValue = value;
       if (value >= 1000000) {
-        return `${(value / 1000000).toFixed(value >= 10000000 ? 0 : 1)}M`;
+        // Round to nearest 100K for millions
+        roundedValue = Math.ceil(value / 100000) * 100000;
       } else if (value >= 1000) {
-        return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}K`;
+        // Round to nearest 10K for thousands
+        roundedValue = Math.ceil(value / 10000) * 10000;
+      } else {
+        // Round to nearest 100 for smaller numbers
+        roundedValue = Math.ceil(value / 100) * 100;
       }
-      return value.toString();
+
+      // Format as abbreviated number (e.g., 1M, 500K, etc.)
+      if (roundedValue >= 1000000) {
+        return `${(roundedValue / 1000000).toFixed(
+          roundedValue >= 10000000 ? 0 : 1
+        )}M`;
+      } else if (roundedValue >= 1000) {
+        return `${(roundedValue / 1000).toFixed(
+          roundedValue >= 10000 ? 0 : 1
+        )}K`;
+      }
+      return roundedValue.toString();
     };
 
     // Add only the top label (max value) inside the chart
@@ -522,7 +539,7 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       .attr("y", 0)
       .attr("dy", "0.71em") // Align with top
       .style("fill", "rgba(255, 255, 255, 0.6)")
-      .style("font-size", "20px")
+      .style("font-size", "40px")
       .style("font-family", "var(--font-space-mono), 'Space Mono', monospace")
       .style("font-weight", "bold")
       .text(formatLabel(yAxisLabelValue));
