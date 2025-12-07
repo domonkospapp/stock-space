@@ -243,28 +243,13 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       .domain([startDate, maxDate])
       .range([0, chartDimensions.width]);
 
-    // Calculate a nice round number close to the max value (use full chart height)
+    // Calculate the actual max value from data
     const maxValue = d3.max(dataWithStart, (d) => d.totalMonthlyValue) || 0;
-    const niceMaxValue = (() => {
-      if (maxValue === 0) return 100;
-      // Add minimal padding (5%) and round to a nice number that's close
-      const paddedMax = maxValue * 1.05; // Only 5% padding
-      const magnitude = Math.pow(10, Math.floor(Math.log10(paddedMax)));
-      const normalized = paddedMax / magnitude;
-      let rounded;
-      // Round to the closest nice number, not always up
-      if (normalized <= 1.1) rounded = 1;
-      else if (normalized <= 1.5) rounded = 1.5;
-      else if (normalized <= 2) rounded = 2;
-      else if (normalized <= 3) rounded = 3;
-      else if (normalized <= 5) rounded = 5;
-      else rounded = Math.ceil(normalized);
-      return rounded * magnitude;
-    })();
 
-    const yScale = d3
+    // Create initial Y scale (will be updated after we calculate spacing to complete last square)
+    let yScale = d3
       .scaleLinear()
-      .domain([0, niceMaxValue])
+      .domain([0, maxValue || 100])
       .range([chartDimensions.height, 0]);
 
     // Add X-axis with lowercase month abbreviations
@@ -325,49 +310,186 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       .attr("stroke", "rgba(255, 255, 255, 0.1)")
       .attr("stroke-width", 1);
 
-    xAxisGroup
-      .selectAll("text")
+    const xAxisTexts = xAxisGroup.selectAll("text");
+
+    xAxisTexts
       .style("fill", "rgba(255, 255, 255, 0.6)")
-      .style("font-size", "16px")
+      .style("font-size", "20px")
       .style("font-family", "var(--font-space-mono), 'Space Mono', monospace")
       .style("text-transform", "lowercase")
-      .attr("text-anchor", "middle"); // Center text on tick marks for edge labels
+      .attr("text-anchor", "middle") // Center text on tick marks for edge labels
+      .style("font-weight", function () {
+        // Make bold except for month names (lowercase month abbreviations)
+        const text = d3.select(this).text();
+        const isMonthName =
+          /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)$/.test(
+            text.toLowerCase()
+          );
+        return isMonthName ? "normal" : "bold";
+      });
 
-    // Get x-axis tick positions for vertical lines
-    const xTickPositions = xScale.ticks().map((d) => xScale(d));
+    // Remove the first label
+    if (xAxisTexts.size() > 0) {
+      const firstNode = xAxisTexts.nodes()[0];
+      if (firstNode && firstNode instanceof Element) {
+        firstNode.remove();
+      }
+    }
 
-    // Add vertical grid lines at x-axis tick positions
+    // Calculate spacing based on labeling interval to create perfect squares
+    // Start from 0, not from the first tick position
+    const allTicks = xScale.ticks();
+    const xTickPositions = allTicks.map((d) => xScale(d));
+
+    // Determine the spacing - always use distance from 0 to first tick
+    // This ensures squares start from the left edge
+    let verticalSpacing = chartDimensions.width;
+    if (xTickPositions.length > 0) {
+      const firstTickPos = xTickPositions[0];
+      // Use the distance from 0 to the first tick as the square width
+      // If first tick is at 0, use spacing between ticks instead
+      if (firstTickPos > 0) {
+        verticalSpacing = firstTickPos;
+      } else if (xTickPositions.length > 1) {
+        // If first tick is at 0, use spacing between first two ticks
+        verticalSpacing = xTickPositions[1] - xTickPositions[0];
+      }
+    }
+
+    // Safety check: ensure verticalSpacing is valid and reasonable
+    if (
+      verticalSpacing <= 0 ||
+      !isFinite(verticalSpacing) ||
+      verticalSpacing > chartDimensions.width
+    ) {
+      // Fallback: create a reasonable number of squares
+      verticalSpacing = chartDimensions.width / 10;
+    }
+
+    // Create evenly spaced vertical lines starting from 0
+    // Calculate how many complete squares fit in the width
+    const numCompleteSquares = Math.max(
+      1,
+      Math.floor(chartDimensions.width / verticalSpacing)
+    );
+    const verticalPositions: number[] = [];
+
+    // Always start at 0
+    verticalPositions.push(0);
+
+    // Add lines at each square interval
+    for (let i = 1; i <= numCompleteSquares; i++) {
+      const pos = i * verticalSpacing;
+      if (pos < chartDimensions.width && isFinite(pos)) {
+        verticalPositions.push(pos);
+      }
+    }
+
+    // Always end at the right edge (avoid duplicates)
+    const lastPos = verticalPositions[verticalPositions.length - 1];
+    if (lastPos < chartDimensions.width - 0.1) {
+      verticalPositions.push(chartDimensions.width);
+    }
+
+    // Vertical lines will be drawn after horizontal positions are calculated
+    // so we can use the topmost horizontal line position
+
+    // Calculate Y-axis max to ensure complete squares from bottom (0) to top
+    // Strategy: Position maxValue inside a square (one square down from top)
+    // The Y-axis label will show yAxisMax at the top, which is slightly above maxValue
+    let yAxisMax = maxValue || 100;
+    let yAxisLabelValue = maxValue || 100;
+
+    if (
+      maxValue > 0 &&
+      verticalSpacing > 0 &&
+      isFinite(verticalSpacing) &&
+      chartDimensions.height > 0
+    ) {
+      // We want maxValue to be positioned one square down from the top
+      // This ensures it sits inside a complete square, not at the top edge
+      // Top edge (y=0) will show yAxisMax
+      // One square down (y=verticalSpacing) will show maxValue
+      const maxValuePosition = verticalSpacing;
+
+      // Y scale: yPos = height - (value / yAxisMax) * height
+      // At maxValuePosition: maxValuePosition = height - (maxValue / yAxisMax) * height
+      // Solving: yAxisMax = maxValue * height / (height - maxValuePosition)
+      // Since maxValuePosition = verticalSpacing:
+      // yAxisMax = maxValue * height / (height - verticalSpacing)
+
+      const denominator = chartDimensions.height - verticalSpacing;
+      if (denominator > 0 && verticalSpacing < chartDimensions.height) {
+        yAxisMax = (maxValue * chartDimensions.height) / denominator;
+        // The Y-axis label shows the value at the top (y=0), which is yAxisMax
+        // This is slightly above maxValue, completing the top square
+        yAxisLabelValue = yAxisMax;
+      } else {
+        yAxisMax = maxValue * 1.1;
+        yAxisLabelValue = yAxisMax;
+      }
+    }
+
+    // Update Y scale with the calculated max
+    yScale = d3
+      .scaleLinear()
+      .domain([0, yAxisMax])
+      .range([chartDimensions.height, 0]);
+
+    // Draw horizontal grid lines to create perfect squares
+    // Calculate from bottom (height) upward to ensure even spacing
+    const numCompleteHorizontalSquares = Math.floor(
+      chartDimensions.height / verticalSpacing
+    );
+    const horizontalPositions: number[] = [];
+
+    // Start from bottom (height) and work upward
+    // This ensures the bottom square is the same height as all others
+    for (let i = 0; i <= numCompleteHorizontalSquares; i++) {
+      const pos = chartDimensions.height - i * verticalSpacing;
+      if (pos >= 0 && isFinite(pos)) {
+        horizontalPositions.push(pos);
+      }
+    }
+
+    // Remove duplicates and ensure we don't have lines too close together
+    // Sort first, then filter out positions that are within 0.5 pixels of each other
+    horizontalPositions.sort((a, b) => a - b);
+
+    // Filter out duplicates and very close positions
+    const filteredPositions: number[] = [];
+    for (let i = 0; i < horizontalPositions.length; i++) {
+      const pos = horizontalPositions[i];
+      // Check if this position is far enough from the last one
+      if (
+        filteredPositions.length === 0 ||
+        Math.abs(pos - filteredPositions[filteredPositions.length - 1]) > 0.5
+      ) {
+        filteredPositions.push(pos);
+      }
+    }
+
+    // Use filtered positions
+    horizontalPositions.length = 0;
+    horizontalPositions.push(...filteredPositions);
+
+    // Get the topmost horizontal line position (smallest y value)
+    const topmostHorizontalLine =
+      horizontalPositions.length > 0 ? Math.min(...horizontalPositions) : 0;
+
+    // Add vertical grid lines - only from topmost horizontal line to bottom
     svg
       .selectAll(".vertical-grid-line")
-      .data(xTickPositions)
+      .data(verticalPositions)
       .enter()
       .append("line")
       .attr("class", "vertical-grid-line")
       .attr("x1", (d) => d)
       .attr("x2", (d) => d)
-      .attr("y1", 0)
+      .attr("y1", topmostHorizontalLine)
       .attr("y2", chartDimensions.height)
       .attr("stroke", "rgba(255, 255, 255, 0.1)")
       .attr("stroke-width", 1);
-
-    // Calculate average spacing between vertical lines to create square grid
-    let verticalSpacing = chartDimensions.width;
-    if (xTickPositions.length > 1) {
-      const spacings: number[] = [];
-      for (let i = 1; i < xTickPositions.length; i++) {
-        spacings.push(xTickPositions[i] - xTickPositions[i - 1]);
-      }
-      verticalSpacing = spacings.reduce((a, b) => a + b, 0) / spacings.length;
-    }
-
-    // Add horizontal grid lines to create squares with vertical lines
-    const numHorizontalLines = Math.ceil(
-      chartDimensions.height / verticalSpacing
-    );
-    const horizontalPositions = Array.from(
-      { length: numHorizontalLines + 1 },
-      (_, i) => i * verticalSpacing
-    ).filter((y) => y <= chartDimensions.height);
 
     svg
       .selectAll(".horizontal-grid-line")
@@ -396,13 +518,14 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
     // Add only the top label (max value) inside the chart
     svg
       .append("text")
-      .attr("x", 4) // Position text 4px to the right of the axis line (reduced for edge-to-edge)
+      .attr("x", 12) // More left padding (increased from 4px to 12px)
       .attr("y", 0)
       .attr("dy", "0.71em") // Align with top
       .style("fill", "rgba(255, 255, 255, 0.6)")
-      .style("font-size", "16px")
+      .style("font-size", "20px")
       .style("font-family", "var(--font-space-mono), 'Space Mono', monospace")
-      .text(formatLabel(niceMaxValue));
+      .style("font-weight", "bold")
+      .text(formatLabel(yAxisLabelValue));
 
     // Add subtle Y-axis line (no ticks, just the line)
     svg
