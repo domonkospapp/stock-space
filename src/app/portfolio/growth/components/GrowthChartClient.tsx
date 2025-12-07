@@ -148,71 +148,230 @@ export default function GrowthChartClient() {
         data={chartData}
         selectedCurrency={selectedCurrency}
       />
-      {/* <h1 className="text-white font-urbanist text-3xl font-bold">
-        Growth History
-      </h1>
-      <h2 className="text-4xl font-bold text-white font-[hagrid]">
-        Growth History
-      </h2>
-      {monthlyHoldingValues.map((monthData) => (
-        <div
-          key={monthData.date}
-          className="bg-dark-blue p-6 rounded-lg shadow-lg mb-6"
-        >
-          <h2 className="text-xl font-bold text-white mb-4">
-            {monthData.date}
-          </h2>
-          <p className="text-white text-lg font-semibold mb-4">
-            Total Monthly Value:{" "}
-            {monthData.totalMonthlyValue !== null &&
-            monthData.totalMonthlyValue !== undefined
-              ? monthData.totalMonthlyValue.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: selectedCurrency,
-                })
-              : "N/A"}
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {monthData.holdings.map((holding) => (
-              <div key={holding.isin} className="bg-gray-700 p-4 rounded-md">
-                <p className="text-white font-bold">{holding.stockName}</p>
-                <p className="text-gray-300">ISIN: {holding.isin}</p>
-                <p className="text-gray-300">Shares: {holding.totalShares}</p>
-                <p className="text-green-400">
-                  Value:{" "}
-                  {holding.value !== null
-                    ? holding.value.toLocaleString("en-US", {
-                        style: "currency",
-                        currency: selectedCurrency,
-                      })
-                    : "N/A"}
-                </p>
-                <p className="text-blue-400">
-                  Historical Price:{" "}
-                  {holding.price !== null
-                    ? holding.price.toLocaleString("en-US", {
-                        style: "currency",
-                        currency: selectedCurrency,
-                      })
-                    : "N/A"}
-                </p>
-                {holding.originalPrice !== null &&
-                  holding.originalPriceCurrency !== null &&
-                  holding.originalPriceCurrency !== selectedCurrency && (
-                    <p className="text-gray-400 text-sm">
-                      (Original:{" "}
-                      {holding.originalPrice.toLocaleString("en-US", {
-                        style: "currency",
-                        currency: holding.originalPriceCurrency,
-                      })}
-                      )
-                    </p>
-                  )}
+
+      {/* Debug Screen */}
+      <div className="mt-8 bg-[#2A2A2A] border border-foreground/20 rounded-2xl p-6 overflow-auto max-h-[600px]">
+        <h3 className="text-2xl font-bold text-white font-[hagrid] mb-4">
+          🔍 Debug: Sum Calculation
+        </h3>
+
+        <div className="space-y-6">
+          {chartData.map((monthData) => {
+            const rawMonthData = monthlyHoldingValues.find(
+              (m) => m.date === monthData.date
+            );
+            if (!rawMonthData) return null;
+
+            // Calculate sum step by step
+            let calculatedSum = 0;
+            const holdingBreakdown = rawMonthData.holdings.map((holding) => {
+              let convertedPrice = holding.price;
+              let priceCurrency = holding.currency;
+              let conversionInfo = "no conversion";
+
+              // If we have original price data and currency changed, recalculate
+              if (
+                holding.originalPrice !== null &&
+                holding.originalPriceCurrency !== null &&
+                holding.originalPriceCurrency !== selectedCurrency
+              ) {
+                convertedPrice = convertCurrency(
+                  holding.originalPrice,
+                  holding.originalPriceCurrency,
+                  selectedCurrency
+                );
+                priceCurrency = selectedCurrency;
+                conversionInfo = `${holding.originalPriceCurrency} → ${selectedCurrency}`;
+              } else if (
+                holding.price !== null &&
+                holding.currency !== null &&
+                holding.currency !== selectedCurrency
+              ) {
+                convertedPrice = convertCurrency(
+                  holding.price,
+                  holding.currency,
+                  selectedCurrency
+                );
+                priceCurrency = selectedCurrency;
+                conversionInfo = `${holding.currency} → ${selectedCurrency}`;
+              }
+
+              const value = convertedPrice
+                ? holding.totalShares * convertedPrice
+                : null;
+
+              const isValid =
+                value !== null && !isNaN(value) && isFinite(value);
+              if (isValid) {
+                calculatedSum += value;
+              }
+
+              return {
+                stockName: holding.stockName,
+                isin: holding.isin,
+                totalShares: holding.totalShares,
+                convertedPrice,
+                priceCurrency,
+                originalPrice: holding.originalPrice,
+                originalPriceCurrency: holding.originalPriceCurrency,
+                value,
+                isValid,
+                conversionInfo,
+              };
+            });
+
+            const finalSum = monthData.totalMonthlyValue;
+            const sumMatches = Math.abs(calculatedSum - finalSum) < 0.01;
+            const hasInvalidValues = holdingBreakdown.some((h) => !h.isValid);
+            const hasNaN = isNaN(finalSum) || !isFinite(finalSum);
+
+            return (
+              <div
+                key={monthData.date}
+                className="bg-[#1A1A1A] border border-foreground/10 rounded-lg p-4"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-xl font-bold text-white font-space-mono">
+                    {monthData.date}
+                  </h4>
+                  <div className="flex gap-4">
+                    <div className="text-right">
+                      <div className="text-xs text-gray-400">
+                        Calculated Sum
+                      </div>
+                      <div
+                        className={`text-lg font-bold ${
+                          hasNaN ? "text-red-400" : "text-green-400"
+                        }`}
+                      >
+                        {calculatedSum.toLocaleString("en-US", {
+                          style: "currency",
+                          currency: selectedCurrency,
+                        })}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-gray-400">Final Sum</div>
+                      <div
+                        className={`text-lg font-bold ${
+                          hasNaN
+                            ? "text-red-400"
+                            : sumMatches
+                            ? "text-green-400"
+                            : "text-yellow-400"
+                        }`}
+                      >
+                        {hasNaN
+                          ? "NaN/Invalid"
+                          : finalSum.toLocaleString("en-US", {
+                              style: "currency",
+                              currency: selectedCurrency,
+                            })}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-gray-400">Match</div>
+                      <div
+                        className={`text-lg font-bold ${
+                          sumMatches ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {sumMatches ? "✓" : "✗"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {hasInvalidValues && (
+                  <div className="mb-3 p-2 bg-red-900/20 border border-red-500/50 rounded text-red-400 text-sm">
+                    ⚠️ Contains invalid values (null, NaN, or Infinity)
+                  </div>
+                )}
+
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                  {holdingBreakdown.map((holding, idx) => (
+                    <div
+                      key={`${holding.isin}-${idx}`}
+                      className={`p-3 rounded border ${
+                        holding.isValid
+                          ? "bg-gray-800/50 border-gray-700"
+                          : "bg-red-900/20 border-red-500/50"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="font-bold text-white text-sm">
+                            {holding.stockName}
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            ISIN: {holding.isin}
+                          </div>
+                        </div>
+                        <div className="text-right ml-4">
+                          {holding.isValid ? (
+                            <div className="text-green-400 font-bold">
+                              {holding.value?.toLocaleString("en-US", {
+                                style: "currency",
+                                currency: selectedCurrency,
+                              })}
+                            </div>
+                          ) : (
+                            <div className="text-red-400 font-bold">
+                              Invalid
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-gray-400">
+                        <div>
+                          <span className="text-gray-500">Shares:</span>{" "}
+                          {holding.totalShares}
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Price:</span>{" "}
+                          {holding.convertedPrice !== null
+                            ? holding.convertedPrice.toLocaleString("en-US", {
+                                style: "currency",
+                                currency:
+                                  holding.priceCurrency || selectedCurrency,
+                              })
+                            : "null"}
+                        </div>
+                        {holding.originalPrice !== null && (
+                          <div>
+                            <span className="text-gray-500">Original:</span>{" "}
+                            {holding.originalPrice.toLocaleString("en-US", {
+                              style: "currency",
+                              currency: holding.originalPriceCurrency || "N/A",
+                            })}
+                          </div>
+                        )}
+                        <div>
+                          <span className="text-gray-500">Conversion:</span>{" "}
+                          {holding.conversionInfo}
+                        </div>
+                      </div>
+                      {!holding.isValid && (
+                        <div className="mt-2 text-xs text-red-400">
+                          ❌ Value calculation: {holding.totalShares} ×{" "}
+                          {holding.convertedPrice ?? "null"} ={" "}
+                          {holding.value ?? "null"}
+                          {holding.convertedPrice === null &&
+                            " (Price is null)"}
+                          {holding.convertedPrice !== null &&
+                            (isNaN(holding.convertedPrice) ||
+                              !isFinite(holding.convertedPrice)) &&
+                            " (Price is NaN/Infinity)"}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
-      ))} */}
+      </div>
     </div>
   );
 }

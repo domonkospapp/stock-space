@@ -90,14 +90,24 @@ export function calculateMonthlyHoldings(
       ) < new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0) // Check if transaction is before the end of the current month
     ) {
       const transaction = sortedTransactions[transactionIndex];
+      // Normalize quantity signs according to the rules (same as TransactionsChart):
+      // BUY with positive qty => shares increase
+      // BUY with negative qty => this is a sell => shares decrease
+      // TRANSFER with positive qty => shares increase (inbound)
+      // TRANSFER with negative qty => shares decrease (outbound)
+      // SELL: always decreases shares (amount is already negative in CSV)
       let normalizedQuantity = 0;
       if (transaction.type === "BUY") {
+        // BUY: positive qty increases shares, negative qty decreases shares
         normalizedQuantity = transaction.amount;
       } else if (transaction.type === "SELL") {
-        normalizedQuantity = -transaction.amount;
+        // SELL: always decreases shares (amount is already negative in CSV)
+        normalizedQuantity = transaction.amount;
       } else if (transaction.type === "TRANSFER") {
+        // TRANSFER: positive qty increases shares (inbound), negative qty decreases shares (outbound)
         normalizedQuantity = transaction.amount;
       }
+      // OTHER transactions are ignored for share count calculation
 
       const currentStockHolding = currentShares.get(transaction.isin) || {
         stockName: transaction.stockName,
