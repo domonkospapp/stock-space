@@ -1,7 +1,7 @@
 "use client";
 
 import { usePortfolioStore } from "../../../../store/portfolioStore";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useSettingsStore } from "../../../../store/settingsStore";
 import MonthlyGrowthChart from "./MonthlyGrowthChart";
 
@@ -21,6 +21,7 @@ export default function GrowthChartClient() {
   const selectedCurrency = useSettingsStore((s) => s.selectedCurrency);
   const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
 
+  // Only fetch if data is missing or stale - don't refetch on currency change
   useEffect(() => {
     const ONE_HOUR_MS = 60 * 60 * 1000;
     const shouldFetch =
@@ -36,15 +37,75 @@ export default function GrowthChartClient() {
         convertCurrency
       );
     }
+    // Removed selectedCurrency from dependencies to prevent refetch on currency change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     processedTransactions,
-    selectedCurrency,
     convertCurrency,
     startGrowthDataCalculations,
     isGrowthDataCalculating,
     lastGrowthDataUpdate,
     monthlyHoldingValues.length,
   ]);
+
+  // Recalculate chart data when currency changes using existing historical prices
+  const chartData = useMemo(() => {
+    return monthlyHoldingValues.map((monthData) => {
+      let totalMonthlyValue = 0;
+
+      // Recalculate values for each holding based on current currency
+      const recalculatedHoldings = monthData.holdings.map((holding) => {
+        let convertedPrice = holding.price;
+        let priceCurrency = holding.currency;
+
+        // If we have original price data and currency changed, recalculate
+        if (
+          holding.originalPrice !== null &&
+          holding.originalPriceCurrency !== null &&
+          holding.originalPriceCurrency !== selectedCurrency
+        ) {
+          convertedPrice = convertCurrency(
+            holding.originalPrice,
+            holding.originalPriceCurrency,
+            selectedCurrency
+          );
+          priceCurrency = selectedCurrency;
+        } else if (
+          holding.price !== null &&
+          holding.currency !== null &&
+          holding.currency !== selectedCurrency
+        ) {
+          // Fallback: convert from stored price if original not available
+          convertedPrice = convertCurrency(
+            holding.price,
+            holding.currency,
+            selectedCurrency
+          );
+          priceCurrency = selectedCurrency;
+        }
+
+        const value = convertedPrice
+          ? holding.totalShares * convertedPrice
+          : null;
+        if (value) {
+          totalMonthlyValue += value;
+        }
+
+        return {
+          ...holding,
+          value,
+          currency: priceCurrency,
+          price: convertedPrice,
+        };
+      });
+
+      return {
+        date: monthData.date,
+        totalMonthlyValue,
+        currency: selectedCurrency,
+      };
+    });
+  }, [monthlyHoldingValues, selectedCurrency, convertCurrency]);
 
   const isLoadingInitialData =
     monthlyHoldingValues.length === 0 && isGrowthDataCalculating;
@@ -84,11 +145,7 @@ export default function GrowthChartClient() {
         </p>
       )}
       <MonthlyGrowthChart
-        data={monthlyHoldingValues.map((d) => ({
-          date: d.date,
-          totalMonthlyValue: d.totalMonthlyValue,
-          currency: selectedCurrency,
-        }))}
+        data={chartData}
         selectedCurrency={selectedCurrency}
       />
       {/* <h1 className="text-white font-urbanist text-3xl font-bold">

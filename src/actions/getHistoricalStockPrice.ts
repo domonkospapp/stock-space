@@ -62,7 +62,11 @@ async function searchAndFetchHistoricalData(
 
     for (const stock of results.quotes) {
       if (!stock.isYahooFinance || !stock.symbol) {
-        const stockIdentifier = (stock as any).symbol || (stock as any).name || (stock as any).shortname || "unknown";
+        const stockIdentifier =
+          (stock as any).symbol ||
+          (stock as any).name ||
+          (stock as any).shortname ||
+          "unknown";
         console.log(
           `[getHistoricalStockPrice] Skipping non-Yahoo Finance or missing symbol stock: ${stockIdentifier}`
         );
@@ -157,11 +161,111 @@ async function searchAndFetchHistoricalData(
 export async function getHistoricalStockPrice(
   isin: string,
   date: string, // YYYY-MM-DD format
-  stockName: string // Add stockName parameter
+  stockName: string, // Add stockName parameter
+  ticker?: string // Optional ticker to skip search
 ): Promise<HistoricalPriceResult | null> {
-  console.log(
-    `[getHistoricalStockPrice] Attempting to fetch historical price for ISIN: ${isin}, Stock Name: ${stockName}, Date: ${date}`
-  );
+  const startTime = performance.now();
+
+  if (ticker) {
+    console.log(
+      `[getHistoricalStockPrice] ⚡ Using cached ticker for ${isin} (${ticker}) on ${date} (skipping search)`
+    );
+  } else {
+    console.log(
+      `[getHistoricalStockPrice] 🔍 No cached ticker for ${isin} on ${date}, will search`
+    );
+  }
+
+  // If ticker is provided, skip all searches and go directly to chart fetch
+  if (ticker) {
+    try {
+      const targetDateObj = new Date(date);
+      const startDateObj = new Date(targetDateObj);
+      startDateObj.setDate(targetDateObj.getDate() - 5); // Go back 5 days to ensure we capture a trading day
+      const endDateObj = new Date(targetDateObj);
+      endDateObj.setDate(targetDateObj.getDate() + 1); // Go one day past to ensure we capture the target day if it's a trading day
+
+      const period1Timestamp = Math.floor(startDateObj.getTime() / 1000);
+      const period2Timestamp = Math.floor(endDateObj.getTime() / 1000);
+
+      const chartStartTime = performance.now();
+      const chartResult = await yahooFinance.chart(ticker, {
+        period1: period1Timestamp,
+        period2: period2Timestamp,
+        interval: "1d", // Daily interval
+      });
+      const chartTime = performance.now() - chartStartTime;
+      console.log(
+        `[getHistoricalStockPrice] ✅ Chart fetched for ${isin} (${ticker}) in ${chartTime.toFixed(
+          2
+        )}ms`
+      );
+
+      const historicalData = chartResult.quotes;
+
+      if (!historicalData || historicalData.length === 0) {
+        const totalTime = performance.now() - startTime;
+        console.warn(
+          `[getHistoricalStockPrice] ⚠️ No chart data found for ${isin} (${ticker}) in ${totalTime.toFixed(
+            2
+          )}ms`
+        );
+        return null;
+      }
+
+      // Find the closest available closing price to the target date
+      let priceEntry = null;
+      let minDiff = Infinity;
+
+      for (const entry of historicalData) {
+        if (entry.date && entry.close) {
+          const entryDate = entry.date.toISOString().split("T")[0];
+          const diff = Math.abs(
+            new Date(entryDate).getTime() - targetDateObj.getTime()
+          );
+
+          if (entryDate === date) {
+            priceEntry = entry;
+            break; // Found exact match, prioritize it
+          }
+
+          if (diff < minDiff) {
+            minDiff = diff;
+            priceEntry = entry;
+          }
+        }
+      }
+
+      if (!priceEntry || !priceEntry.close) {
+        const totalTime = performance.now() - startTime;
+        console.warn(
+          `[getHistoricalStockPrice] ⚠️ No suitable price found for ${isin} (${ticker}) on ${date} in ${totalTime.toFixed(
+            2
+          )}ms`
+        );
+        return null;
+      }
+
+      const totalTime = performance.now() - startTime;
+      console.log(
+        `[getHistoricalStockPrice] ✅ Found price for ${isin} (${ticker}) on ${date} in ${totalTime.toFixed(
+          2
+        )}ms (cached ticker)`
+      );
+
+      return {
+        ticker,
+        price: priceEntry.close,
+        currency: chartResult.meta.currency || "USD", // Get currency from meta data
+      };
+    } catch (error) {
+      console.error(
+        `[getHistoricalStockPrice] Error fetching historical data for ticker ${ticker}:`,
+        error
+      );
+      // Fall through to search methods if ticker fails
+    }
+  }
 
   // Primary search using the full ISIN
   let result = await searchAndFetchHistoricalData(isin, isin, date);

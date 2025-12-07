@@ -89,7 +89,7 @@ export default function Home() {
 
             {/* Content on right */}
             <div className="col-span-7 flex flex-col gap-8">
-              <h1 className="text-7xl font-hagrid leading-tight font-bold uppercase tracking-tight">
+              <h1 className="text-7xl font-hagrid leading-tight font-bold uppercase tracking-wide">
                 ANALYSE STOCKS DIFFERENTLY
               </h1>
               <p className="text-xl font-space-mono text-gray-300 max-w-2xl leading-relaxed">
