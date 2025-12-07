@@ -15,7 +15,6 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
   selectedCurrency,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const tooltipRef = useRef<HTMLDivElement | null>(null);
   const [chartDimensions, setChartDimensions] = useState({
     width: 0,
     height: 0,
@@ -595,9 +594,6 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       .attr("stroke-width", 3) // Thicker line
       .attr("d", line);
 
-    // Add tooltips
-    const tooltip = d3.select(tooltipRef.current);
-
     const focus = svg
       .append("g")
       .attr("class", "focus")
@@ -685,9 +681,6 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
 
   return (
     <div className="flex flex-col relative w-full" style={{ width: "100vw" }}>
-      {/* <h2 className="text-4xl font-bold text-white font-[hagrid] mb-4 px-0">
-        Monthly Portfolio Value
-      </h2> */}
       <div className="relative w-full" style={{ position: "relative" }}>
         <svg
           ref={svgRef}
@@ -701,14 +694,6 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
             }px`,
           }}
         ></svg>
-        <div
-          ref={tooltipRef}
-          style={{
-            position: "fixed",
-            pointerEvents: "none",
-            display: "none",
-          }}
-        ></div>
       </div>
 
       {/* Fixed display for month and value - positioned below main money value at top right */}
