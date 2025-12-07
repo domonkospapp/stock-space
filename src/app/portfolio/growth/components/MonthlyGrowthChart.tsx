@@ -116,22 +116,135 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
       );
 
     const parseDate = d3.timeParse("%Y-%m");
-    const formattedData = data.map((d) => ({
-      date: parseDate(d.date) as Date,
-      totalMonthlyValue: d.totalMonthlyValue,
-      currency: d.currency,
-    }));
+    // Parse dates and ensure they're at the start of each month
+    const formattedData = data.map((d) => {
+      const parsedDate = parseDate(d.date) as Date;
+      // Ensure the date is at the start of the month (day 1)
+      const dateAtStartOfMonth = new Date(
+        parsedDate.getFullYear(),
+        parsedDate.getMonth(),
+        1
+      );
+      return {
+        date: dateAtStartOfMonth,
+        totalMonthlyValue: d.totalMonthlyValue,
+        currency: d.currency,
+      };
+    });
 
     // Sort data by date
     formattedData.sort((a, b) => a.date.getTime() - b.date.getTime());
 
+    // Get the extent from original data to determine the range
+    const [minDate, maxDate] = d3.extent(formattedData, (d) => d.date) as [
+      Date,
+      Date
+    ];
+
+    // Create temporary scale to determine tick interval and first tick position
+    const tempScale = d3
+      .scaleTime()
+      .domain([minDate, maxDate])
+      .range([0, chartDimensions.width]);
+
+    const tempTicks = tempScale.ticks();
+
+    // Determine the labeling resolution (interval between labels in months)
+    let labelIntervalMonths = 1; // Default to 1 month
+    if (tempTicks.length > 1) {
+      const firstTick = tempTicks[0];
+      const secondTick = tempTicks[1];
+      const monthsDiff =
+        (secondTick.getFullYear() - firstTick.getFullYear()) * 12 +
+        (secondTick.getMonth() - firstTick.getMonth());
+      labelIntervalMonths = monthsDiff;
+    }
+
+    // Calculate the start date: extend backwards to align with labeling interval
+    // This ensures no half squares at the beginning
+    const firstTickDate = tempTicks[0] || minDate;
+    const tickBasedStartDate = new Date(
+      firstTickDate.getFullYear(),
+      firstTickDate.getMonth(),
+      1
+    );
+
+    // Find the start of the interval that contains minDate
+    // Extend backwards by the labeling interval to ensure full squares
+    const minDateMonth = minDate.getMonth();
+    const minDateYear = minDate.getFullYear();
+
+    // Calculate how many months into the interval the minDate falls
+    // We need to find which interval (of labelIntervalMonths) contains minDate
+    // and extend back to the start of that interval
+    const monthsFromEpoch = minDateYear * 12 + minDateMonth;
+    const intervalStartMonths =
+      Math.floor(monthsFromEpoch / labelIntervalMonths) * labelIntervalMonths;
+    const intervalStartYear = Math.floor(intervalStartMonths / 12);
+    const intervalStartMonth = intervalStartMonths % 12;
+
+    const intervalStartDate = new Date(
+      intervalStartYear,
+      intervalStartMonth,
+      1
+    );
+
+    // Use the earlier of tick-based start, interval start, or actual minDate
+    const startDate = [
+      tickBasedStartDate,
+      intervalStartDate,
+      new Date(minDateYear, minDateMonth, 1),
+    ].sort((a, b) => a.getTime() - b.getTime())[0];
+
+    // Fill in missing months with zero values from startDate to maxDate
+    const filledData: typeof formattedData = [];
+    if (formattedData.length > 0) {
+      // Create a map of existing data by month key
+      const dataMap = new Map<string, (typeof formattedData)[0]>();
+      formattedData.forEach((d) => {
+        const monthKey = `${d.date.getFullYear()}-${d.date.getMonth()}`;
+        dataMap.set(monthKey, d);
+      });
+
+      // Fill in all months from startDate to maxDate
+      const currentDate = new Date(startDate);
+      const endDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+
+      while (currentDate <= endDate) {
+        const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+        const existingData = dataMap.get(monthKey);
+
+        if (existingData) {
+          filledData.push(existingData);
+        } else {
+          // Add zero value for missing month (before investing started)
+          filledData.push({
+            date: new Date(currentDate),
+            totalMonthlyValue: 0,
+            currency: formattedData[0]?.currency || "",
+          });
+        }
+
+        // Move to next month
+        currentDate.setMonth(currentDate.getMonth() + 1);
+      }
+
+      // Sort filled data by date to ensure chronological order
+      filledData.sort((a, b) => a.date.getTime() - b.date.getTime());
+    } else {
+      filledData.push(...formattedData);
+    }
+
+    // Use filledData directly (it already includes zeros from startDate)
+    const dataWithStart = filledData;
+
     const xScale = d3
       .scaleTime()
-      .domain(d3.extent(formattedData, (d) => d.date) as [Date, Date])
+      .domain([startDate, maxDate])
       .range([0, chartDimensions.width]);
 
     // Calculate a nice round number close to the max value (use full chart height)
-    const maxValue = d3.max(formattedData, (d) => d.totalMonthlyValue) || 0;
+    const maxValue = d3.max(dataWithStart, (d) => d.totalMonthlyValue) || 0;
     const niceMaxValue = (() => {
       if (maxValue === 0) return 100;
       // Add minimal padding (5%) and round to a nice number that's close
@@ -315,11 +428,11 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
     // Add the filled area with gradient
     svg
       .append("path")
-      .datum(formattedData)
+      .datum(dataWithStart)
       .attr("fill", "url(#area-gradient)")
       .attr("d", area);
 
-    // Add the white line
+    // Add the white line with linear interpolation (explicit)
     const line = d3
       .line<{
         date: Date;
@@ -327,11 +440,12 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
         currency: string;
       }>()
       .x((d) => xScale(d.date))
-      .y((d) => yScale(d.totalMonthlyValue));
+      .y((d) => yScale(d.totalMonthlyValue))
+      .curve(d3.curveLinear); // Explicitly set linear interpolation
 
     svg
       .append("path")
-      .datum(formattedData)
+      .datum(dataWithStart)
       .attr("fill", "none")
       .attr("stroke", "#FFFFFF") // White color for the line
       .attr("stroke-width", 3) // Thicker line
@@ -369,9 +483,9 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
     function mousemove(event: MouseEvent) {
       const x0 = xScale.invert(d3.pointer(event)[0]);
       const bisectDate = d3.bisector((d: { date: Date }) => d.date).left;
-      const i = bisectDate(formattedData, x0, 1);
-      const d0 = formattedData[i - 1];
-      const d1 = formattedData[i];
+      const i = bisectDate(dataWithStart, x0, 1);
+      const d0 = dataWithStart[i - 1];
+      const d1 = dataWithStart[i];
       const d =
         x0.getTime() - d0.date.getTime() > d1.date.getTime() - x0.getTime()
           ? d1
@@ -450,9 +564,9 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({
 
   return (
     <div className="flex flex-col relative w-full" style={{ width: "100vw" }}>
-      <h2 className="text-4xl font-bold text-white font-[hagrid] mb-4 px-0">
+      {/* <h2 className="text-4xl font-bold text-white font-[hagrid] mb-4 px-0">
         Monthly Portfolio Value
-      </h2>
+      </h2> */}
       <div className="relative w-full">
         <svg
           ref={svgRef}
