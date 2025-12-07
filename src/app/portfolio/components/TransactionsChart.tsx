@@ -19,7 +19,7 @@ function extractTicker(stockName: string): string {
   // Fallback: take first word and clean it
   const words = stockName.split(" ");
   if (words.length > 0) {
-    let firstWord = words[0]
+    const firstWord = words[0]
       .replace(/\.(COM|INC|CORP|LTD|LLC|ADR|AG|SA|NV|SE)$/i, "")
       .replace(/[^A-Z0-9]/g, "")
       .substring(0, 5)
@@ -54,7 +54,6 @@ function formatMonthAbbrev(date: Date): string {
 }
 
 export default function TransactionsChart({ transactions }: Props) {
-  const positions = usePortfolioStore((s) => s.positions);
   const holdingsMap = usePortfolioStore((s) => s.holdingsMap);
 
   if (!transactions.length) {
@@ -258,12 +257,6 @@ export default function TransactionsChart({ transactions }: Props) {
 
   const maxShares = Math.max(...chartData.map((d) => d.cumulativeShares), 1);
 
-  // Get current year (or latest year from data)
-  const currentYear =
-    chartData.length > 0
-      ? chartData[0].date.getFullYear()
-      : new Date().getFullYear();
-
   // Calculate percentage of total portfolio
   const latestShares = chartData.length > 0 ? chartData[0].cumulativeShares : 0;
   const percentage =
@@ -305,10 +298,6 @@ export default function TransactionsChart({ transactions }: Props) {
       <div className="space-y-6">
         {years.map((year) => {
           const yearData = dataByYear[year];
-          const yearMaxShares = Math.max(
-            ...yearData.map((d) => d.cumulativeShares),
-            1
-          );
 
           return (
             <div key={year}>

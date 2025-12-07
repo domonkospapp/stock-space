@@ -241,7 +241,7 @@ export const usePortfolioStore = create<PortfolioState>()(
 
             try {
               // Try to get ticker from holdingsMap first, then tickerMap
-              let cachedTicker =
+              const cachedTicker =
                 existingHolding?.ticker || tickerMap[position.isin];
 
               if (cachedTicker) {
