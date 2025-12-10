@@ -271,6 +271,61 @@ export default function PositionsTreemap({
           rectData
         );
       }
+
+      // Add "Click to view purchase history" text at the bottom (only on the biggest tiles)
+      // Only show on tiles that are significantly larger than the minimum large tile size
+      if (rectWidth > 180 && rectHeight > 120) {
+        const bottomPadding = 28; // Space below text
+        const fixedFontSize = 16; // Fixed font size, not relative
+        const textSpacing = 18; // Space between border and text
+        const historyTextY = y + rectHeight - bottomPadding;
+        const borderY = historyTextY - fixedFontSize - textSpacing;
+
+        const borderColor = rectData
+          ? selectedPosition === (rectData.data as any).isin
+            ? "#111827"
+            : "white"
+          : "white";
+
+        // Add top border (horizontal line)
+        svg
+          .append("line")
+          .attr("x1", x + 20)
+          .attr("y1", borderY)
+          .attr("x2", x + rectWidth - 20)
+          .attr("y2", borderY)
+          .style("stroke", borderColor)
+          .style("stroke-width", "1px")
+          .style("pointer-events", "none");
+
+        // Text with fixed font size
+        addText(
+          svg,
+          x + 20,
+          historyTextY,
+          "Click to view history",
+          fixedFontSize,
+          "400",
+          "start",
+          rectData
+        );
+
+        // Add arrow icon, right-aligned and vertically centered with text
+        const arrowSize = 32; // Bigger size
+        const arrowX = x + rectWidth - 20; // Right-aligned
+        // Vertically center with text (text baseline is at historyTextY, center is approximately historyTextY - fixedFontSize/2)
+        const arrowY = historyTextY - fixedFontSize / 2 - arrowSize / 2;
+
+        svg
+          .append("image")
+          .attr("href", "/arrow.svg")
+          .attr("x", arrowX - arrowSize)
+          .attr("y", arrowY)
+          .attr("width", arrowSize)
+          .attr("height", arrowSize)
+          .style("pointer-events", "none")
+          .style("opacity", borderColor === "white" ? 1 : 0.8);
+      }
     };
 
     const addMediumTileText = (
