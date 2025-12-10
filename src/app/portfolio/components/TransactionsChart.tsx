@@ -3,6 +3,7 @@
 import React from "react";
 import { Transaction } from "utils/types";
 import { usePortfolioStore } from "../../../store/portfolioStore";
+import { useSettingsStore } from "../../../store/settingsStore";
 
 type Props = {
   transactions: Transaction[];
@@ -55,6 +56,9 @@ function formatMonthAbbrev(date: Date): string {
 
 export default function TransactionsChart({ transactions }: Props) {
   const holdingsMap = usePortfolioStore((s) => s.holdingsMap);
+  const positions = usePortfolioStore((s) => s.positions);
+  const convertCurrency = usePortfolioStore((s) => s.convertCurrency);
+  const selectedCurrency = useSettingsStore((s) => s.selectedCurrency);
 
   if (!transactions.length) {
     return (
@@ -75,12 +79,30 @@ export default function TransactionsChart({ transactions }: Props) {
   // Get stock info from first transaction
   const stockName = transactions[0]?.stockName || "";
   const ticker = extractTicker(stockName);
+  const stockIsin = transactions[0]?.isin || "";
 
-  // Calculate total portfolio shares for percentage calculation
-  const totalPortfolioShares = Object.values(holdingsMap).reduce(
-    (sum, pos) => sum + pos.totalShares,
+  // Get current position from holdingsMap
+  const currentPosition = holdingsMap[stockIsin];
+  const currentShares = currentPosition?.totalShares || 0;
+
+  // Calculate allocation percentage based on value (same as treemap cards)
+  // Use holdingsMap to get currentValue which is populated during calculations
+  const activePositionsFromMap = Object.values(holdingsMap).filter(
+    (p) => p.totalShares > 0
+  );
+  const totalValue = activePositionsFromMap.reduce(
+    (sum, p) =>
+      sum + convertCurrency(p.currentValue || 0, "USD", selectedCurrency),
     0
   );
+  const currentValue = currentPosition
+    ? convertCurrency(
+        currentPosition.currentValue || 0,
+        "USD",
+        selectedCurrency
+      )
+    : 0;
+  const percentage = totalValue > 0 ? (currentValue / totalValue) * 100 : 0;
 
   const cumulativeData = transactions.reduce((acc, transaction) => {
     // Parse DD.MM.YYYY format
@@ -256,11 +278,6 @@ export default function TransactionsChart({ transactions }: Props) {
   chartData.sort((a, b) => b.date.getTime() - a.date.getTime());
 
   const maxShares = Math.max(...chartData.map((d) => d.cumulativeShares), 1);
-
-  // Calculate percentage of total portfolio
-  const latestShares = chartData.length > 0 ? chartData[0].cumulativeShares : 0;
-  const percentage =
-    totalPortfolioShares > 0 ? (latestShares / totalPortfolioShares) * 100 : 0;
 
   // Group data by year
   const dataByYear = chartData.reduce((acc, item) => {
