@@ -110,14 +110,46 @@ export default function PositionsTreemap({
         .style("stroke", "white")
         .style("strokeWidth", "1px")
         .style("rx", (d) => {
+          const width = (d as any).x1 - (d as any).x0;
           const height = (d as any).y1 - (d as any).y0;
-          // Use height/2 as max radius to prevent weird distortions
-          return Math.min(height / 2 - 18, 36);
+
+          // Determine card size category
+          const isLarge = width > 120 && height > 80;
+          const isMedium = width > 60 && height > 40;
+          const isSmall = width > 30 && height > 20;
+
+          // Less rounding for smaller cards
+          if (isLarge) {
+            return Math.min(height / 2 - 18, 36);
+          } else if (isMedium) {
+            return Math.min(height / 2 - 18, 36);
+          } else if (isSmall) {
+            return Math.min(height / 2 - 20, 12);
+          } else {
+            // Tiny cards - minimal rounding
+            return Math.min(height / 2 - 22, 6);
+          }
         })
         .style("ry", (d) => {
+          const width = (d as any).x1 - (d as any).x0;
           const height = (d as any).y1 - (d as any).y0;
-          // Use height/2 as max radius to prevent weird distortions
-          return Math.min(height / 2 - 18, 36);
+
+          // Determine card size category
+          const isLarge = width > 120 && height > 80;
+          const isMedium = width > 60 && height > 40;
+          const isSmall = width > 30 && height > 20;
+
+          // Less rounding for smaller cards
+          if (isLarge) {
+            return Math.min(height / 2 - 18, 36);
+          } else if (isMedium) {
+            return Math.min(height / 2 - 18, 36);
+          } else if (isSmall) {
+            return Math.min(height / 2 - 20, 12);
+          } else {
+            // Tiny cards - minimal rounding
+            return Math.min(height / 2 - 22, 6);
+          }
         })
         .style("cursor", "pointer")
         .on("click", (event, d) => {
