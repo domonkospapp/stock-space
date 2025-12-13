@@ -153,7 +153,7 @@ export default function PortfolioHistory() {
             <select
               value={selectedStock}
               onChange={(e) => setSelectedStock(e.target.value)}
-              className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-lg font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[300px]"
+              className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-full font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[300px]"
             >
               {availableStocks.map((stock) => (
                 <option
@@ -187,7 +187,7 @@ export default function PortfolioHistory() {
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-lg font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[120px]"
+              className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-full font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[120px]"
             >
               <option value={0} className="bg-[#2A2A2A] text-white">
                 Year
