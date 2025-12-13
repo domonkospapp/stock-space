@@ -111,6 +111,29 @@ export default function PortfolioHistory() {
     return dateB.getTime() - dateA.getTime();
   });
 
+  // Calculate total value split by buy and sell (transfer counts as buy)
+  const { buyTotal, sellTotal } = sortedTransactions.reduce(
+    (acc, transaction) => {
+      const transactionValue = Math.abs(transaction.amount * transaction.price);
+      const valueInSelectedCurrency = convertCurrency(
+        transactionValue,
+        transaction.currency,
+        selectedCurrency
+      );
+
+      if (transaction.type === "BUY" || transaction.type === "TRANSFER") {
+        acc.buyTotal += valueInSelectedCurrency;
+      } else if (transaction.type === "SELL") {
+        acc.sellTotal += valueInSelectedCurrency;
+      }
+
+      return acc;
+    },
+    { buyTotal: 0, sellTotal: 0 }
+  );
+
+  const transactionCount = sortedTransactions.length;
+
   return (
     <>
       {/* Header */}
@@ -122,80 +145,112 @@ export default function PortfolioHistory() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="mb-6 flex gap-4">
-        {/* Asset Filter */}
-        <div className="relative">
-          <select
-            value={selectedStock}
-            onChange={(e) => setSelectedStock(e.target.value)}
-            className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-lg font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[300px]"
-          >
-            {availableStocks.map((stock) => (
-              <option
-                key={stock.value}
-                value={stock.value}
-                className="bg-[#2A2A2A] text-white"
-              >
-                {stock.value === "all" ? "All Stocks" : stock.label}
-              </option>
-            ))}
-          </select>
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            <svg
-              className="w-4 h-4 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      {/* Filters and Summary */}
+      <div className="mb-6 flex gap-4 items-center justify-between">
+        <div className="flex gap-4">
+          {/* Asset Filter */}
+          <div className="relative">
+            <select
+              value={selectedStock}
+              onChange={(e) => setSelectedStock(e.target.value)}
+              className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-lg font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[300px]"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+              {availableStocks.map((stock) => (
+                <option
+                  key={stock.value}
+                  value={stock.value}
+                  className="bg-[#2A2A2A] text-white"
+                >
+                  {stock.value === "all" ? "All Stocks" : stock.label}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* Year Filter */}
+          <div className="relative">
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+              className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-lg font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[120px]"
+            >
+              <option value={0} className="bg-[#2A2A2A] text-white">
+                Year
+              </option>
+              {availableYears
+                .filter((year) => year !== 0)
+                .map((year) => (
+                  <option
+                    key={year}
+                    value={year}
+                    className="bg-[#2A2A2A] text-white"
+                  >
+                    {year}
+                  </option>
+                ))}
+            </select>
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
           </div>
         </div>
 
-        {/* Year Filter */}
-        <div className="relative">
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-lg font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[120px]"
-          >
-            <option value={0} className="bg-[#2A2A2A] text-white">
-              Year
-            </option>
-            {availableYears
-              .filter((year) => year !== 0)
-              .map((year) => (
-                <option
-                  key={year}
-                  value={year}
-                  className="bg-[#2A2A2A] text-white"
-                >
-                  {year}
-                </option>
-              ))}
-          </select>
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            <svg
-              className="w-4 h-4 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+        {/* Summary - Right Aligned */}
+        {sortedTransactions.length > 0 && (
+          <div className="flex gap-6 items-center pr-4">
+            <div className="text-right">
+              <div className="text-gray-400 font-[urbanist] text-sm">
+                Buy Total
+              </div>
+              <div className="text-green-500 font-[hagrid] text-lg">
+                {formatCurrency(buyTotal, selectedCurrency)}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-gray-400 font-[urbanist] text-sm">
+                Sell Total
+              </div>
+              <div className="text-red-500 font-[hagrid] text-lg">
+                {formatCurrency(sellTotal, selectedCurrency)}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-gray-400 font-[urbanist] text-sm">
+                Transactions
+              </div>
+              <div className="text-white font-[hagrid] text-lg">
+                {transactionCount}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Transaction Table */}
@@ -229,7 +284,7 @@ export default function PortfolioHistory() {
                   <th className="text-left py-3 px-4 text-white font-[hagrid] text-sm">
                     Value
                   </th>
-                  <th className="text-left py-3 px-4 text-white font-[hagrid] text-sm">
+                  <th className="text-right py-3 px-4 text-white font-[hagrid] text-sm">
                     Action
                   </th>
                 </tr>
@@ -281,7 +336,7 @@ export default function PortfolioHistory() {
                           selectedCurrency
                         )}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4 text-right">
                         <span
                           className={`font-[urbanist] ${
                             transaction.type === "BUY"
