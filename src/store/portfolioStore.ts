@@ -149,6 +149,7 @@ export const usePortfolioStore = create<PortfolioState>()(
         // 2. No tickers in holdings (need to fetch prices)
         // 3. Data is stale (older than 1 hour)
         // 4. Markets are open (always fetch when markets are open)
+        // 5. Missing currentValue in holdings (need to populate prices)
         const needsTickerCache =
           cachedTickersCount === 0 && !hasTickersInHoldings;
         const isDataStale =
@@ -156,9 +157,15 @@ export const usePortfolioStore = create<PortfolioState>()(
           Date.now() - lastPriceUpdate.getTime() > 60 * 60 * 1000; // 1 hour
         const marketsOpen = shouldFetchMarketData();
         const browserOnline = isBrowserOnline();
-        // Only fetch if browser is online AND (we need tickers OR data is stale OR markets are open)
+        // Check if we have positions without currentValue (incomplete data)
+        const hasIncompleteData = positions.some(
+          (p) => !holdingsMap[p.isin]?.currentValue
+        );
+        // Fetch if browser is online AND (we need tickers OR data is stale OR markets are open OR data is incomplete)
+        // Note: We allow fetches on weekends to get previous close prices via fallback
         const shouldFetch =
-          browserOnline && (needsTickerCache || isDataStale || marketsOpen);
+          browserOnline &&
+          (needsTickerCache || isDataStale || marketsOpen || hasIncompleteData);
 
         // If we have existing data but don't need to fetch, skip
         if (hasExistingData && !shouldFetch) {

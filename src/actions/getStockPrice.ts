@@ -2,6 +2,27 @@
 
 import yahooFinance from "yahoo-finance2";
 
+/**
+ * Helper function to extract price from quote with fallback to previous close
+ * when market is closed (e.g., weekends)
+ */
+function getPriceFromQuote(quote: any): number | null {
+  // Try current market price first
+  if (quote.regularMarketPrice != null) {
+    return quote.regularMarketPrice;
+  }
+
+  // Fall back to previous close price when market is closed
+  if (quote.regularMarketPreviousClose != null) {
+    console.log(
+      `[getStockPrice] 📅 Market closed, using previous close price: ${quote.regularMarketPreviousClose}`
+    );
+    return quote.regularMarketPreviousClose;
+  }
+
+  return null;
+}
+
 export default async function getStockPrice(isin: string, ticker?: string) {
   const startTime = performance.now();
 
@@ -20,7 +41,8 @@ export default async function getStockPrice(isin: string, ticker?: string) {
         )}ms`
       );
 
-      if (!quote.regularMarketPrice) {
+      const price = getPriceFromQuote(quote);
+      if (price === null) {
         throw new Error(`No price found for ${ticker}`);
       }
 
@@ -33,7 +55,7 @@ export default async function getStockPrice(isin: string, ticker?: string) {
 
       return {
         ticker,
-        price: quote.regularMarketPrice,
+        price,
         currency: quote.currency,
       };
     } catch (error) {
@@ -80,7 +102,8 @@ export default async function getStockPrice(isin: string, ticker?: string) {
       )}ms`
     );
 
-    if (!quote.regularMarketPrice) {
+    const price = getPriceFromQuote(quote);
+    if (price === null) {
       throw new Error(`No price found for ${foundTicker}`);
     }
 
@@ -93,7 +116,7 @@ export default async function getStockPrice(isin: string, ticker?: string) {
 
     return {
       ticker: foundTicker,
-      price: quote.regularMarketPrice,
+      price,
       currency: quote.currency,
     };
   } catch (error) {
@@ -124,7 +147,8 @@ export default async function getStockPrice(isin: string, ticker?: string) {
               `[getStockPrice] Found ticker ${stock.symbol} via alternative search.`
             );
             const quote = await yahooFinance.quote(stock.symbol);
-            if (!quote.regularMarketPrice) {
+            const price = getPriceFromQuote(quote);
+            if (price === null) {
               console.log(
                 `[getStockPrice] No price found for ${stock.symbol} via alternative search.`
               );
@@ -132,7 +156,7 @@ export default async function getStockPrice(isin: string, ticker?: string) {
             }
             return {
               ticker: stock.symbol,
-              price: quote.regularMarketPrice,
+              price,
               currency: quote.currency,
             };
           }
