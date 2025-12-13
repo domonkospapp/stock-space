@@ -6,6 +6,20 @@ import { useSettingsStore } from "../../../store/settingsStore";
 
 type Currency = "EUR" | "USD";
 
+// Helper function to extract ticker from stock name
+function extractTicker(stockName: string): string {
+  // Try to find a ticker-like pattern (all caps, 2-5 letters)
+  const tickerMatch = stockName.match(/\b[A-Z]{2,5}\b/);
+  if (tickerMatch) {
+    return tickerMatch[0];
+  }
+  // Fallback: return first word or first 4 characters
+  const firstWord = stockName.split(" ")[0];
+  return firstWord.length <= 5
+    ? firstWord.toUpperCase()
+    : firstWord.substring(0, 4).toUpperCase();
+}
+
 export default function PortfolioHistory() {
   const [selectedYear, setSelectedYear] = useState<number>(
     new Date().getFullYear()
@@ -28,14 +42,9 @@ export default function PortfolioHistory() {
   };
 
   const formatDate = (dateString: string): string => {
-    // Parse DD.MM.YYYY format
+    // Parse DD.MM.YYYY format and convert to YYYY.MM.DD
     const [day, month, year] = dateString.split(".");
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    return `${year}.${month.padStart(2, "0")}.${day.padStart(2, "0")}`;
   };
 
   // Get available years from transactions
@@ -84,24 +93,11 @@ export default function PortfolioHistory() {
     return yearMatch && stockMatch;
   });
 
-  // Group transactions by date
-  const groupedTransactions = filteredTransactions.reduce(
-    (acc, transaction) => {
-      const date = transaction.date;
-      if (!acc[date]) {
-        acc[date] = [];
-      }
-      acc[date].push(transaction);
-      return acc;
-    },
-    {} as Record<string, typeof processedTransactions>
-  );
-
-  // Sort dates in descending order (newest first)
-  const sortedDates = Object.keys(groupedTransactions).sort((a, b) => {
+  // Sort transactions by date in descending order (newest first)
+  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     // Parse DD.MM.YYYY format for both dates
-    const [dayA, monthA, yearA] = a.split(".");
-    const [dayB, monthB, yearB] = b.split(".");
+    const [dayA, monthA, yearA] = a.date.split(".");
+    const [dayB, monthB, yearB] = b.date.split(".");
     const dateA = new Date(
       parseInt(yearA),
       parseInt(monthA) - 1,
@@ -115,229 +111,200 @@ export default function PortfolioHistory() {
     return dateB.getTime() - dateA.getTime();
   });
 
-  // Create monthly transaction counts for calendar
-  const monthlyCounts = Array.from({ length: 12 }, (_, monthIndex) => {
-    const monthName = new Date(
-      selectedYear || new Date().getFullYear(),
-      monthIndex
-    ).toLocaleDateString("en-US", {
-      month: "short",
-    });
-    const count = filteredTransactions.filter((transaction) => {
-      const parts = transaction.date.split(".");
-      return parseInt(parts[1]) === monthIndex + 1;
-    }).length;
-    return { month: monthName, count, monthIndex };
-  });
-
   return (
     <>
       {/* Header */}
       <div className="mb-8">
         <div className="mb-6">
           <h2 className="text-4xl font-bold text-white font-[hagrid]">
-            Transaction History
+            Transaction history
           </h2>
-          <p className="text-gray-300 font-[urbanist] mt-2">
-            Complete history of all your portfolio transactions
-          </p>
         </div>
       </div>
 
-      {/* Split View: Transaction List and Calendar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Transaction History */}
-        <div className="lg:col-span-2">
-          <div className="space-y-8">
-            {sortedDates.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-400 font-[urbanist] text-lg">
-                  No transaction history found
-                </p>
-              </div>
-            ) : (
-              sortedDates.map((date) => (
-                <div key={date}>
-                  <h2 className="text-2xl font-bold text-white font-[hagrid] mb-4">
-                    {formatDate(date)}
-                  </h2>
-
-                  <div className="space-y-3">
-                    {groupedTransactions[date].map((transaction, index) => {
-                      // Calculate the actual transaction value (shares * price)
-                      const transactionValue = Math.abs(
-                        transaction.amount * transaction.price
-                      );
-                      const amountInSelectedCurrency = convertCurrency(
-                        transactionValue,
-                        transaction.currency,
-                        selectedCurrency
-                      );
-
-                      return (
-                        <div
-                          key={`${transaction.date}-${index}`}
-                          className="flex items-center justify-between p-4 rounded-lg border border-white"
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-4">
-                              <div
-                                className={`w-3 h-3 rounded-full ${
-                                  transaction.type === "BUY"
-                                    ? "bg-green-500"
-                                    : transaction.type === "SELL"
-                                    ? "bg-red-500"
-                                    : transaction.type === "TRANSFER"
-                                    ? "bg-blue-500"
-                                    : "bg-gray-500"
-                                }`}
-                              />
-                              <div>
-                                <h3 className="text-white font-[hagrid] text-lg">
-                                  {transaction.type}{" "}
-                                  {Math.abs(transaction.amount).toFixed(0)}{" "}
-                                  shares
-                                </h3>
-                                <p className="text-gray-300 font-[urbanist] text-sm">
-                                  {transaction.isin} • {transaction.stockName}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="text-right">
-                            <div
-                              className={`font-[hagrid] text-lg ${
-                                transaction.type === "BUY"
-                                  ? "text-red-400"
-                                  : transaction.type === "SELL"
-                                  ? "text-green-400"
-                                  : transaction.type === "TRANSFER"
-                                  ? "text-blue-400"
-                                  : "text-gray-400"
-                              }`}
-                            >
-                              {transaction.type === "BUY"
-                                ? "-"
-                                : transaction.type === "SELL"
-                                ? "+"
-                                : ""}
-                              {formatCurrency(
-                                amountInSelectedCurrency,
-                                selectedCurrency
-                              )}
-                            </div>
-                            <div className="text-gray-400 font-[urbanist] text-sm">
-                              {transaction.price.toLocaleString("en-US", {
-                                style: "currency",
-                                currency: transaction.currency as Currency,
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}{" "}
-                              per share
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))
-            )}
+      {/* Filters */}
+      <div className="mb-6 flex gap-4">
+        {/* Asset Filter */}
+        <div className="relative">
+          <select
+            value={selectedStock}
+            onChange={(e) => setSelectedStock(e.target.value)}
+            className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-lg font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[300px]"
+          >
+            {availableStocks.map((stock) => (
+              <option
+                key={stock.value}
+                value={stock.value}
+                className="bg-[#2A2A2A] text-white"
+              >
+                {stock.value === "all" ? "All Stocks" : stock.label}
+              </option>
+            ))}
+          </select>
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <svg
+              className="w-4 h-4 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
           </div>
         </div>
 
-        {/* Calendar Layout */}
-        <div className="lg:col-span-1">
-          <div className="p-6 sticky top-8">
-            {/* Filters */}
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-white font-[hagrid] mb-4">
-                Filters
-              </h3>
-
-              {/* Stock Selector */}
-              <div className="mb-4">
-                <label className="block text-gray-300 font-[urbanist] text-sm mb-2">
-                  Stock
-                </label>
-                <select
-                  value={selectedStock}
-                  onChange={(e) => setSelectedStock(e.target.value)}
-                  className="w-full bg-transparent border border-white text-white px-3 py-2 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
+        {/* Year Filter */}
+        <div className="relative">
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+            className="appearance-none bg-[#2A2A2A] border border-foreground/30 text-white px-4 py-2 pr-10 rounded-lg font-[urbanist] focus:border-foreground focus:outline-none cursor-pointer min-w-[120px]"
+          >
+            <option value={0} className="bg-[#2A2A2A] text-white">
+              Year
+            </option>
+            {availableYears
+              .filter((year) => year !== 0)
+              .map((year) => (
+                <option
+                  key={year}
+                  value={year}
+                  className="bg-[#2A2A2A] text-white"
                 >
-                  {availableStocks.map((stock) => (
-                    <option
-                      key={stock.value}
-                      value={stock.value}
-                      className="bg-background text-white"
-                    >
-                      {stock.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Year Selector */}
-              <div className="mb-4">
-                <label className="block text-gray-300 font-[urbanist] text-sm mb-2">
-                  Year
-                </label>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                  className="w-full bg-transparent border border-white text-white px-3 py-2 rounded-lg font-[urbanist] focus:border-ci-yellow focus:outline-none"
-                >
-                  {availableYears.map((year) => (
-                    <option
-                      key={year}
-                      value={year}
-                      className="bg-background text-white"
-                    >
-                      {year === 0 ? "All Years" : year}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Calendar Header */}
-            <div className="mb-4">
-              <h3 className="text-xl font-bold text-white font-[hagrid]">
-                Calendar
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              {monthlyCounts.map(({ month, count, monthIndex }) => (
-                <div
-                  key={monthIndex}
-                  className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                    count > 0
-                      ? "border-ci-yellow bg-ci-yellow/10 hover:bg-ci-yellow/20"
-                      : "border-white bg-transparent hover:bg-white/10"
-                  }`}
-                >
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-white font-[hagrid] mb-1">
-                      {month}
-                    </div>
-                    <div
-                      className={`text-2xl font-bold font-[hagrid] ${
-                        count > 0 ? "text-ci-yellow" : "text-gray-400"
-                      }`}
-                    >
-                      {count}
-                    </div>
-                    <div className="text-xs text-gray-400 font-[urbanist] mt-1">
-                      {count}
-                    </div>
-                  </div>
-                </div>
+                  {year}
+                </option>
               ))}
-            </div>
+          </select>
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <svg
+              className="w-4 h-4 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
           </div>
         </div>
+      </div>
+
+      {/* Transaction Table */}
+      <div className="w-full">
+        {sortedTransactions.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400 font-[urbanist] text-lg">
+              No transaction history found
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-foreground/30">
+                  <th className="text-left py-3 px-4 text-white font-[hagrid] text-sm">
+                    Asset
+                  </th>
+                  <th className="text-left py-3 px-4 text-white font-[hagrid] text-sm">
+                    Trade ID
+                  </th>
+                  <th className="text-left py-3 px-4 text-white font-[hagrid] text-sm">
+                    Date
+                  </th>
+                  <th className="text-left py-3 px-4 text-white font-[hagrid] text-sm">
+                    Price
+                  </th>
+                  <th className="text-left py-3 px-4 text-white font-[hagrid] text-sm">
+                    Amount
+                  </th>
+                  <th className="text-left py-3 px-4 text-white font-[hagrid] text-sm">
+                    Value
+                  </th>
+                  <th className="text-left py-3 px-4 text-white font-[hagrid] text-sm">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedTransactions.map((transaction, index) => {
+                  const priceInSelectedCurrency = convertCurrency(
+                    transaction.price,
+                    transaction.currency,
+                    selectedCurrency
+                  );
+
+                  // Calculate value: price × amount
+                  const transactionValue = Math.abs(
+                    transaction.amount * transaction.price
+                  );
+                  const valueInSelectedCurrency = convertCurrency(
+                    transactionValue,
+                    transaction.currency,
+                    selectedCurrency
+                  );
+
+                  return (
+                    <tr
+                      key={`${transaction.date}-${index}`}
+                      className="border-b border-foreground/10 hover:bg-foreground/5"
+                    >
+                      <td className="py-3 px-4 text-white font-[urbanist]">
+                        {transaction.stockName}
+                      </td>
+                      <td className="py-3 px-4 text-white font-[urbanist]">
+                        {transaction.isin}
+                      </td>
+                      <td className="py-3 px-4 text-white font-[urbanist]">
+                        {formatDate(transaction.date)}
+                      </td>
+                      <td className="py-3 px-4 text-white font-[urbanist]">
+                        {formatCurrency(
+                          priceInSelectedCurrency,
+                          selectedCurrency
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-white font-[urbanist]">
+                        {Math.abs(transaction.amount).toFixed(0)}
+                      </td>
+                      <td className="py-3 px-4 text-white font-[urbanist]">
+                        {formatCurrency(
+                          valueInSelectedCurrency,
+                          selectedCurrency
+                        )}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`font-[urbanist] ${
+                            transaction.type === "BUY"
+                              ? "text-green-500"
+                              : transaction.type === "SELL"
+                              ? "text-red-500"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          {transaction.type === "BUY"
+                            ? "buy ↑"
+                            : transaction.type === "SELL"
+                            ? "sell ↓"
+                            : transaction.type}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </>
   );
