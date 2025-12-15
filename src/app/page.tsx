@@ -78,9 +78,9 @@ export default function Home() {
       {/* Hero Section */}
       <section
         id="hero"
-        className="min-h-screen max-w-7xl mx-auto px-8 flex flex-col py-16"
+        className="h-[calc(100vh-80px)] max-w-7xl mx-auto px-8 flex flex-col justify-between py-4 overflow-hidden"
       >
-        <div className="flex-1 flex items-center">
+        <div className="flex-1 flex items-center min-h-0 py-4">
           <div className="grid grid-cols-12 gap-8 w-full items-center">
             {/* Astronaut on left */}
             <div className="col-span-5 flex justify-center items-center">
@@ -88,7 +88,7 @@ export default function Home() {
             </div>
 
             {/* Content on right */}
-            <div className="col-span-7 flex flex-col gap-8">
+            <div className="col-span-7 flex flex-col gap-6">
               <h1 className="text-7xl font-hagrid leading-tight font-bold uppercase tracking-wide">
                 ANALYSE STOCKS DIFFERENTLY
               </h1>
@@ -114,14 +114,18 @@ export default function Home() {
         </div>
 
         {/* STCK SPACE text image */}
-        <div className="mt-16 w-full">
-          <div className="max-w-7xl mx-auto">
+        <div
+          className="flex items-end justify-center flex-shrink-0 pb-8"
+          style={{ height: "clamp(60px, 12vh, 120px)" }}
+        >
+          <div className="w-full max-w-7xl mx-auto h-full flex items-end mb-10">
             <Image
               src="/stockspacetext.png"
               alt="STCK SPACE"
               width={1200}
               height={200}
-              className="w-full h-auto"
+              className="w-auto h-full max-w-full object-contain"
+              style={{ maxHeight: "100%", width: "auto" }}
             />
           </div>
         </div>
