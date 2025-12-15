@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef } from "react";
 import Astronaut3D from "./components/Astronaut3D";
+import MenuItem from "./components/MenuItem";
 
 export default function Home() {
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
@@ -359,33 +360,13 @@ const Header = () => {
 
       {/* Navigation */}
       <nav className="flex space-x-2">
-        <button
-          className="font-space-mono text-lg text-foreground px-4 py-2 hover:text-gray-300 transition-colors cursor-pointer lowercase"
-          onClick={() => scrollToSection("hero")}
-        >
-          home
-        </button>
-        <button
-          className="font-space-mono text-lg text-foreground px-4 py-2 hover:text-gray-300 transition-colors cursor-pointer lowercase"
-          onClick={() => scrollToSection("about")}
-        >
-          about
-        </button>
-        <button
-          className="font-space-mono text-lg text-foreground px-4 py-2 hover:text-gray-300 transition-colors cursor-pointer lowercase"
-          onClick={() => scrollToSection("steps")}
-        >
-          demo
-        </button>
+        <MenuItem onClick={() => scrollToSection("hero")}>home</MenuItem>
+        <MenuItem onClick={() => scrollToSection("about")}>about</MenuItem>
+        <MenuItem onClick={() => scrollToSection("steps")}>demo</MenuItem>
       </nav>
 
       {/* Login */}
-      <Link
-        href="/login"
-        className="font-space-mono text-lg text-foreground hover:text-gray-300 transition-colors lowercase"
-      >
-        login
-      </Link>
+      <MenuItem href="/login">login</MenuItem>
     </header>
   );
 };
