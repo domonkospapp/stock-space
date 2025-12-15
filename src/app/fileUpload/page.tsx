@@ -217,8 +217,11 @@ export default function FileUpload() {
                   preload="metadata"
                   crossOrigin="anonymous"
                 >
-                  <source src="/videos/how-to.mov" type="video/quicktime" />
-                  <source src="/videos/how-to.mov" type="video/mp4" />
+                  <source
+                    src="/videos/how-to-long.mov"
+                    type="video/quicktime"
+                  />
+                  <source src="/videos/how-to-long.mov" type="video/mp4" />
                   <p className="text-center text-gray-400 mt-4">
                     Your browser doesn&apos;t support this video format.
                     <br />
@@ -229,7 +232,7 @@ export default function FileUpload() {
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
                   <button
-                    onClick={() => playVideoAtTime(2)}
+                    onClick={() => playVideoAtTime(8)}
                     className="bg-ci-purple hover:bg-ci-yellow w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors cursor-pointer group"
                   >
                     <span className="text-background font-bold text-lg group-hover:text-background">
@@ -237,15 +240,24 @@ export default function FileUpload() {
                     </span>
                   </button>
                   <h3 className="text-sm font-bold font-[hagrid] mb-1">
-                    Login
+                    Open Depotumzätze
                   </h3>
                   <p className="text-xs text-gray-300 font-[urbanist]">
-                    Access Flatex
+                    Login to{" "}
+                    <a
+                      href="https://flatex.at"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-ci-yellow hover:underline"
+                    >
+                      flatex.at
+                    </a>{" "}
+                    and open <strong>Depotumzätze</strong> under Konto & Depot
                   </p>
                 </div>
                 <div className="text-center">
                   <button
-                    onClick={() => playVideoAtTime(8)}
+                    onClick={() => playVideoAtTime(11)}
                     className="bg-ci-purple hover:bg-ci-yellow w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors cursor-pointer group"
                   >
                     <span className="text-background font-bold text-lg group-hover:text-background">
@@ -253,15 +265,15 @@ export default function FileUpload() {
                     </span>
                   </button>
                   <h3 className="text-sm font-bold font-[hagrid] mb-1">
-                    Export
+                    Set from filter back
                   </h3>
                   <p className="text-xs text-gray-300 font-[urbanist]">
-                    Get CSV file
+                    Select the full date range you want to export
                   </p>
                 </div>
                 <div className="text-center">
                   <button
-                    onClick={() => playVideoAtTime(12)}
+                    onClick={() => playVideoAtTime(19)}
                     className="bg-ci-purple hover:bg-ci-yellow w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors cursor-pointer group"
                   >
                     <span className="text-background font-bold text-lg group-hover:text-background">
@@ -269,10 +281,11 @@ export default function FileUpload() {
                     </span>
                   </button>
                   <h3 className="text-sm font-bold font-[hagrid] mb-1">
-                    Upload
+                    Export CSV
                   </h3>
                   <p className="text-xs text-gray-300 font-[urbanist]">
-                    Use file here
+                    Click on <strong>...</strong> and select{" "}
+                    <strong>CSV</strong> as the format
                   </p>
                 </div>
               </div>

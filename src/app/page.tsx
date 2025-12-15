@@ -71,8 +71,18 @@ export default function Home() {
             loop
             onEnded={() => setHoveredVideo(null)}
           >
-            <source src="/videos/how-to.mov" type="video/quicktime" />
-            <source src="/videos/how-to.mov" type="video/mp4" />
+            <source
+              src={
+                hoveredVideo === 2 ? "/videos/step-2.mov" : "/videos/how-to.mov"
+              }
+              type="video/quicktime"
+            />
+            <source
+              src={
+                hoveredVideo === 2 ? "/videos/step-2.mov" : "/videos/how-to.mov"
+              }
+              type="video/mp4"
+            />
             Your browser does not support the video tag.
           </video>
         </div>
