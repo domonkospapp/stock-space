@@ -21,9 +21,7 @@ function extractTicker(stockName: string): string {
 }
 
 export default function PortfolioHistory() {
-  const [selectedYear, setSelectedYear] = useState<number>(
-    new Date().getFullYear()
-  );
+  const [selectedYear, setSelectedYear] = useState<number>(0); // 0 = All Years
   const [selectedStock, setSelectedStock] = useState<string>("all");
 
   const selectedCurrency = useSettingsStore((s) => s.selectedCurrency);
