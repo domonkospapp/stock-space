@@ -17,6 +17,8 @@
   --color-ci-yellow: #E1FF8E;
   --color-ci-black: #292929;
   --color-ci-purple: #A3A2F9;
+  --color-ci-green: #6FD2A2;
+  --color-ci-red: #FA5422;
 }
 
 @media (prefers-color-scheme: dark) {

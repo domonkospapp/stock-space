@@ -229,7 +229,7 @@ export default function PortfolioHistory() {
               <div className="text-gray-400 font-[urbanist] text-sm">
                 Buy Total
               </div>
-              <div className="text-green-500 font-[hagrid] text-lg">
+              <div className="text-ci-green font-[hagrid] text-lg">
                 {formatCurrency(buyTotal, selectedCurrency)}
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function PortfolioHistory() {
               <div className="text-gray-400 font-[urbanist] text-sm">
                 Sell Total
               </div>
-              <div className="text-red-500 font-[hagrid] text-lg">
+              <div className="text-ci-red font-[hagrid] text-lg">
                 {formatCurrency(sellTotal, selectedCurrency)}
               </div>
             </div>
@@ -340,9 +340,9 @@ export default function PortfolioHistory() {
                         <span
                           className={`font-[urbanist] ${
                             transaction.type === "BUY"
-                              ? "text-green-500"
+                              ? "text-ci-green"
                               : transaction.type === "SELL"
-                              ? "text-red-500"
+                              ? "text-ci-red"
                               : "text-gray-400"
                           }`}
                         >
