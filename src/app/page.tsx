@@ -4,12 +4,18 @@ import { ArrowUpRightIcon } from "@phosphor-icons/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Astronaut3D from "./components/Astronaut3D";
 import MenuItem from "./components/MenuItem";
 import MenuWrapper from "./components/MenuWrapper";
 import { usePortfolioStore } from "../store/portfolioStore";
+import processedTransactions from "../utils/transactions/processTransactions";
+import { createPortfolioSummary } from "../utils/transactions/createPortfolioSummary";
+import { demoCsvTransactions } from "../utils/demoPortfolioData";
 
 export default function Home() {
+  const router = useRouter();
+  const setPortfolioData = usePortfolioStore((s) => s.setPortfolioData);
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -35,6 +41,20 @@ export default function Home() {
         video.currentTime = 0;
       }
     });
+  };
+
+  const handleDemoPortfolio = () => {
+    // Process the demo transactions
+    const processed = processedTransactions(demoCsvTransactions);
+
+    // Create portfolio summary
+    const summary = createPortfolioSummary(processed);
+
+    // Set the portfolio data in the store
+    setPortfolioData(summary, processed);
+
+    // Navigate to portfolio page
+    router.push("/portfolio");
   };
 
   return (
@@ -118,7 +138,10 @@ export default function Home() {
                   <span>Upload Flatex CSV</span>
                   <ArrowUpRightIcon className="w-5 h-5" weight="bold" />
                 </Link>
-                <button className="border border-foreground text-foreground px-6 py-4 cursor-pointer rounded-full font-space-mono hover:bg-foreground hover:text-[#1A1A1A] text-lg font-bold transition-colors">
+                <button
+                  onClick={handleDemoPortfolio}
+                  className="border border-foreground text-foreground px-6 py-4 cursor-pointer rounded-full font-space-mono hover:bg-foreground hover:text-[#1A1A1A] text-lg font-bold transition-colors"
+                >
                   Try Demo Portfolio
                 </button>
               </div>

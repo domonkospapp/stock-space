@@ -1,0 +1,128 @@
+import { CsvTransaction } from "./types";
+
+export const demoCsvTransactions: CsvTransaction[] = [
+  // Apple stock purchases
+  {
+    date: "15.01.2023",
+    stockName: "APPLE INC.",
+    isin: "US0378331005",
+    amount: 10,
+    price: 150.25,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  {
+    date: "20.03.2023",
+    stockName: "APPLE INC.",
+    isin: "US0378331005",
+    amount: 15,
+    price: 155.5,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  {
+    date: "10.06.2023",
+    stockName: "APPLE INC.",
+    isin: "US0378331005",
+    amount: 5,
+    price: 180.75,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  // Microsoft stock purchases
+  {
+    date: "05.02.2023",
+    stockName: "MICROSOFT CORP.",
+    isin: "US5949181045",
+    amount: 20,
+    price: 245.0,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  {
+    date: "18.05.2023",
+    stockName: "MICROSOFT CORP.",
+    isin: "US5949181045",
+    amount: 10,
+    price: 335.8,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  // Tesla stock purchases
+  {
+    date: "12.02.2023",
+    stockName: "TESLA INC.",
+    isin: "US88160R1014",
+    amount: 25,
+    price: 200.5,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  {
+    date: "25.04.2023",
+    stockName: "TESLA INC.",
+    isin: "US88160R1014",
+    amount: 15,
+    price: 165.3,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  // NVIDIA stock purchases
+  {
+    date: "08.03.2023",
+    stockName: "NVIDIA CORP.",
+    isin: "US67066G1040",
+    amount: 30,
+    price: 280.0,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  {
+    date: "22.07.2023",
+    stockName: "NVIDIA CORP.",
+    isin: "US67066G1040",
+    amount: 10,
+    price: 450.25,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  // Amazon stock purchases
+  {
+    date: "14.01.2023",
+    stockName: "AMAZON.COM INC.",
+    isin: "US0231351067",
+    amount: 50,
+    price: 95.5,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  {
+    date: "30.06.2023",
+    stockName: "AMAZON.COM INC.",
+    isin: "US0231351067",
+    amount: 25,
+    price: 130.75,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  // Google stock purchases
+  {
+    date: "03.02.2023",
+    stockName: "ALPHABET INC.",
+    isin: "US02079K3059",
+    amount: 20,
+    price: 95.0,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+  {
+    date: "17.05.2023",
+    stockName: "ALPHABET INC.",
+    isin: "US02079K3059",
+    amount: 15,
+    price: 120.4,
+    currency: "USD",
+    transactionInfo: "Kauf",
+  },
+];
+
