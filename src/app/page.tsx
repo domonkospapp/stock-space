@@ -39,7 +39,7 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen bg-[#1A1A1A] text-foreground relative"
+      className="min-h-screen text-foreground relative"
       onMouseMove={handleMouseMove}
       style={{
         backgroundImage: `
