@@ -27,13 +27,15 @@ export default function PortfolioTotalValue() {
   // Show 0 if no portfolio data
   if (positions.length === 0) {
     return (
-      <h1 className="text-8xl font-bold text-white font-[hagrid]">$ 0.00</h1>
+      <h1 className="text-8xl font-bold text-white font-[hagrid] whitespace-nowrap">
+        $ 0.00
+      </h1>
     );
   }
 
   return (
     <div>
-      <h1 className="text-8xl font-bold text-white font-[hagrid]">
+      <h1 className="text-8xl font-bold text-white font-[hagrid] whitespace-nowrap mt-6">
         {isAllCalculated ? (
           formatCurrency(
             selectedCurrency === "USD" ? totalInUSD : totalInEUR,

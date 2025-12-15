@@ -6,6 +6,8 @@ import Image from "next/image";
 import { useState, useRef } from "react";
 import Astronaut3D from "./components/Astronaut3D";
 import MenuItem from "./components/MenuItem";
+import MenuWrapper from "./components/MenuWrapper";
+import { usePortfolioStore } from "../store/portfolioStore";
 
 export default function Home() {
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
@@ -335,6 +337,10 @@ const StepExplanation = ({
 };
 
 const Header = () => {
+  const { positions, processedTransactions } = usePortfolioStore();
+  const hasPortfolioData =
+    positions.length > 0 || processedTransactions.length > 0;
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -343,30 +349,22 @@ const Header = () => {
   };
 
   return (
-    <header className="flex justify-between items-center py-8 px-8 w-full max-w-7xl mx-auto">
-      {/* Logo */}
-      <div className="flex items-center space-x-3">
-        <Image
-          src="/astronaut.svg"
-          alt="stck.space"
-          width={32}
-          height={32}
-          className="w-8 h-8"
-        />
-        <span className="font-space-mono text-xl text-foreground">
-          stck.space
-        </span>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex space-x-2">
+    <MenuWrapper>
+      {/* Navigation - Centered */}
+      <nav className="flex space-x-2 absolute left-1/2 transform -translate-x-1/2">
         <MenuItem onClick={() => scrollToSection("hero")}>home</MenuItem>
         <MenuItem onClick={() => scrollToSection("about")}>about</MenuItem>
         <MenuItem onClick={() => scrollToSection("steps")}>demo</MenuItem>
       </nav>
 
-      {/* Login */}
-      <MenuItem href="/login">login</MenuItem>
-    </header>
+      {/* Dashboard or Upload - Right aligned */}
+      <div className="ml-auto">
+        {hasPortfolioData ? (
+          <MenuItem href="/portfolio">dashboard</MenuItem>
+        ) : (
+          <MenuItem href="/fileUpload">upload</MenuItem>
+        )}
+      </div>
+    </MenuWrapper>
   );
 };

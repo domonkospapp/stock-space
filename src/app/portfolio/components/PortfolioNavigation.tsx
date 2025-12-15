@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import MenuItem from "../../components/MenuItem";
 
 export default function PortfolioNavigation() {
   const pathname = usePathname();
@@ -12,58 +12,35 @@ export default function PortfolioNavigation() {
   };
 
   return (
-    <div className="">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-6">
-          <h2 className="text-xl font-bold text-white font-[hagrid]">
-            stck.space
-          </h2>
-
-          {/* Navigation Links */}
-          <nav className="flex space-x-4">
-            <Link
-              href="/portfolio/growth"
-              className={`font-urbanist text-xl px-6 py-2 border border-white rounded-full transition-all cursor-pointer ${
-                isActive("/portfolio/growth")
-                  ? "bg-white text-background"
-                  : "text-white hover:bg-white hover:text-background"
-              }`}
-            >
-              growth
-            </Link>
-            <Link
-              href="/portfolio"
-              className={`font-urbanist text-xl px-6 py-2 border border-white rounded-full transition-all cursor-pointer ${
-                isActive("/portfolio")
-                  ? "bg-white text-background"
-                  : "text-white hover:bg-white hover:text-background"
-              }`}
-            >
-              allocation
-            </Link>
-            <Link
-              href="/portfolio/history"
-              className={`font-urbanist text-xl px-6 py-2 border border-white rounded-full transition-all cursor-pointer ${
-                isActive("/portfolio/history")
-                  ? "bg-white text-background"
-                  : "text-white hover:bg-white hover:text-background"
-              }`}
-            >
-              history
-            </Link>
-            <Link
-              href="/portfolio/settings"
-              className={`font-urbanist text-xl px-6 py-2 border border-white rounded-full transition-all cursor-pointer ${
-                isActive("/portfolio/settings")
-                  ? "bg-white text-background"
-                  : "text-white hover:bg-white hover:text-background"
-              }`}
-            >
-              settings
-            </Link>
-          </nav>
-        </div>
-      </div>
-    </div>
+    <nav className="flex space-x-2">
+      <MenuItem
+        href="/portfolio"
+        textColor="text-white"
+        active={isActive("/portfolio")}
+      >
+        allocation
+      </MenuItem>
+      <MenuItem
+        href="/portfolio/growth"
+        textColor="text-white"
+        active={isActive("/portfolio/growth")}
+      >
+        growth
+      </MenuItem>
+      <MenuItem
+        href="/portfolio/history"
+        textColor="text-white"
+        active={isActive("/portfolio/history")}
+      >
+        history
+      </MenuItem>
+      <MenuItem
+        href="/portfolio/settings"
+        textColor="text-white"
+        active={isActive("/portfolio/settings")}
+      >
+        settings
+      </MenuItem>
+    </nav>
   );
 }

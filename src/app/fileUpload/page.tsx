@@ -9,6 +9,8 @@ import { usePortfolioStore } from "../../store/portfolioStore";
 // import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import MenuWrapper from "../components/MenuWrapper";
+import MenuItem from "../components/MenuItem";
 
 export default function FileUpload() {
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -110,17 +112,10 @@ export default function FileUpload() {
 
   return (
     <div className="min-h-screen bg-ci-black text-white">
+      <MenuWrapper>
+        <MenuItem href="/">home</MenuItem>
+      </MenuWrapper>
       <main className="max-w-7xl mx-auto px-8 pt-8 pb-16">
-        {/* Brand Header */}
-        <div className="text-left mb-6">
-          <Link
-            href="/"
-            className="text-2xl font-bold text-white font-[hagrid] cursor-pointer hover:text-gray-300 transition-colors"
-          >
-            stck.space
-          </Link>
-        </div>
-
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-6xl font-bold font-[hagrid] mb-6">
