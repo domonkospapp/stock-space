@@ -300,7 +300,7 @@ export default function TransactionsChart({ transactions }: Props) {
         <h3 className="text-foreground font-[hagrid] text-4xl">
           Cumulative{" "}
           <span className="bg-foreground text-background px-2 text-3xl rounded-xl">
-            {ticker}
+            {stockName}
           </span>{" "}
           share count <br /> over time
         </h3>
