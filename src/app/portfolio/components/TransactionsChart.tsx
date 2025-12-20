@@ -294,7 +294,7 @@ export default function TransactionsChart({ transactions }: Props) {
     .sort((a, b) => b - a);
 
   return (
-    <div className="mt-24">
+    <div className="my-24">
       {/* Title with ticker highlight and percentage */}
       <div className="mb-12 flex items-start justify-between border-b-2 border-foreground pb-2">
         <h3 className="text-foreground font-[hagrid] text-4xl">
