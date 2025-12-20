@@ -18,6 +18,7 @@ export default function Home() {
   const setPortfolioData = usePortfolioStore((s) => s.setPortfolioData);
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [videoLoading, setVideoLoading] = useState(false);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -26,6 +27,7 @@ export default function Home() {
 
   const handlePlayButtonHover = (stepNumber: number) => {
     setHoveredVideo(stepNumber);
+    setVideoLoading(true);
     const video = videoRefs.current[stepNumber - 1];
     if (video) {
       video.currentTime = 0;
@@ -35,6 +37,7 @@ export default function Home() {
 
   const handlePlayButtonLeave = () => {
     setHoveredVideo(null);
+    setVideoLoading(false);
     videoRefs.current.forEach((video) => {
       if (video) {
         video.pause();
@@ -81,30 +84,53 @@ export default function Home() {
             top: mousePosition.y - 450,
           }}
         >
-          <video
-            ref={(el) => {
-              videoRefs.current[hoveredVideo - 1] = el;
-            }}
-            className="w-[640px] h-[384px] rounded-lg shadow-2xl"
-            autoPlay
-            muted
-            loop
-            onEnded={() => setHoveredVideo(null)}
-          >
-            <source
-              src={
-                hoveredVideo === 2 ? "/videos/step-2.mov" : "/videos/how-to.mov"
-              }
-              type="video/quicktime"
-            />
-            <source
-              src={
-                hoveredVideo === 2 ? "/videos/step-2.mov" : "/videos/how-to.mov"
-              }
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
+          <div className="relative w-[640px] h-[384px] rounded-2xl shadow-2xl overflow-hidden bg-[#2A2A2A]">
+            {videoLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-[#2A2A2A] z-10">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-12 h-12 border-4 border-foreground/20 border-t-foreground rounded-full animate-spin"></div>
+                  <p className="text-sm font-space-mono text-foreground/60">
+                    Loading video...
+                  </p>
+                </div>
+              </div>
+            )}
+            <video
+              ref={(el) => {
+                videoRefs.current[hoveredVideo - 1] = el;
+              }}
+              className="w-full h-full object-cover"
+              style={{
+                transform: "scale(1.111)",
+                transformOrigin: "center center",
+              }}
+              autoPlay
+              muted
+              loop
+              onLoadStart={() => setVideoLoading(true)}
+              onCanPlay={() => setVideoLoading(false)}
+              onWaiting={() => setVideoLoading(true)}
+              onPlaying={() => setVideoLoading(false)}
+              onEnded={() => {
+                setHoveredVideo(null);
+                setVideoLoading(false);
+              }}
+            >
+              <source
+                src={
+                  hoveredVideo === 2 ? "/videos/step-2.mov" : "/videos/how-to.mov"
+                }
+                type="video/quicktime"
+              />
+              <source
+                src={
+                  hoveredVideo === 2 ? "/videos/step-2.mov" : "/videos/how-to.mov"
+                }
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+          </div>
         </div>
       )}
 
