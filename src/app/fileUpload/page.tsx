@@ -119,13 +119,6 @@ export default function FileUpload() {
         <MenuItem href="/">home</MenuItem>
       </MenuWrapper>
       <main className="max-w-7xl mx-auto px-8 pt-24 pb-16">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-6xl font-bold font-[hagrid] mb-6">
-            Upload your data
-          </h1>
-        </div>
-
         {/* Main Upload Section - Horizontal Layout */}
         {!csvFile && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
@@ -247,51 +240,122 @@ export default function FileUpload() {
 
         {csvFile && (
           <>
-            {/* Save Portfolio Section - Show First */}
-            <div className="bg-ci-yellow rounded-2xl p-12 mb-12 text-center">
-              <h2 className="text-3xl font-bold font-[hagrid] mb-6 text-background">
-                Ready to Analyze Your Portfolio?
-              </h2>
-              <p className="text-xl font-[urbanist] text-background mb-8 max-w-2xl mx-auto">
-                Your data has been imported successfully!
-                <span className="block mt-2 text-lg">
-                  {csvTransactions.length} transactions processed into{" "}
-                  {portfolioSummary.length} portfolio positions.
-                </span>
+            {/* Import Complete Section */}
+            <div className="mb-12">
+              <h1 className="text-6xl font-bold font-[hagrid] mb-2 text-foreground">
+                Import complete
+              </h1>
+              <p className="text-lg font-space-mono text-gray-300 mb-8">
+                Dataset validated and ready for analysis.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button
-                  className="bg-background hover:bg-gray-200 text-ci-yellow text-xl font-bold font-[urbanist] px-8 py-4 rounded-full transition-colors inline-flex items-center space-x-3"
-                  onClick={() => {
-                    setPortfolioData(portfolioSummary, processedData);
-                    router.push("/portfolio");
-                  }}
-                >
-                  <span>Start Analyzing</span>
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M5 12H19M19 12L12 5M19 12L12 19"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
+              {/* Success Card */}
+              <div className="bg-[#2A2A2A]/80 backdrop-blur-sm border border-foreground/20 rounded-2xl p-12">
+                <h2 className="text-3xl font-bold font-[hagrid] mb-6 text-foreground text-center">
+                  Ready to Analyze Your Portfolio?
+                </h2>
+                <p className="text-lg font-space-mono text-foreground mb-8 text-center">
+                  Your data has been imported successfully!
+                </p>
 
-                <button
-                  className="border-2 border-background text-background hover:bg-background hover:text-ci-yellow text-lg font-bold font-[urbanist] px-6 py-3 rounded-full transition-colors"
-                  onClick={scrollToDataReview}
-                >
-                  Review Data First
-                </button>
+                {/* Checkmark List */}
+                <div className="space-y-4 mb-8 max-w-md mx-auto">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center flex-shrink-0">
+                      <svg
+                        className="w-4 h-4 text-background"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-foreground font-space-mono">
+                      {csvTransactions.length} transactions processed
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center flex-shrink-0">
+                      <svg
+                        className="w-4 h-4 text-background"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-foreground font-space-mono">
+                      {portfolioSummary.length} portfolio positions detected
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-foreground flex items-center justify-center flex-shrink-0">
+                      <svg
+                        className="w-4 h-4 text-background"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-foreground font-space-mono">
+                      No errors found
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <button
+                    className="bg-ci-yellow hover:bg-ci-yellow/80 text-background text-xl font-bold font-space-mono px-8 py-4 rounded-full transition-colors inline-flex items-center space-x-3"
+                    onClick={() => {
+                      setPortfolioData(portfolioSummary, processedData);
+                      router.push("/portfolio");
+                    }}
+                  >
+                    <span>Start analysing</span>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5 12H19M19 12L12 5M19 12L12 19"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+
+                  <button
+                    className="border-2 border-foreground bg-[#2A2A2A] text-foreground hover:bg-foreground hover:text-background text-lg font-bold font-space-mono px-6 py-3 rounded-full transition-colors"
+                    onClick={scrollToDataReview}
+                  >
+                    Review data first
+                  </button>
+                </div>
               </div>
             </div>
 
