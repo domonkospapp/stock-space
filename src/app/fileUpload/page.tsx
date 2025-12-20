@@ -20,6 +20,8 @@ export default function FileUpload() {
   const [activeTab, setActiveTab] = useState<string>("original");
   const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [activeStep, setActiveStep] = useState<number | null>(null);
   const router = useRouter();
 
   const setPortfolioData = usePortfolioStore((s) => s.setPortfolioData);
@@ -72,7 +74,8 @@ export default function FileUpload() {
     }
   };
 
-  const playVideoAtTime = (seconds: number) => {
+  const playVideoAtTime = (seconds: number, stepNumber: number) => {
+    setActiveStep(stepNumber);
     if (videoRef) {
       try {
         videoRef.currentTime = seconds;
@@ -115,180 +118,129 @@ export default function FileUpload() {
       <MenuWrapper>
         <MenuItem href="/">home</MenuItem>
       </MenuWrapper>
-      <main className="max-w-7xl mx-auto px-8 pt-8 pb-16">
+      <main className="max-w-7xl mx-auto px-8 pt-24 pb-16">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="mb-12">
           <h1 className="text-6xl font-bold font-[hagrid] mb-6">
-            Upload Your CSV
+            Upload your data
           </h1>
-          <p className="text-2xl font-[urbanist] text-gray-300 max-w-3xl mx-auto">
-            Import your Flatex transaction data and see your portfolio come to
-            life
-          </p>
         </div>
 
         {/* Main Upload Section - Horizontal Layout */}
         {!csvFile && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
             {/* File Upload Section */}
-            <div className="rounded-3xl p-8">
-              <h2 className="text-3xl font-bold font-[hagrid] mb-6 text-center">
-                Upload Your CSV
+            <div>
+              <h2 className="text-lg font-space-mono text-gray-300 mb-4">
+                Upload your CSV
               </h2>
-              <div className="text-center">
-                <div className="mb-8">
-                  <label htmlFor="csv-upload" className="cursor-pointer">
-                    <div
-                      className={`border-2 border-dashed rounded-2xl p-8 transition-colors h-64 flex flex-col items-center justify-center ${
-                        isDragOver
-                          ? "border-ci-yellow bg-ci-yellow/10"
-                          : "border-gray-600 hover:border-ci-yellow"
-                      }`}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                    >
-                      <div className="text-center">
-                        <svg
-                          className="w-12 h-12 mx-auto mb-4 text-gray-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                          />
-                        </svg>
-                        <p className="text-lg font-[urbanist] text-gray-300 mb-2">
-                          {csvFile
-                            ? `Selected: ${(csvFile as File).name}`
-                            : "Drop your CSV file here or click to browse"}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Only .csv files are supported
-                        </p>
-                      </div>
-                    </div>
-                  </label>
-                  <input
-                    id="csv-upload"
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </div>
-
-                {csvFile && (
-                  <div className="bg-ci-yellow text-background rounded-full px-6 py-3 inline-flex items-center space-x-2">
+              <div>
+                <label htmlFor="csv-upload" className="cursor-pointer">
+                  <div
+                    className={`border-2 border-dashed rounded-2xl p-12 transition-colors flex flex-col items-center justify-center relative ${
+                      isDragOver
+                        ? "border-foreground bg-foreground/5"
+                        : "border-foreground/50 hover:border-foreground"
+                    }`}
+                    style={{
+                      backgroundImage: `
+                        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)
+                      `,
+                      backgroundSize: "50px 50px",
+                      aspectRatio: "16 / 9",
+                      minHeight: "300px",
+                    }}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                  >
                     <svg
-                      className="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+                      className="w-16 h-16 mx-auto mb-6 text-foreground"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
                       <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                       />
                     </svg>
-                    <span className="font-[urbanist] font-bold">
-                      File uploaded successfully!
-                    </span>
+                    <p className="text-sm font-space-mono text-gray-300 text-center">
+                      Drop your CSV file or click here to browse
+                    </p>
                   </div>
-                )}
+                </label>
+                <input
+                  id="csv-upload"
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
               </div>
             </div>
 
             {/* Video Instructions Section */}
-            <div className="rounded-3xl p-8">
-              <h2 className="text-3xl font-bold font-[hagrid] mb-6 text-center">
-                How to Export from Flatex
+            <div>
+              <h2 className="text-lg font-space-mono text-gray-300 mb-4">
+                How to export from flatex
               </h2>
-              <div className="relative rounded-2xl overflow-hidden mb-6">
+              <div
+                className="border-2 border-foreground rounded-2xl overflow-hidden mb-6 relative"
+                style={{
+                  backgroundImage: `
+                    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)
+                  `,
+                  backgroundSize: "50px 50px",
+                  aspectRatio: "16 / 9",
+                  minHeight: "300px",
+                }}
+              >
+                {!isVideoPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <p className="text-sm font-space-mono text-gray-400">
+                      Video
+                    </p>
+                  </div>
+                )}
                 <video
                   ref={setVideoRef}
-                  className="w-full h-auto"
+                  className={`w-full h-full object-contain relative z-0 ${
+                    !isVideoPlaying ? "opacity-50" : "opacity-100"
+                  } transition-opacity`}
                   controls
                   poster="/flatex-export.jpg"
                   preload="metadata"
                   crossOrigin="anonymous"
+                  onPlay={() => setIsVideoPlaying(true)}
+                  onPause={() => {
+                    setIsVideoPlaying(false);
+                    setActiveStep(null);
+                  }}
+                  onEnded={() => {
+                    setIsVideoPlaying(false);
+                    setActiveStep(null);
+                  }}
                 >
                   <source
                     src="/videos/how-to-long.mov"
                     type="video/quicktime"
                   />
                   <source src="/videos/how-to-long.mov" type="video/mp4" />
-                  <p className="text-center text-gray-400 mt-4">
+                  <p className="text-center text-gray-400 mt-4 font-space-mono">
                     Your browser doesn&apos;t support this video format.
-                    <br />
-                    Please try downloading the video or use a different browser.
                   </p>
                 </video>
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <button
-                    onClick={() => playVideoAtTime(8)}
-                    className="bg-ci-purple hover:bg-ci-yellow w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors cursor-pointer group"
-                  >
-                    <span className="text-background font-bold text-lg group-hover:text-background">
-                      1
-                    </span>
-                  </button>
-                  <h3 className="text-sm font-bold font-[hagrid] mb-1">
-                    Open Depotumzätze
-                  </h3>
-                  <p className="text-xs text-gray-300 font-[urbanist]">
-                    Login to{" "}
-                    <a
-                      href="https://flatex.at"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-ci-yellow hover:underline"
-                    >
-                      flatex.at
-                    </a>{" "}
-                    and open <strong>Depotumzätze</strong> under Konto & Depot
-                  </p>
-                </div>
-                <div className="text-center">
-                  <button
-                    onClick={() => playVideoAtTime(11)}
-                    className="bg-ci-purple hover:bg-ci-yellow w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors cursor-pointer group"
-                  >
-                    <span className="text-background font-bold text-lg group-hover:text-background">
-                      2
-                    </span>
-                  </button>
-                  <h3 className="text-sm font-bold font-[hagrid] mb-1">
-                    Set from filter back
-                  </h3>
-                  <p className="text-xs text-gray-300 font-[urbanist]">
-                    Select the full date range you want to export
-                  </p>
-                </div>
-                <div className="text-center">
-                  <button
-                    onClick={() => playVideoAtTime(19)}
-                    className="bg-ci-purple hover:bg-ci-yellow w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 transition-colors cursor-pointer group"
-                  >
-                    <span className="text-background font-bold text-lg group-hover:text-background">
-                      3
-                    </span>
-                  </button>
-                  <h3 className="text-sm font-bold font-[hagrid] mb-1">
-                    Export CSV
-                  </h3>
-                  <p className="text-xs text-gray-300 font-[urbanist]">
-                    Click on <strong>...</strong> and select{" "}
-                    <strong>CSV</strong> as the format
-                  </p>
-                </div>
-              </div>
+              {/* Three-step guide */}
+              <ThreeStepGuide
+                playVideoAtTime={playVideoAtTime}
+                activeStep={activeStep}
+              />
             </div>
           </div>
         )}
@@ -609,3 +561,105 @@ export default function FileUpload() {
     </div>
   );
 }
+
+type StepButtonProps = {
+  stepNumber: number;
+  title: string;
+  description: string;
+  videoTime: number;
+  activeStep: number | null;
+  playVideoAtTime: (seconds: number, stepNumber: number) => void;
+};
+
+const StepButton = ({
+  stepNumber,
+  title,
+  description,
+  videoTime,
+  activeStep,
+  playVideoAtTime,
+}: StepButtonProps) => {
+  const isActive = activeStep === stepNumber;
+
+  return (
+    <button
+      onClick={() => playVideoAtTime(videoTime, stepNumber)}
+      className="flex-1 text-center relative z-10 cursor-pointer transition-opacity hover:opacity-80"
+    >
+      <div
+        className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 transition-colors ${
+          isActive
+            ? "bg-[#1A1A1A] border-0"
+            : "bg-transparent border-2 border-dashed border-foreground"
+        }`}
+      >
+        <span className="font-space-mono font-bold text-lg text-foreground">
+          {stepNumber}
+        </span>
+      </div>
+      <h3 className="text-sm font-space-mono mb-1 text-foreground">{title}</h3>
+      <p className="text-xs font-space-mono text-gray-400">{description}</p>
+    </button>
+  );
+};
+
+type ThreeStepGuideProps = {
+  playVideoAtTime: (seconds: number, stepNumber: number) => void;
+  activeStep: number | null;
+};
+
+const ThreeStepGuide = ({
+  playVideoAtTime,
+  activeStep,
+}: ThreeStepGuideProps) => {
+  return (
+    <div className="flex items-start justify-between relative pt-2">
+      {/* Connecting lines - between buttons only */}
+      {/* Line between step 1 and 2 - positioned from center of button 1 to center of button 2, minus circle radius and padding */}
+      <div
+        className="absolute h-0.5 bg-foreground z-0"
+        style={{
+          top: "32px", // pt-2 (8px) + half circle height (24px) = 32px
+          left: "calc(16.666% + 40px)",
+          width: "calc(33.333% - 80px)",
+        }}
+      ></div>
+      {/* Line between step 2 and 3 - positioned from center of button 2 to center of button 3, minus circle radius and padding */}
+      <div
+        className="absolute h-0.5 bg-foreground z-0"
+        style={{
+          top: "32px", // pt-2 (8px) + half circle height (24px) = 32px
+          left: "calc(50% + 40px)",
+          width: "calc(33.333% - 80px)",
+        }}
+      ></div>
+
+      <StepButton
+        stepNumber={1}
+        title="Open Depotumzätze"
+        description="Login to flatex.at and open Depotumzätze under Konto & Depot"
+        videoTime={8}
+        activeStep={activeStep}
+        playVideoAtTime={playVideoAtTime}
+      />
+
+      <StepButton
+        stepNumber={2}
+        title="Set from filter back"
+        description="Select the full date range you want to export"
+        videoTime={11}
+        activeStep={activeStep}
+        playVideoAtTime={playVideoAtTime}
+      />
+
+      <StepButton
+        stepNumber={3}
+        title="Export CSV"
+        description="Click on ... and select CSV as the format"
+        videoTime={19}
+        activeStep={activeStep}
+        playVideoAtTime={playVideoAtTime}
+      />
+    </div>
+  );
+};
