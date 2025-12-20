@@ -17,7 +17,7 @@ export default function FileUpload() {
   const [csvTransactions, setCsvTransactions] = useState<CsvTransaction[]>([]);
   const [processedData, setProcessedData] = useState<Transaction[]>([]);
   const [portfolioSummary, setPortfolioSummary] = useState<Position[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("original");
+  const [activeTab, setActiveTab] = useState<string>("summary");
   const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -108,9 +108,9 @@ export default function FileUpload() {
   };
 
   const tabs = [
-    { id: "original", label: "Raw Data", color: "bg-amber-300" },
-    { id: "processed", label: "Processed Data", color: "bg-purple-500" },
     { id: "summary", label: "Portfolio Summary", color: "bg-emerald-300" },
+    { id: "processed", label: "Processed Data", color: "bg-purple-500" },
+    { id: "original", label: "Raw Data", color: "bg-amber-300" },
   ];
 
   return (
@@ -350,7 +350,7 @@ export default function FileUpload() {
                   </button>
 
                   <button
-                    className="border-2 border-foreground bg-[#2A2A2A] text-foreground hover:bg-foreground hover:text-background text-lg font-bold font-space-mono px-6 py-3 rounded-full transition-colors"
+                    className="border-2 border-foreground bg-[#2A2A2A] text-foreground hover:bg-foreground hover:text-background text-xl font-bold font-space-mono px-8 py-4 rounded-full transition-colors"
                     onClick={scrollToDataReview}
                   >
                     Review data first
@@ -360,16 +360,16 @@ export default function FileUpload() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="rounded-2xl p-2 mb-8" data-tabs="true">
+            <div className="mb-8" data-tabs="true">
               <div className="flex space-x-2">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-8 py-4 font-bold font-[urbanist] text-lg rounded-full transition-all cursor-pointer border-2 ${
+                    className={`px-8 py-4 font-bold font-[urbanist] text-lg transition-all cursor-pointer border-b-2 ${
                       activeTab === tab.id
-                        ? "border-white text-white"
-                        : "border-transparent text-gray-300 hover:text-white"
+                        ? "text-white border-white"
+                        : "text-gray-300 hover:text-white border-transparent"
                     }`}
                   >
                     {tab.label}
@@ -383,7 +383,7 @@ export default function FileUpload() {
               {/* Original Data Tab */}
               {activeTab === "original" && (
                 <div>
-                  <h2 className="text-3xl font-bold font-[hagrid] mb-8 text-center">
+                  <h2 className="text-3xl font-bold font-[hagrid] mb-8 text-left">
                     Imported Data Transactions (Original - Unchanged)
                   </h2>
                   <div className="overflow-x-auto">
@@ -451,7 +451,7 @@ export default function FileUpload() {
               {/* Processed Data Tab */}
               {activeTab === "processed" && (
                 <div>
-                  <h2 className="text-3xl font-bold font-[hagrid] mb-8 text-center">
+                  <h2 className="text-3xl font-bold font-[hagrid] mb-8 text-left">
                     Processed Transactions
                   </h2>
                   <div className="overflow-x-auto">
@@ -541,7 +541,7 @@ export default function FileUpload() {
               {/* Portfolio Summary Tab */}
               {activeTab === "summary" && (
                 <div>
-                  <div className="mb-8 text-center">
+                  <div className="mb-8 text-left">
                     <h2 className="text-3xl font-bold font-[hagrid] mb-2">
                       Portfolio Summary
                     </h2>
