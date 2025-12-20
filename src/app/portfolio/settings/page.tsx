@@ -72,7 +72,7 @@ export default function PortfolioSettings() {
                 <div className="flex-1 flex flex-col items-center">
                   <button
                     onClick={() => setSelectedCurrency("USD")}
-                    className={`w-full py-6 rounded-full font-bold transition-all border-2 ${
+                    className={`w-full py-2 rounded-full font-bold transition-all border-2 ${
                       selectedCurrency === "USD"
                         ? "bg-ci-yellow border-ci-yellow"
                         : "border-white bg-[#292929]"
@@ -95,7 +95,7 @@ export default function PortfolioSettings() {
                 <div className="flex-1 flex flex-col items-center">
                   <button
                     onClick={() => setSelectedCurrency("EUR")}
-                    className={`w-full py-6 rounded-full font-bold transition-all border-2 ${
+                    className={`w-full py-2 rounded-full font-bold transition-all border-2 ${
                       selectedCurrency === "EUR"
                         ? "bg-ci-yellow border-ci-yellow"
                         : "border-white bg-[#292929]"
